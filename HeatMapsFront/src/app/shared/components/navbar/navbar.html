@@ -40,6 +40,14 @@
   </nav>
 
   <div class="sidebar-footer">
+
+    <button class="theme-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
+      <span class="material-icons">{{ isDark() ? 'light_mode' : 'dark_mode' }}</span>
+      @if (!isCollapsed()) {
+        <span>{{ isDark() ? 'Modo claro' : 'Modo oscuro' }}</span>
+      }
+    </button>
+
     @if (isLoggedIn()) {
       <div class="admin-info">
         <span class="material-icons">account_circle</span>

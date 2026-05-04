@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AllowedEmail } from '../models/admin.model';
-import { API_URL } from '../constants/api.constants';
+import { apiUrl as API_URL } from '../config';
 
 export interface AllowedEmailsListResponse {
   success: boolean;

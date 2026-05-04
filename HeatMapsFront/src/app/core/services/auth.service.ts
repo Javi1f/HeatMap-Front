@@ -6,7 +6,7 @@ import {
   RegisterRequest, RegisterResponse,
   SessionResponse
 } from '../models/admin.model';
-import { API_URL } from '../constants/api.constants';
+import { apiUrl as API_URL } from '../config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

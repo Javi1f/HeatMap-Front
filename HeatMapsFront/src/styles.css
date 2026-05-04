@@ -1,10 +1,60 @@
-:root {
-  --color-primary: #5C9EAD;
-  --color-secondary: #EA8C55;
-  --color-accent: #98C1D9;
-  --color-light: #E2F1AF;
-  --color-dark: #272D2D;
+/* ── Variables por tema ─────────────────────────────────────── */
+
+body[data-theme="dark"] {
+  --color-primary:        #E8640C;
+  --color-primary-hover:  #D05A0B;
+  --color-secondary:      #EA8C55;
+  --color-danger:         #E05A3A;
+
+  --color-text:           #F0F0F0;
+  --color-text-muted:     #888888;
+  --color-text-on-primary:#111111;
+
+  --bg-body:              #0f0f0f;
+  --bg-surface:           #1A1A1A;
+  --bg-surface-deep:      #141414;
+  --bg-surface-hover:     #202020;
+  --bg-input:             #1E1E1E;
+
+  --border:               #2a2a2a;
+  --border-2:             #333333;
+
+  /* Backward compat con var() usados en componentes */
+  --color-light:          #F0F0F0;
+  --color-accent:         #888888;
+  --color-dark:           #0f0f0f;
+
+  color-scheme: dark;
 }
+
+body[data-theme="light"] {
+  --color-primary:        #E8640C;
+  --color-primary-hover:  #C95800;
+  --color-secondary:      #D94F2A;
+  --color-danger:         #D94F2A;
+
+  --color-text:           #1A1A1A;
+  --color-text-muted:     #666666;
+  --color-text-on-primary:#FFFFFF;
+
+  --bg-body:              #F2F2F2;
+  --bg-surface:           #FFFFFF;
+  --bg-surface-deep:      #F5F5F5;
+  --bg-surface-hover:     #EFEFEF;
+  --bg-input:             #FFFFFF;
+
+  --border:               #E0E0E0;
+  --border-2:             #CCCCCC;
+
+  /* Backward compat */
+  --color-light:          #1A1A1A;
+  --color-accent:         #666666;
+  --color-dark:           #F2F2F2;
+
+  color-scheme: light;
+}
+
+/* ── Reset base ─────────────────────────────────────────────── */
 
 * {
   box-sizing: border-box;
@@ -14,17 +64,18 @@
 
 body {
   font-family: Roboto, sans-serif;
-  background-color: var(--color-dark);
-  color: var(--color-light);
+  background-color: var(--bg-body);
+  color: var(--color-text);
   min-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--color-primary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--color-secondary);
+  color: var(--color-primary-hover);
 }
