@@ -1,0 +1,25 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  margin-left: 240px;
+  padding: 2rem;
+  flex: 1;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+  margin-left: 64px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 64px;
+  }
+
+  .main-content.collapsed {
+    margin-left: 64px;
+  }
+}

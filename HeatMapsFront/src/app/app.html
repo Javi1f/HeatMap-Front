@@ -1,0 +1,10 @@
+<div class="app-layout">
+  <app-navbar />
+  <main [class.collapsed]="isCollapsed()" class="main-content">
+    <router-outlet />
+  </main>
+
+  @if (showLogin()) {
+    <app-login-modal />
+  }
+</div>

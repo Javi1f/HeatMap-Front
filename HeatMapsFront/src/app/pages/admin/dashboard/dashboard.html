@@ -1,0 +1,150 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      <span class="material-icons">dashboard</span>
+      Dashboard
+    </h1>
+    <p class="dashboard-subtitle">Panel de administración</p>
+  </div>
+
+  <section class="section-card">
+
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">mark_email_read</span>
+        <div>
+          <h2 class="section-title">Correos permitidos</h2>
+          <p class="section-desc">Solo estos correos pueden registrarse como administradores</p>
+        </div>
+      </div>
+      @if (!isLoading()) {
+        <span class="badge">{{ emails().length }}</span>
+      }
+    </div>
+
+    <form class="add-form" [formGroup]="addForm" (ngSubmit)="onAddEmail()">
+      <div class="add-input-group">
+        <div class="input-wrapper">
+          <span class="material-icons input-icon">alternate_email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="nuevo@empresa.com"
+            class="add-input"
+            [class.input-error]="f['email'].invalid && f['email'].touched"
+          />
+        </div>
+        <button type="submit" class="btn-add" [disabled]="isAdding()">
+          @if (isAdding()) {
+            <div class="spinner spinner-sm"></div>
+          } @else {
+            <span class="material-icons">add</span>
+            Añadir
+          }
+        </button>
+      </div>
+      @if (f['email'].invalid && f['email'].touched) {
+        <span class="field-error">Ingresa un correo electrónico válido.</span>
+      }
+      @if (addError()) {
+        <span class="field-error">{{ addError() }}</span>
+      }
+    </form>
+
+    @if (error()) {
+      <div class="alert alert-error">
+        <span class="material-icons">error_outline</span>
+        {{ error() }}
+        <button class="retry-btn" (click)="loadEmails()">Reintentar</button>
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando correos...</p>
+      </div>
+    }
+
+    @if (!isLoading() && emails().length > 0) {
+      <div class="table-wrapper">
+        <table class="emails-table">
+          <thead>
+          <tr>
+            <th>Correo</th>
+            <th>Añadido por</th>
+            <th>Fecha</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (email of emails(); track email.id) {
+              <tr [class.row-protected]="!canDelete(email)">
+                <td class="cell-email">
+                  <span class="material-icons email-icon">alternate_email</span>
+                  <span>{{ email.email }}</span>
+                  @if (email.email === currentAdminEmail()) {
+                    <span class="tag tag-you">tú</span>
+                  }
+                  @if (email.id === firstEmailId()) {
+                    <span class="tag tag-founder">fundador</span>
+                  }
+                </td>
+                <td class="cell-secondary">{{ email.addedBy }}</td>
+                <td class="cell-secondary">{{ email.createdAt | date: 'dd/MM/yyyy' }}</td>
+                <td class="cell-actions">
+                  @if (canDelete(email)) {
+                    <button
+                      class="btn-delete"
+                      [disabled]="deletingId() === email.id"
+                      (click)="requestDelete(email.id)"
+                      [title]="getDeleteTooltip(email)"
+                    >
+                      @if (deletingId() === email.id) {
+                        <div class="spinner spinner-sm"></div>
+                      } @else {
+                        <span class="material-icons">delete_outline</span>
+                      }
+                    </button>
+                  } @else {
+                    <span class="btn-delete btn-delete-disabled" [title]="getDeleteTooltip(email)">
+                      <span class="material-icons">lock_outline</span>
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (!isLoading() && emails().length === 0 && !error()) {
+      <div class="empty-state">
+        <span class="material-icons">inbox</span>
+        <p>No hay correos permitidos registrados</p>
+      </div>
+    }
+
+  </section>
+</div>
+
+@if (confirmDeleteId() !== null && emailBeingDeleted()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-wrap">
+        <span class="material-icons modal-icon-warn">warning_amber</span>
+      </div>
+      <h3>¿Eliminar correo?</h3>
+      <p>
+        El correo <strong>{{ emailBeingDeleted()!.email }}</strong> ya no podrá
+        usarse para registrarse como administrador.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancelar</button>
+        <button class="btn-danger" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

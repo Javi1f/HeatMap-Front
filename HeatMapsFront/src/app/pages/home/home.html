@@ -1,0 +1,91 @@
+<div class="home-container">
+  <section class="hero">
+    <div class="hero-overlay">
+      <h1 class="hero-title">Bienvenido a PlaceAt</h1>
+      <p class="hero-subtitle">Explora y analiza datos de ocupación de forma visual e intuitiva</p>
+    </div>
+  </section>
+
+  <section class="intro">
+    <div class="intro-card">
+      <h2>¿Qué es PlaceAt?</h2>
+      <p>
+        PlaceAt es una plataforma de visualización de datos de ocupación que permite
+        analizar patrones, tendencias y concentraciones de información en mapas interactivos.
+        Diseñada para administradores y usuarios que necesitan tomar decisiones basadas
+        en datos de ocupación de forma rápida y precisa.
+      </p>
+    </div>
+  </section>
+
+  <section class="cards-section">
+    <div class="cards-row">
+
+      <div class="action-card">
+        <div class="card-image">
+          <img
+            src="assets/login-placeholder.png"
+            alt="Iniciar sesión"
+          />
+        </div>
+        <div class="card-body">
+          <h3>Iniciar sesión</h3>
+          <p>Accede al panel de administración para gestionar usuarios y administrar los mapas de calor.</p>
+
+          @if (alreadyLoggedMsg()) {
+            <div class="already-logged-msg">
+              <span class="material-icons">info</span>
+              <a (click)="router.navigate(['/admin/dashboard'])">Ir al dashboard</a>
+            </div>
+          }
+
+
+          <button class="card-btn" (click)="openLogin()">
+            <span class="material-icons">login</span>
+            Iniciar sesión
+          </button>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="card-image">
+          <img
+            src="assets/maps-placeholder.png"
+            alt="Visualizar mapas"
+          />
+        </div>
+        <div class="card-body">
+          <h3>Visualizar mapas</h3>
+          <p>Explora los mapas de calor disponibles sin necesidad de iniciar sesión.</p>
+          <button class="card-btn secondary" (click)="goToMaps()">
+            <span class="material-icons">map</span>
+            Ver mapas
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="action-card-wide">
+      <div class="card-image-wide">
+        <img
+          src="assets/register-placeholder.png"
+          alt="Registrarse"
+        />
+      </div>
+      <div class="card-body">
+        <h3>Crear cuenta</h3>
+        @if (isLoggedIn()) {
+          <p>Estás dentro como administrador. Para crear otra cuenta primero se cerrará tu sesión actual.</p>
+        } @else {
+          <p>Regístrate como administrador para gestionar usuarios y administrar los mapas de calor de tu organización.</p>
+        }
+        <button class="card-btn register-btn" (click)="goToRegister()">
+          <span class="material-icons">{{ isLoggedIn() ? 'logout' : 'person_add' }}</span>
+          {{ isLoggedIn() ? 'Cerrar sesión y registrarse' : 'Registrarse' }}
+        </button>
+      </div>
+    </div>
+
+  </section>
+</div>

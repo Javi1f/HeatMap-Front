@@ -1,0 +1,30 @@
+:root {
+  --color-primary: #5C9EAD;
+  --color-secondary: #EA8C55;
+  --color-accent: #98C1D9;
+  --color-light: #E2F1AF;
+  --color-dark: #272D2D;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Roboto, sans-serif;
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-secondary);
+}

@@ -1,0 +1,76 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>Iniciar sesión</h2>
+      <button class="close-btn" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    @if (loginError()) {
+      <div class="alert alert-error">{{ loginError() }}</div>
+    }
+
+    @if (isBlocked()) {
+      <div class="alert alert-blocked">
+        Demasiados intentos. Espera <strong>{{ countdown() }}</strong> segundos.
+      </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label for="identifier">Correo o usuario</label>
+        <input
+          id="identifier"
+          type="text"
+          formControlName="identifier"
+          placeholder="correo@ejemplo.com o usuario"
+          [class.input-error]="f['identifier'].invalid && f['identifier'].touched"
+          [attr.disabled]="isBlocked() ? true : null"
+        />
+        @if (f['identifier'].invalid && f['identifier'].touched) {
+          <span class="error">Este campo es obligatorio.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Contraseña"
+            [class.input-error]="f['password'].invalid && f['password'].touched"
+            [attr.disabled]="isBlocked() ? true : null"
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            <span class="material-icons">
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
+          </button>
+        </div>
+        @if (f['password'].invalid && f['password'].touched) {
+          <span class="error">La contraseña es obligatoria.</span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isBlocked()"
+      >
+        Iniciar sesión
+      </button>
+
+    </form>
+
+    <div class="register-link">
+      ¿No tienes cuenta?
+      <a routerLink="/register" (click)="closeModal()">Regístrate</a>
+    </div>
+
+  </div>
+</div>

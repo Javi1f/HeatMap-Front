@@ -1,0 +1,66 @@
+@if (isMobileOpen()) {
+  <div class="mobile-overlay" (click)="toggleSidebar()"></div>
+}
+
+<aside
+  [class.collapsed]="isCollapsed() && !isMobileOpen()"
+  [class.mobile-open]="isMobileOpen()"
+>
+
+  <button class="toggle-btn" (click)="toggleSidebar()">
+    <span class="material-icons">
+      {{ isMobileOpen() ? 'close' : isCollapsed() ? 'chevron_right' : 'chevron_left' }}
+    </span>
+  </button>
+
+  <div class="sidebar-image">
+    <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'" />
+  </div>
+
+  <nav class="nav-links">
+    @for (item of navItems; track item.route) {
+      <a class="nav-item" (click)="navigate(item.route)">
+        <span class="material-icons">{{ item.icon }}</span>
+        @if (!isCollapsed() || isMobileOpen()) {
+          <span class="nav-label">{{ item.label }}</span>
+        }
+      </a>
+    }
+
+    @if (isLoggedIn()) {
+      @for (item of adminItems; track item.route) {
+        <a class="nav-item admin-item" (click)="navigate(item.route)">
+          <span class="material-icons">{{ item.icon }}</span>
+          @if (!isCollapsed() || isMobileOpen()) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    @if (isLoggedIn()) {
+      <div class="admin-info">
+        <span class="material-icons">account_circle</span>
+        @if (!isCollapsed() || isMobileOpen()) {
+          <span class="admin-name">{{ currentAdmin()?.username }}</span>
+        }
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <span class="material-icons">logout</span>
+        @if (!isCollapsed() || isMobileOpen()) {
+          <span>Cerrar sesión</span>
+        }
+      </button>
+    } @else {
+      <button class="login-btn" (click)="openLogin()">
+        <span class="material-icons">login</span>
+        @if (!isCollapsed() || isMobileOpen()) {
+          <span>Iniciar sesión</span>
+        }
+      </button>
+    }
+  </div>
+
+</aside>

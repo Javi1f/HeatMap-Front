@@ -1,0 +1,128 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Crear cuenta admin</h2>
+
+    @if (formError()) {
+      <div class="alert alert-error">{{ formError() }}</div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          placeholder="Nombre de usuario"
+          [class.input-error]="f['username'].invalid && f['username'].touched"
+        />
+        @if (f['username'].invalid && f['username'].touched) {
+          @if (f['username'].errors?.['required']) {
+            <span class="error">El usuario es obligatorio.</span>
+          } @else if (f['username'].errors?.['minlength']) {
+            <span class="error">Mínimo 3 caracteres.</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+          [class.input-error]="f['email'].invalid && f['email'].touched"
+        />
+        @if (f['email'].invalid && f['email'].touched) {
+          @if (f['email'].errors?.['required']) {
+            <span class="error">El correo es obligatorio.</span>
+          } @else if (f['email'].errors?.['email'] || f['email'].errors?.['pattern']) {
+            <span class="error">Ingresa un correo válido.</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Contraseña"
+            [class.input-error]="f['password'].invalid && f['password'].touched"
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (f['password'].invalid && f['password'].touched) {
+          @if (f['password'].errors?.['required']) {
+            <span class="error">La contraseña es obligatoria.</span>
+          } @else if (f['password'].errors?.['minlength']) {
+            <span class="error">Mínimo 8 caracteres.</span>
+          } @else if (f['password'].errors?.['pattern']) {
+            <span class="error">Debe incluir mayúscula, minúscula, número y carácter especial (&#64;$!%*?&).</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar contraseña</label>
+        <div class="input-wrapper">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Repite la contraseña"
+            [class.input-error]="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched"
+          />
+          <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
+            {{ showConfirmPassword() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched) {
+          <span class="error">Las contraseñas no coinciden.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary">Registrarse</button>
+
+    </form>
+  </div>
+</div>
+
+@if (showModal()) {
+  <div class="modal-overlay" (click)="onCloseModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <h3>Verificación de correo</h3>
+      <p>Ingresa el código enviado a <strong>{{ registerForm.value.email }}</strong></p>
+
+      <div class="attempts">
+        Intentos restantes:
+        <span [class.attempts-low]="attemptsLeft() === 1">{{ attemptsLeft() }}</span>
+      </div>
+
+      <input
+        type="text"
+        [(ngModel)]="verificationCodeValue"
+        placeholder="Código de verificación"
+        maxlength="5"
+        class="code-input"
+      />
+
+      @if (verificationError()) {
+        <span class="error">{{ verificationError() }}</span>
+      }
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="onCloseModal()">Cancelar</button>
+        <button class="btn-primary" (click)="onVerify()">Verificar</button>
+      </div>
+
+    </div>
+  </div>
+}
