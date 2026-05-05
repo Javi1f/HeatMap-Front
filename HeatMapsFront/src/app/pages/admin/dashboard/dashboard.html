@@ -73,23 +73,25 @@
           <thead>
           <tr>
             <th>Correo</th>
-            <th>Añadido por</th>
-            <th>Fecha</th>
+            <th class="col-secondary">Añadido por</th>
+            <th class="col-secondary">Fecha</th>
             <th class="col-actions">Acciones</th>
           </tr>
           </thead>
           <tbody>
             @for (email of emails(); track email.id) {
               <tr [class.row-protected]="!canDelete(email)">
-                <td class="cell-email">
-                  <span class="material-icons email-icon">alternate_email</span>
-                  <span>{{ email.email }}</span>
-                  @if (email.email === currentAdminEmail()) {
-                    <span class="tag tag-you">tú</span>
-                  }
-                  @if (email.id === firstEmailId()) {
-                    <span class="tag tag-founder">fundador</span>
-                  }
+                <td>
+                  <div class="cell-email">
+                    <span class="material-icons email-icon">alternate_email</span>
+                    <span class="email-text">{{ email.email }}</span>
+                    @if (email.email === currentAdminEmail()) {
+                      <span class="tag tag-you">tú</span>
+                    }
+                    @if (email.id === firstEmailId()) {
+                      <span class="tag tag-founder">fundador</span>
+                    }
+                  </div>
                 </td>
                 <td class="cell-secondary">{{ email.addedBy }}</td>
                 <td class="cell-secondary">{{ email.createdAt | date: 'dd/MM/yyyy' }}</td>

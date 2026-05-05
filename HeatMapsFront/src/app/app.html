@@ -3,7 +3,6 @@
   <main [class.collapsed]="isCollapsed()" class="main-content">
     <router-outlet />
   </main>
-
   @if (showLogin()) {
     <app-login-modal />
   }

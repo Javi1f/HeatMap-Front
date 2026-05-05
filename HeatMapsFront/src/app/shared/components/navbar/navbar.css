@@ -176,6 +176,23 @@ aside.mobile-open { width: 100vw !important; z-index: 150; }
 }
 
 @media (max-width: 768px) {
-  aside            { width: 64px; }
-  aside.mobile-open{ width: 100vw !important; }
+  aside             { width: 64px; }
+  aside.mobile-open { width: min(280px, 100vw) !important; }
+
+  .toggle-btn {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .nav-item,
+  .theme-btn,
+  .logout-btn,
+  .login-btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  aside.mobile-open { width: 100vw !important; }
 }
