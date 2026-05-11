@@ -20,7 +20,6 @@ export class CryptoService {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const plain = new TextEncoder().encode(JSON.stringify(data));
 
-    // Web Crypto devuelve: ciphertext || authTag (authTag = últimos 16 bytes)
     const encrypted = new Uint8Array(
       await crypto.subtle.encrypt({ name: 'AES-GCM', iv, tagLength: 128 }, key, plain)
     );
@@ -28,7 +27,6 @@ export class CryptoService {
     const ciphertext = encrypted.slice(0, encrypted.length - 16);
     const authTag    = encrypted.slice(encrypted.length - 16);
 
-    // Formato del backend: IV(12) | AuthTag(16) | Ciphertext(N)
     const combined = new Uint8Array(12 + 16 + ciphertext.length);
     combined.set(iv,         0);
     combined.set(authTag,    12);
@@ -45,7 +43,6 @@ export class CryptoService {
     const authTag    = buf.slice(12, 28);
     const ciphertext = buf.slice(28);
 
-    // Web Crypto espera: ciphertext || authTag
     const combined = new Uint8Array(ciphertext.length + 16);
     combined.set(ciphertext, 0);
     combined.set(authTag, ciphertext.length);

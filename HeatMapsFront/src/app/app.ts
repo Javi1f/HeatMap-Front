@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.themeService.init(); // aplica el tema guardado al arrancar
+    this.themeService.init();
     if (this.authService.getToken()) {
       this.authService.checkSession().subscribe({ error: () => {} });
     }
