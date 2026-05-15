@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "prestart": "node -r dotenv/config -e \"const f=require('fs'),p=process.env;if(!p.API_URL||!p.ENCRYPTION_KEY){console.error('ERROR: faltan API_URL o ENCRYPTION_KEY en .env');process.exit(1);}f.writeFileSync('src/app/core/config.ts','export const apiUrl='+JSON.stringify(p.API_URL+'/api')+';\\nexport const encryptionKey='+JSON.stringify(p.ENCRYPTION_KEY)+';\\n');console.log('config.ts generado desde .env');\"",
+    "set-env": "node -r dotenv/config -e \"const f=require('fs'),p=process.env;if(!p.API_URL||!p.ENCRYPTION_KEY){console.error('ERROR: faltan API_URL o ENCRYPTION_KEY en .env');process.exit(1);}f.writeFileSync('src/app/core/config.ts','export const apiUrl='+JSON.stringify(p.API_URL+'/api')+';\\nexport const encryptionKey='+JSON.stringify(p.ENCRYPTION_KEY)+';\\n');console.log('config.ts generado desde .env');\"",
+    "prestart": "npm run set-env",
+    "prebuild": "npm run set-env",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
