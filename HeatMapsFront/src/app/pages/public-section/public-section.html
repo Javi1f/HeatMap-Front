@@ -1,1 +1,146 @@
-<p>Prueba para github</p>
+<div class="public-container">
+
+  <div class="public-header">
+    <h1 class="public-title">
+      <span class="material-icons" aria-hidden="true">sensors</span>
+      Sensores en tiempo real
+    </h1>
+    <div class="status-bar">
+      <span class="status-dot" [class.connected]="isConnected()" role="status"
+            [attr.aria-label]="isConnected() ? 'Conectado' : 'Desconectado'">
+      </span>
+      <span class="status-text">{{ isConnected() ? 'Conectado' : 'Desconectado' }}</span>
+      @if (lastUpdated()) {
+        <span class="last-updated">· Última lectura: {{ lastUpdated() | date:'HH:mm:ss' }}</span>
+      }
+    </div>
+  </div>
+
+  <section class="sensor-card">
+
+    @if (sensorList().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons" aria-hidden="true">wifi_off</span>
+        @if (isConnected()) {
+          <p>Esperando datos de los sensores…</p>
+          <span class="empty-hint">Los datos aparecerán aquí en cuanto lleguen lecturas</span>
+        } @else {
+          <p>Sin conexión al servidor</p>
+          <span class="empty-hint">Intentando reconectar…</span>
+        }
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table class="sensor-table" aria-label="Lecturas de sensores en tiempo real">
+          <thead>
+            <tr>
+              <th class="col-expand" scope="col"></th>
+              <th scope="col">Sensor</th>
+              <th class="col-num" scope="col">Dispositivos</th>
+              <th class="col-num hide-sm" scope="col">RSSI prom.</th>
+              <th class="col-num hide-sm" scope="col">Bytes</th>
+              <th class="col-time" scope="col">Hora</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sensor of sensorList(); track sensor.sensor_id) {
+              <tr class="sensor-row"
+                  [class.expanded]="isExpanded(sensor.sensor_id)"
+                  (click)="toggleExpand(sensor.sensor_id)"
+                  (keydown.enter)="toggleExpand(sensor.sensor_id)"
+                  (keydown.space)="toggleExpand(sensor.sensor_id)"
+                  tabindex="0"
+                  role="button"
+                  [attr.aria-expanded]="isExpanded(sensor.sensor_id)"
+                  [attr.aria-label]="'Sensor ' + sensor.sensor_id">
+                <td class="cell-expand" aria-hidden="true">
+                  <span class="material-icons expand-icon"
+                        [class.rotated]="isExpanded(sensor.sensor_id)">
+                    chevron_right
+                  </span>
+                </td>
+                <td>
+                  <div class="cell-sensor">
+                    <span class="live-dot" aria-hidden="true"></span>
+                    <span class="sensor-id">{{ sensor.sensor_id }}</span>
+                  </div>
+                </td>
+                <td class="col-num">
+                  <span class="device-count">{{ sensor.total_devices }}</span>
+                </td>
+                <td class="col-num hide-sm">
+                  @if (averageRssi(sensor); as rssi) {
+                    <span class="rssi-badge" [ngClass]="rssiClass(rssi)">{{ rssi }} dBm</span>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="col-num hide-sm">{{ formatBytes(sensor.bytes_received) }}</td>
+                <td class="col-time">{{ sensor.timestamp }}</td>
+              </tr>
+
+              @if (isExpanded(sensor.sensor_id)) {
+                <tr class="devices-row">
+                  <td colspan="6" class="devices-cell">
+                    <div class="devices-container">
+                      <p class="devices-title">
+                        <span class="material-icons" aria-hidden="true">devices</span>
+                        Dispositivos detectados ({{ sensor.devices.length }})
+                      </p>
+
+                      @if (sensor.devices.length === 0) {
+                        <p class="text-muted" style="font-size:0.88rem;padding:0.5rem 0">
+                          Sin dispositivos en esta lectura.
+                        </p>
+                      } @else {
+                        <div class="devices-table-wrapper">
+                          <table class="devices-table"
+                                 [attr.aria-label]="'Dispositivos del sensor ' + sensor.sensor_id">
+                            <thead>
+                              <tr>
+                                <th scope="col">MAC</th>
+                                <th scope="col">RSSI</th>
+                                <th scope="col">Canal</th>
+                                <th class="hide-sm" scope="col">Tipo</th>
+                                <th class="hide-sm" scope="col">Paquetes</th>
+                                <th scope="col">Aleatorio</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for (device of sensor.devices; track device.mac) {
+                                <tr>
+                                  <td class="cell-mac">{{ device.mac }}</td>
+                                  <td>
+                                    <span class="rssi-badge"
+                                          [ngClass]="rssiClass(device.rssi)">
+                                      {{ device.rssi }}
+                                    </span>
+                                  </td>
+                                  <td>{{ device.channel }}</td>
+                                  <td class="hide-sm">{{ device.type }}</td>
+                                  <td class="hide-sm">{{ device.packets }}</td>
+                                  <td>
+                                    <span class="material-icons rand-icon"
+                                          [class.rand-yes]="device.randomized"
+                                          [attr.aria-label]="device.randomized ? 'MAC aleatoria' : 'MAC fija'">
+                                      {{ device.randomized ? 'shuffle' : 'tag' }}
+                                    </span>
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </section>
+</div>
