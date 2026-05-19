@@ -28,12 +28,12 @@ import { SensorData } from '../../socket/sensor-data.model';
  * @param rssi - Valor RSSI en dBm.
  * @returns Nombre de la clase CSS: `rssi-excellent` | `rssi-good` | `rssi-fair` | `rssi-poor`.
  */
-function rssiClass(rssi: number): string {
+const rssiClass = (rssi: number): string => {
   if (rssi >= -50) return 'rssi-excellent';
   if (rssi >= -70) return 'rssi-good';
   if (rssi >= -85) return 'rssi-fair';
   return 'rssi-poor';
-}
+};
 
 /**
  * Componente de fila expandida (selector de atributo) para la sub-tabla de dispositivos.

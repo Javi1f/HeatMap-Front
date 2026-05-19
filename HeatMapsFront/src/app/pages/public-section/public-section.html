@@ -79,9 +79,8 @@
                 <td class="col-time">{{ sensor.timestamp }}</td>
               </tr>
 
-              @if (isExpanded(sensor.sensor_id)) {
-                <tr class="devices-row" appSensorDevicesRow [sensor]="sensor"></tr>
-              }
+              <tr class="devices-row" appSensorDevicesRow [sensor]="sensor"
+                  [hidden]="!isExpanded(sensor.sensor_id)"></tr>
             }
           </tbody>
         </table>

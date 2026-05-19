@@ -23,34 +23,12 @@
       }
     </div>
 
-    <form class="add-form" [formGroup]="addForm" (ngSubmit)="onAddEmail()">
-      <div class="add-input-group">
-        <div class="input-wrapper">
-          <span class="material-icons input-icon">alternate_email</span>
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="nuevo@empresa.com"
-            class="add-input"
-            [class.input-error]="f['email'].invalid && f['email'].touched"
-          />
-        </div>
-        <button type="submit" class="btn-add" [disabled]="isAdding()">
-          @if (isAdding()) {
-            <div class="spinner spinner-sm"></div>
-          } @else {
-            <span class="material-icons">add</span>
-            Añadir
-          }
-        </button>
-      </div>
-      @if (f['email'].invalid && f['email'].touched) {
-        <span class="field-error">Ingresa un correo electrónico válido.</span>
-      }
-      @if (addError()) {
-        <span class="field-error">{{ addError() }}</span>
-      }
-    </form>
+    <app-add-email-form
+      [addForm]="addForm"
+      [isAdding]="isAdding()"
+      [addError]="addError()"
+      (formSubmit)="onAddEmail()">
+    </app-add-email-form>
 
     @if (error()) {
       <div class="alert alert-error">
@@ -58,16 +36,12 @@
         {{ error() }}
         <button class="retry-btn" (click)="loadEmails()">Reintentar</button>
       </div>
-    }
-
-    @if (isLoading()) {
+    } @else if (isLoading()) {
       <div class="loading-state">
         <div class="spinner"></div>
         <p>Cargando correos...</p>
       </div>
-    }
-
-    @if (!isLoading() && emails().length > 0) {
+    } @else if (emails().length > 0) {
       <div class="table-wrapper">
         <table class="emails-table">
           <thead>
@@ -94,9 +68,7 @@
           </tbody>
         </table>
       </div>
-    }
-
-    @if (!isLoading() && emails().length === 0 && !error()) {
+    } @else {
       <div class="empty-state">
         <span class="material-icons">inbox</span>
         <p>No hay correos permitidos registrados</p>
@@ -106,21 +78,9 @@
   </section>
 </div>
 
-@if (confirmDeleteId() !== null && emailBeingDeleted()) {
-  <div class="modal-overlay" (click)="cancelDelete()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-icon-wrap">
-        <span class="material-icons modal-icon-warn">warning_amber</span>
-      </div>
-      <h3>¿Eliminar correo?</h3>
-      <p>
-        El correo <strong>{{ emailBeingDeleted()?.email }}</strong> ya no podrá
-        usarse para registrarse como administrador.
-      </p>
-      <div class="modal-actions">
-        <button class="btn-secondary" (click)="cancelDelete()">Cancelar</button>
-        <button class="btn-danger" (click)="confirmDelete()">Eliminar</button>
-      </div>
-    </div>
-  </div>
-}
+<app-delete-confirm-modal
+  [email]="emailBeingDeleted()"
+  [hidden]="confirmDeleteId() === null"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()">
+</app-delete-confirm-modal>

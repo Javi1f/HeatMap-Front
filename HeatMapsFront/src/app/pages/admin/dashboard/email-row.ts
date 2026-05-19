@@ -68,5 +68,5 @@ export class EmailRowComponent {
    * Emite el `id` del correo cuando el usuario hace clic en el botón "Eliminar".
    * El componente padre gestiona el flujo de confirmación con modal.
    */
-  @Output() deleteRequested = new EventEmitter<number>();
+  @Output() readonly deleteRequested = new EventEmitter<number>();
 }

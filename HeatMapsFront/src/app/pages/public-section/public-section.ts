@@ -40,11 +40,11 @@ import { SensorDevicesRowComponent } from './sensor-devices-row';
  * @param bytes - Número de bytes a formatear.
  * @returns Cadena con la unidad: `"1023 B"`, `"1.5 KB"`, `"2.34 MB"`, etc.
  */
-function formatBytes(bytes: number): string {
+const formatBytes = (bytes: number): string => {
   if (bytes < 1024)       return `${bytes} B`;
   if (bytes < 1_048_576)  return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1_048_576).toFixed(2)} MB`;
-}
+};
 
 /**
  * Calcula el RSSI promedio de todos los dispositivos de una lectura.
@@ -53,11 +53,11 @@ function formatBytes(bytes: number): string {
  * @returns El RSSI promedio redondeado al entero más cercano,
  *          o `null` si la lectura no contiene dispositivos.
  */
-function averageRssi(data: SensorData): number | null {
+const averageRssi = (data: SensorData): number | null => {
   if (data.devices.length === 0) return null;
   const sum = data.devices.reduce((acc: number, d: SensorDevice) => acc + d.rssi, 0);
   return Math.round(sum / data.devices.length);
-}
+};
 
 /**
  * Devuelve la clase CSS de calidad para un valor RSSI dado.
@@ -72,12 +72,12 @@ function averageRssi(data: SensorData): number | null {
  * @param rssi - Valor RSSI en dBm (número negativo).
  * @returns Nombre de la clase CSS correspondiente a la calidad de la señal.
  */
-function rssiClass(rssi: number): string {
+const rssiClass = (rssi: number): string => {
   if (rssi >= -50) return 'rssi-excellent';
   if (rssi >= -70) return 'rssi-good';
   if (rssi >= -85) return 'rssi-fair';
   return 'rssi-poor';
-}
+};
 
 /**
  * Componente de la sección pública de monitoreo de sensores.

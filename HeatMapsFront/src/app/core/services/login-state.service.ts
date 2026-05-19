@@ -31,6 +31,7 @@ import { AuthService } from './auth.service';
  * Provisto a nivel de componente (`providers: [LoginStateService]`) para que
  * cada instancia del formulario (página y modal) tenga su propio estado aislado.
  */
+// skipcq: JS-0579 — providedIn: null is intentional; service is component-scoped via providers[]
 @Injectable({ providedIn: null })
 export class LoginStateService {
   /** Formulario reactivo con los campos `identifier` y `password`. */

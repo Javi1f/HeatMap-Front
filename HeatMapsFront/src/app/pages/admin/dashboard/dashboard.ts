@@ -28,6 +28,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AllowedEmailsService } from '../../../core/services/allowed-emails.service';
 import { AllowedEmail } from '../../../core/models/admin.model';
 import { EmailRowComponent } from './email-row';
+import { AddEmailFormComponent } from './add-email-form';
+import { DeleteConfirmModalComponent } from './delete-confirm-modal';
 
 /**
  * Componente del dashboard de administración.
@@ -36,7 +38,7 @@ import { EmailRowComponent } from './email-row';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent],
+  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -114,8 +116,13 @@ export class Dashboard implements OnInit {
    * Acceso directo a los controles del formulario de añadir correo.
    * Conveniente para verificar el estado de validación en la plantilla.
    */
+  /** Acceso directo a los controles del formulario de añadir correo. */
   get f() { return this.addForm.controls; }
 
+  /**
+   * Carga la lista de correos permitidos al inicializar el componente.
+   * @see {@link loadEmails}
+   */
   ngOnInit(): void {
     this.loadEmails();
   }
