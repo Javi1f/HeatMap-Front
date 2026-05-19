@@ -1,0 +1,34 @@
+<td>
+  <div class="cell-email">
+    <span class="material-icons email-icon">alternate_email</span>
+    <span class="email-text">{{ email.email }}</span>
+    @if (isCurrentUser) {
+      <span class="tag tag-you">tú</span>
+    }
+    @if (isFounder) {
+      <span class="tag tag-founder">fundador</span>
+    }
+  </div>
+</td>
+<td class="cell-secondary">{{ email.addedBy }}</td>
+<td class="cell-secondary">{{ email.createdAt | date: 'dd/MM/yyyy' }}</td>
+<td class="cell-actions">
+  @if (canDelete) {
+    <button
+      class="btn-delete"
+      [disabled]="deletingId === email.id"
+      (click)="deleteRequested.emit(email.id)"
+      [title]="tooltip"
+    >
+      @if (deletingId === email.id) {
+        <div class="spinner spinner-sm"></div>
+      } @else {
+        <span class="material-icons">delete_outline</span>
+      }
+    </button>
+  } @else {
+    <span class="btn-delete btn-delete-disabled" [title]="tooltip">
+      <span class="material-icons">lock_outline</span>
+    </span>
+  }
+</td>

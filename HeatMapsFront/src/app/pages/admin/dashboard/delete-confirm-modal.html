@@ -1,0 +1,16 @@
+<div class="modal-overlay" (click)="deleteCancelled.emit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-icon-wrap">
+      <span class="material-icons modal-icon-warn">warning_amber</span>
+    </div>
+    <h3>¿Eliminar correo?</h3>
+    <p>
+      El correo <strong>{{ email?.email }}</strong> ya no podrá
+      usarse para registrarse como administrador.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="deleteCancelled.emit()">Cancelar</button>
+      <button class="btn-danger" (click)="deleteConfirmed.emit()">Eliminar</button>
+    </div>
+  </div>
+</div>

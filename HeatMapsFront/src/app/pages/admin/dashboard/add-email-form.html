@@ -1,0 +1,28 @@
+<form class="add-form" [formGroup]="addForm" (ngSubmit)="formSubmit.emit()">
+  <div class="add-input-group">
+    <div class="input-wrapper">
+      <span class="material-icons input-icon">alternate_email</span>
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="nuevo@empresa.com"
+        class="add-input"
+        [class.input-error]="f['email'].invalid && f['email'].touched"
+      />
+    </div>
+    <button type="submit" class="btn-add" [disabled]="isAdding">
+      @if (isAdding) {
+        <div class="spinner spinner-sm"></div>
+      } @else {
+        <span class="material-icons">add</span>
+        Añadir
+      }
+    </button>
+  </div>
+  @if (f['email'].invalid && f['email'].touched) {
+    <span class="field-error">Ingresa un correo electrónico válido.</span>
+  }
+  @if (addError) {
+    <span class="field-error">{{ addError }}</span>
+  }
+</form>

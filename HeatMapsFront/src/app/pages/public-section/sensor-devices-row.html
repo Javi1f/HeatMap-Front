@@ -1,0 +1,52 @@
+<td colspan="6" class="devices-cell">
+  <div class="devices-container">
+    <p class="devices-title">
+      <span class="material-icons" aria-hidden="true">devices</span>
+      Dispositivos detectados ({{ sensor.devices.length }})
+    </p>
+
+    @if (sensor.devices.length === 0) {
+      <p class="text-muted" style="font-size:0.88rem;padding:0.5rem 0">
+        Sin dispositivos en esta lectura.
+      </p>
+    } @else {
+      <div class="devices-table-wrapper">
+        <table class="devices-table"
+               [attr.aria-label]="'Dispositivos del sensor ' + sensor.sensor_id">
+          <thead>
+            <tr>
+              <th scope="col">MAC</th>
+              <th scope="col">RSSI</th>
+              <th scope="col">Canal</th>
+              <th class="hide-sm" scope="col">Tipo</th>
+              <th class="hide-sm" scope="col">Paquetes</th>
+              <th scope="col">Aleatorio</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (device of sensor.devices; track device.mac) {
+              <tr>
+                <td class="cell-mac">{{ device.mac }}</td>
+                <td>
+                  <span class="rssi-badge" [ngClass]="rssiClass(device.rssi)">
+                    {{ device.rssi }}
+                  </span>
+                </td>
+                <td>{{ device.channel }}</td>
+                <td class="hide-sm">{{ device.type }}</td>
+                <td class="hide-sm">{{ device.packets }}</td>
+                <td>
+                  <span class="material-icons rand-icon"
+                        [class.rand-yes]="device.randomized"
+                        [attr.aria-label]="device.randomized ? 'MAC aleatoria' : 'MAC fija'">
+                    {{ device.randomized ? 'shuffle' : 'tag' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</td>
