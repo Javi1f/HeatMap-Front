@@ -36,20 +36,22 @@ export class CryptoService {
    * operaciones hacen `await` sobre ella, por lo que son seguras aunque la
    * importación no haya terminado todavía.
    */
-  private keyPromise: Promise<CryptoKey> = this.importKey();
+  private keyPromise: Promise<CryptoKey> = CryptoService.importKey();
 
   /**
    * Importa la clave hexadecimal de configuración como `CryptoKey` AES-GCM.
    *
+   * Es `static` porque no necesita acceder a ningún estado de instancia:
+   * solo lee la constante de configuración del módulo y llama a la Web Crypto API.
    * La clave se marca como `extractable: false` para impedir que el material
    * crudo sea exportado desde el contexto del browser una vez importado.
    *
    * @returns Promise que resuelve la `CryptoKey` lista para usar.
    */
-  private async importKey(): Promise<CryptoKey> {
+  private static importKey(): Promise<CryptoKey> {
     const hex = encryptionKey;
     const keyBytes = Uint8Array.from(
-      hex.match(/.{2}/g)!.map(b => parseInt(b, 16))
+      (hex.match(/.{2}/g) ?? []).map(b => parseInt(b, 16))
     );
     return crypto.subtle.importKey(
       'raw',

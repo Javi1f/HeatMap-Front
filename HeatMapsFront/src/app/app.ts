@@ -17,6 +17,7 @@
 
 import { Component, computed, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { noop } from 'rxjs';
 import { NavbarComponent } from './shared/components/navbar/navbar';
 import { AuthService } from './core/services/auth.service';
 import { SidebarService } from './core/services/sidebar.service';
@@ -60,10 +61,10 @@ export class AppComponent implements OnInit {
     // Aplicar el tema guardado en localStorage al atributo data-theme del body
     this.themeService.init();
 
-    // Si hay token, intentar reconstruir la sesión en memoria
-    // El error es ignorado aquí: AuthService.checkSession ya llama clearSession() en caso de fallo
+    // Si hay token, intentar reconstruir la sesión en memoria.
+    // El error se descarta con noop: checkSession ya llama clearSession() internamente en caso de fallo.
     if (this.authService.getToken()) {
-      this.authService.checkSession().subscribe({ error: () => {} });
+      this.authService.checkSession().subscribe({ error: noop });
     }
   }
 }

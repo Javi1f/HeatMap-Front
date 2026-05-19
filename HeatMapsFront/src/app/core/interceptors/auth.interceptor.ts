@@ -48,7 +48,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       // Sesión expirada o token inválido: limpiar estado y redirigir
       if (error.status === 401) {
         authService.clearSession();
-        void router.navigate(['/login']);
+        router.navigate(['/login']).catch(() => undefined);
       }
       return throwError(() => error);
     })
