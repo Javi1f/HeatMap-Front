@@ -31,9 +31,11 @@ export interface VerifyCodeResponse {
 }
 
 export interface VerifyCodeErrorResponse {
+  success: boolean;
   message: string;
-  attemptsLeft: number;
+  code: string;
   statusCode: number;
+  details?: { attemptsLeft: number };
 }
 
 export interface SessionResponse {

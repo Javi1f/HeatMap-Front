@@ -105,14 +105,14 @@ export class Register {
       error: (err: HttpErrorResponse) => {
         const body = err.error as VerifyCodeErrorResponse;
 
-        if (body?.attemptsLeft === 0) {
+        if (body?.details?.attemptsLeft === 0) {
           this.showModal.set(false);
           this.registerForm.reset();
           this.verificationCodeValue = '';
           this.verificationService.reset();
           this.formError.set('Verificación errónea. Solicita un nuevo código.');
         } else {
-          this.verificationService.handleServerError(body?.attemptsLeft ?? 0);
+          this.verificationService.handleServerError(body?.details?.attemptsLeft ?? 0);
         }
       }
     });
