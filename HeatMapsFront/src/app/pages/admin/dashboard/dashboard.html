@@ -81,6 +81,6 @@
 <app-delete-confirm-modal
   [email]="emailBeingDeleted()"
   [hidden]="confirmDeleteId() === null"
-  (confirm)="confirmDelete()"
-  (cancel)="cancelDelete()">
+  (deleteConfirmed)="confirmDelete()"
+  (deleteCancelled)="cancelDelete()">
 </app-delete-confirm-modal>

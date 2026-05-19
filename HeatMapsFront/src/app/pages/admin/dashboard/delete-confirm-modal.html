@@ -1,4 +1,4 @@
-<div class="modal-overlay" (click)="cancel.emit()">
+<div class="modal-overlay" (click)="deleteCancelled.emit()">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-icon-wrap">
       <span class="material-icons modal-icon-warn">warning_amber</span>
@@ -9,8 +9,8 @@
       usarse para registrarse como administrador.
     </p>
     <div class="modal-actions">
-      <button class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
-      <button class="btn-danger" (click)="confirm.emit()">Eliminar</button>
+      <button class="btn-secondary" (click)="deleteCancelled.emit()">Cancelar</button>
+      <button class="btn-danger" (click)="deleteConfirmed.emit()">Eliminar</button>
     </div>
   </div>
 </div>

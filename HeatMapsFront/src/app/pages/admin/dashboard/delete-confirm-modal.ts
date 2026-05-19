@@ -21,8 +21,8 @@ import { AllowedEmail } from '../../../core/models/admin.model';
  * <app-delete-confirm-modal
  *   [email]="emailBeingDeleted()"
  *   [hidden]="confirmDeleteId() === null"
- *   (confirm)="confirmDelete()"
- *   (cancel)="cancelDelete()">
+ *   (deleteConfirmed)="confirmDelete()"
+ *   (deleteCancelled)="cancelDelete()">
  * </app-delete-confirm-modal>
  * ```
  */
@@ -39,9 +39,9 @@ export class DeleteConfirmModalComponent {
    */
   @Input() email: AllowedEmail | null = null;
 
-  /** Emite cuando el usuario confirma la eliminación. */
-  @Output() readonly confirm = new EventEmitter<void>();
+  /** Emite cuando el usuario confirma la eliminación del correo. */
+  @Output() readonly deleteConfirmed = new EventEmitter<void>();
 
-  /** Emite cuando el usuario cancela o cierra el modal. */
-  @Output() readonly cancel = new EventEmitter<void>();
+  /** Emite cuando el usuario cancela o cierra el modal sin eliminar. */
+  @Output() readonly deleteCancelled = new EventEmitter<void>();
 }
