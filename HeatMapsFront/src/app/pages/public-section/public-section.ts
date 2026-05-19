@@ -30,6 +30,54 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SocketService } from '../../socket/socket.service';
 import { SensorData, SensorDevice } from '../../socket/sensor-data.model';
+import { SensorDevicesRowComponent } from './sensor-devices-row';
+
+// ── Funciones de utilidad puras (sin estado de instancia) ──────────────────
+
+/**
+ * Formatea un número de bytes a una cadena legible con la unidad apropiada.
+ *
+ * @param bytes - Número de bytes a formatear.
+ * @returns Cadena con la unidad: `"1023 B"`, `"1.5 KB"`, `"2.34 MB"`, etc.
+ */
+function formatBytes(bytes: number): string {
+  if (bytes < 1024)       return `${bytes} B`;
+  if (bytes < 1_048_576)  return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1_048_576).toFixed(2)} MB`;
+}
+
+/**
+ * Calcula el RSSI promedio de todos los dispositivos de una lectura.
+ *
+ * @param data - Lectura del sensor con la lista de dispositivos.
+ * @returns El RSSI promedio redondeado al entero más cercano,
+ *          o `null` si la lectura no contiene dispositivos.
+ */
+function averageRssi(data: SensorData): number | null {
+  if (data.devices.length === 0) return null;
+  const sum = data.devices.reduce((acc: number, d: SensorDevice) => acc + d.rssi, 0);
+  return Math.round(sum / data.devices.length);
+}
+
+/**
+ * Devuelve la clase CSS de calidad para un valor RSSI dado.
+ *
+ * | Rango dBm     | Clase CSS        | Calidad   |
+ * |---------------|------------------|-----------|
+ * | `>= -50`      | `rssi-excellent` | Excelente |
+ * | `-50` a `-70` | `rssi-good`      | Buena     |
+ * | `-70` a `-85` | `rssi-fair`      | Aceptable |
+ * | `< -85`       | `rssi-poor`      | Débil     |
+ *
+ * @param rssi - Valor RSSI en dBm (número negativo).
+ * @returns Nombre de la clase CSS correspondiente a la calidad de la señal.
+ */
+function rssiClass(rssi: number): string {
+  if (rssi >= -50) return 'rssi-excellent';
+  if (rssi >= -70) return 'rssi-good';
+  if (rssi >= -85) return 'rssi-fair';
+  return 'rssi-poor';
+}
 
 /**
  * Componente de la sección pública de monitoreo de sensores.
@@ -38,7 +86,7 @@ import { SensorData, SensorDevice } from '../../socket/sensor-data.model';
 @Component({
   selector: 'app-public-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensorDevicesRowComponent],
   templateUrl: './public-section.html',
   styleUrl: './public-section.css',
 })
@@ -120,51 +168,13 @@ export class PublicSection implements OnInit, OnDestroy {
     return this.expandedSensorId() === sensorId;
   }
 
-  /**
-   * Formatea un número de bytes a una cadena legible con la unidad apropiada.
-   *
-   * @param bytes - Número de bytes a formatear.
-   * @returns Cadena con la unidad: `"1023 B"`, `"1.5 KB"`, `"2.34 MB"`, etc.
-   */
-  formatBytes(bytes: number): string {
-    if (bytes < 1024)       return `${bytes} B`;
-    if (bytes < 1_048_576)  return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1_048_576).toFixed(2)} MB`;
-  }
-
-  /**
-   * Calcula el RSSI promedio de todos los dispositivos de una lectura.
-   *
-   * @param data - Lectura del sensor con la lista de dispositivos.
-   * @returns El RSSI promedio redondeado al entero más cercano,
-   *          o `null` si la lectura no contiene dispositivos.
-   */
-  averageRssi(data: SensorData): number | null {
-    if (data.devices.length === 0) return null;
-    const sum = data.devices.reduce((acc: number, d: SensorDevice) => acc + d.rssi, 0);
-    return Math.round(sum / data.devices.length);
-  }
-
-  /**
-   * Devuelve la clase CSS de calidad para un valor RSSI dado.
-   * Las clases están definidas en `public-section.css` y aplican colores distintivos.
-   *
-   * | Rango dBm     | Clase CSS        | Calidad    |
-   * |---------------|------------------|------------|
-   * | `>= -50`      | `rssi-excellent` | Excelente  |
-   * | `-50` a `-70` | `rssi-good`      | Buena      |
-   * | `-70` a `-85` | `rssi-fair`      | Aceptable  |
-   * | `< -85`       | `rssi-poor`      | Débil      |
-   *
-   * @param rssi - Valor RSSI en dBm (número negativo).
-   * @returns Nombre de la clase CSS correspondiente a la calidad de la señal.
-   */
-  rssiClass(rssi: number): string {
-    if (rssi >= -50) return 'rssi-excellent';
-    if (rssi >= -70) return 'rssi-good';
-    if (rssi >= -85) return 'rssi-fair';
-    return 'rssi-poor';
-  }
+  // ── Puentes de plantilla: exponen las funciones de módulo al contexto del template ──
+  /** @see {@link formatBytes} */
+  readonly formatBytes  = formatBytes;
+  /** @see {@link averageRssi} */
+  readonly averageRssi  = averageRssi;
+  /** @see {@link rssiClass} */
+  readonly rssiClass    = rssiClass;
 
   /** Cancela todas las suscripciones al socket para evitar fugas de memoria. */
   ngOnDestroy(): void {

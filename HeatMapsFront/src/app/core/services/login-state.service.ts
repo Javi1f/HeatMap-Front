@@ -31,7 +31,7 @@ import { AuthService } from './auth.service';
  * Provisto a nivel de componente (`providers: [LoginStateService]`) para que
  * cada instancia del formulario (página y modal) tenga su propio estado aislado.
  */
-@Injectable()
+@Injectable({ providedIn: null })
 export class LoginStateService {
   /** Formulario reactivo con los campos `identifier` y `password`. */
   loginForm: FormGroup;
@@ -128,7 +128,7 @@ export class LoginStateService {
         // saveSession es llamado internamente por AuthService.login via tap()
         this.failedAttempts = 0;
         onSuccess?.();
-        void this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/admin/dashboard']).catch(() => undefined);
       },
       error: () => {
         this.failedAttempts++;

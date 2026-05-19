@@ -115,7 +115,7 @@ export class Register {
         ]],
         confirmPassword: ['', Validators.required]
       },
-      { validators: this.passwordMatchValidator }
+      { validators: Register.passwordMatchValidator }
     );
   }
 
@@ -125,7 +125,7 @@ export class Register {
    * @param group - El `FormGroup` completo del registro.
    * @returns `null` si las contraseñas coinciden, o `{ passwordMismatch: true }` si no.
    */
-  passwordMatchValidator(group: AbstractControl) {
+  static passwordMatchValidator(group: AbstractControl) {
     const password = group.get('password')?.value;
     const confirm  = group.get('confirmPassword')?.value;
     return password === confirm ? null : { passwordMismatch: true };
@@ -191,7 +191,7 @@ export class Register {
     this.authService.verifyCode(this.pendingEmail, this.verificationCodeValue).subscribe({
       next: () => {
         this.showModal.set(false);
-        void this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/admin/dashboard']).catch(() => undefined);
       },
       error: (err: HttpErrorResponse) => {
         const body = err.error as VerifyCodeErrorResponse;

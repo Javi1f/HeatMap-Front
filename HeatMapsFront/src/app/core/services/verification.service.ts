@@ -54,9 +54,9 @@ export class VerificationService {
     if (serverAttemptsLeft === 0) {
       this.verificationError.set('Has agotado todos los intentos.');
     } else {
-      const s = serverAttemptsLeft === 1 ? '' : 's';
+      const suffix = serverAttemptsLeft === 1 ? '' : 's';
       this.verificationError.set(
-        `Código incorrecto. Te quedan ${serverAttemptsLeft} intento${s}.`
+        `Código incorrecto. Te quedan ${serverAttemptsLeft} intento${suffix}.`
       );
     }
   }

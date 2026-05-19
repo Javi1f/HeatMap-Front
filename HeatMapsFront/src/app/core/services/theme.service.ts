@@ -35,7 +35,7 @@ export class ThemeService {
    * Signal privado con el tema actualmente activo.
    * Se inicializa leyendo `localStorage` para persistir la preferencia del usuario.
    */
-  private _theme = signal<Theme>(this.getInitialTheme());
+  private _theme = signal<Theme>(ThemeService.getInitialTheme());
 
   /**
    * Signal de solo lectura con el tema activo (`"dark"` | `"light"`).
@@ -55,7 +55,7 @@ export class ThemeService {
    *
    * @returns El tema persistido o `"dark"` si no hay preferencia.
    */
-  private getInitialTheme(): Theme {
+  private static getInitialTheme(): Theme {
     return (localStorage.getItem('theme') as Theme) ?? 'dark';
   }
 

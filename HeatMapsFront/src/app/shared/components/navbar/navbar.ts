@@ -120,8 +120,8 @@ export class NavbarComponent {
   logout(): void {
     this.sidebarService.closeMobile();
     this.authService.logout().subscribe({
-      next:  () => { void this.router.navigate(['/']); },
-      error: () => { void this.router.navigate(['/']); }
+      next:  () => { this.router.navigate(['/']).catch(() => undefined); },
+      error: () => { this.router.navigate(['/']).catch(() => undefined); }
     });
   }
 
@@ -131,7 +131,7 @@ export class NavbarComponent {
    * @param route - Ruta Angular destino (ej. `"/admin/dashboard"`).
    */
   navigate(route: string): void {
-    void this.router.navigate([route]);
+    this.router.navigate([route]).catch(() => undefined);
     this.sidebarService.closeMobile();
   }
 }

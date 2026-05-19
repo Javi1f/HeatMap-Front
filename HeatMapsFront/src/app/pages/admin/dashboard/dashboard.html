@@ -80,41 +80,15 @@
           </thead>
           <tbody>
             @for (email of emails(); track email.id) {
-              <tr [class.row-protected]="!canDelete(email)">
-                <td>
-                  <div class="cell-email">
-                    <span class="material-icons email-icon">alternate_email</span>
-                    <span class="email-text">{{ email.email }}</span>
-                    @if (email.email === currentAdminEmail()) {
-                      <span class="tag tag-you">tú</span>
-                    }
-                    @if (email.id === firstEmailId()) {
-                      <span class="tag tag-founder">fundador</span>
-                    }
-                  </div>
-                </td>
-                <td class="cell-secondary">{{ email.addedBy }}</td>
-                <td class="cell-secondary">{{ email.createdAt | date: 'dd/MM/yyyy' }}</td>
-                <td class="cell-actions">
-                  @if (canDelete(email)) {
-                    <button
-                      class="btn-delete"
-                      [disabled]="deletingId() === email.id"
-                      (click)="requestDelete(email.id)"
-                      [title]="getDeleteTooltip(email)"
-                    >
-                      @if (deletingId() === email.id) {
-                        <div class="spinner spinner-sm"></div>
-                      } @else {
-                        <span class="material-icons">delete_outline</span>
-                      }
-                    </button>
-                  } @else {
-                    <span class="btn-delete btn-delete-disabled" [title]="getDeleteTooltip(email)">
-                      <span class="material-icons">lock_outline</span>
-                    </span>
-                  }
-                </td>
+              <tr appEmailRow
+                  [class.row-protected]="!canDelete(email)"
+                  [email]="email"
+                  [canDelete]="canDelete(email)"
+                  [tooltip]="getDeleteTooltip(email)"
+                  [deletingId]="deletingId()"
+                  [isCurrentUser]="email.email === currentAdminEmail()"
+                  [isFounder]="email.id === firstEmailId()"
+                  (deleteRequested)="requestDelete($event)">
               </tr>
             }
           </tbody>

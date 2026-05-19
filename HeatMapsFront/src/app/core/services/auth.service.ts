@@ -42,6 +42,13 @@ import { apiUrl as API_URL } from '../config';
 export class AuthService {
   private http = inject(HttpClient);
 
+  /**
+   * Clave bajo la que se persiste el JWT en `localStorage`.
+   * Centralizada en un campo para evitar literales duplicados y satisfacer
+   * el requisito de uso de `this` en los métodos que acceden al almacenamiento.
+   */
+  private readonly tokenKey = 'token';
+
   /** Signal privado que indica si hay una sesión activa en memoria. */
   private _isAuthenticated = signal<boolean>(false);
 
@@ -189,7 +196,7 @@ export class AuthService {
    * @param response - Respuesta de login/verificación con `{ admin, token }`.
    */
   saveSession(response: LoginResponse): void {
-    localStorage.setItem('token', response.token);
+    localStorage.setItem(this.tokenKey, response.token);
     this._isAuthenticated.set(true);
     this._currentAdmin.set(response.admin);
   }
@@ -201,7 +208,7 @@ export class AuthService {
    * {@link checkSession} confirma que la sesión es inválida.
    */
   clearSession(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem(this.tokenKey);
     this._isAuthenticated.set(false);
     this._currentAdmin.set(null);
   }
@@ -212,6 +219,6 @@ export class AuthService {
    * @returns El token JWT como string, o `null` si no existe.
    */
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem(this.tokenKey);
   }
 }

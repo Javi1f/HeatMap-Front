@@ -27,6 +27,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { AllowedEmailsService } from '../../../core/services/allowed-emails.service';
 import { AllowedEmail } from '../../../core/models/admin.model';
+import { EmailRowComponent } from './email-row';
 
 /**
  * Componente del dashboard de administración.
@@ -35,7 +36,7 @@ import { AllowedEmail } from '../../../core/models/admin.model';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

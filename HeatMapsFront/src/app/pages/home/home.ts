@@ -82,19 +82,19 @@ export class Home implements OnDestroy {
   goToRegister(): void {
     if (this.isLoggedIn()) {
       this.authService.logout().subscribe({
-        next:  () => { void this.router.navigate(['/register']); },
-        error: () => { void this.router.navigate(['/register']); }
+        next:  () => { this.router.navigate(['/register']).catch(() => undefined); },
+        error: () => { this.router.navigate(['/register']).catch(() => undefined); }
       });
       return;
     }
-    void this.router.navigate(['/register']);
+    this.router.navigate(['/register']).catch(() => undefined);
   }
 
   /**
    * Navega a la sección pública de sensores en tiempo real (`/public`).
    */
   goToMaps(): void {
-    void this.router.navigate(['/public']);
+    this.router.navigate(['/public']).catch(() => undefined);
   }
 
   /**
@@ -102,7 +102,7 @@ export class Home implements OnDestroy {
    * Llamado desde el link del mensaje "ya estás autenticado".
    */
   goToDashboard(): void {
-    void this.router.navigate(['/admin/dashboard']);
+    this.router.navigate(['/admin/dashboard']).catch(() => undefined);
   }
 
   /**
