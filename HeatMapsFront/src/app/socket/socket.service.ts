@@ -132,8 +132,13 @@ export class SocketService implements OnDestroy {
     this.socket.on('disconnect',    () => { this.connectedSubject.next(false); });
     this.socket.on('connect_error', () => { this.connectedSubject.next(false); });
 
+    // El manejador del socket es síncrono y `recibirResumen` no lo es, así que
+    // la promesa queda suelta. Se le engancha un `catch` en lugar de
+    // descartarla con `void`: hoy no puede rechazar porque atrapa sus propios
+    // errores, pero si algún día dejara de hacerlo, la escucha seguiría viva en
+    // vez de morir con un rechazo sin atender.
     this.socket.on('sensor-data', (sobre: SobreCifrado) => {
-      void this.recibirResumen(sobre);
+      this.recibirResumen(sobre).catch(() => undefined);
     });
   }
 

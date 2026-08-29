@@ -5,49 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ccc4914-4d39-4a3d-b308-b766e0cff0f8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/angular.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/crypto/crypto.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/crypto/crypto.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/guards/auth-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/guards/auth-guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/interceptors/auth.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/interceptors/auth.interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/interceptors/crypto.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/interceptors/crypto.interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/models/admin.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/models/admin.model.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/services/allowed-emails.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/allowed-emails.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/services/login-state.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/login-state.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/services/sidebar.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/sidebar.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/add-email-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/add-email-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/delete-confirm-modal.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/delete-confirm-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/email-row.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/email-row.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postcss.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/set-env.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/set-env.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/http-error.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/http-error.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/reportes.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/reportes.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/sensor-devices-row.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/sensor-devices-row.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/socket/sensor-data.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/socket/sensor-data.model.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/socket/socket.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/socket/socket.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,33 +98,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/deads_ydg60se/OneDrive/Documentos/GitHub/HeatMap-Front/HeatMapsFront&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.Angular CLI Server.executor&quot;: &quot;Run&quot;,
-    &quot;npm.build.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.runtime&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2026.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Metris-and-Dashboard",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/deads_ydg60se/OneDrive/Documentos/GitHub/HeatMap-Front/HeatMapsFront",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_interpreter_path": "node",
+    "nodejs_package_manager_path": "npm",
+    "npm.Angular CLI Server.executor": "Run",
+    "npm.build.executor": "Run",
+    "settings.editor.selected.configurable": "settings.javascript.runtime",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2026.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="npm.Angular CLI Server">
     <configuration name="Angular Application" type="JavascriptDebugType" uri="http://localhost:4200">
       <method v="2" />

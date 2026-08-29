@@ -22,7 +22,7 @@ const REQUIRED = ['API_URL', 'ENCRYPTION_KEY'];
 
 const missing = REQUIRED.filter((name) => !process.env[name]);
 if (missing.length > 0) {
-  console.error('ERROR: faltan ' + missing.join(', ') + ' en .env');
+  console.error(`ERROR: faltan ${missing.join(', ')} en .env`);
   process.exit(1);
 }
 
@@ -37,10 +37,10 @@ const contents = [
   ' */',
   '',
   '/** URL base de la API REST, con el sufijo `/api` ya incluido. */',
-  'export const apiUrl = ' + JSON.stringify(process.env.API_URL + '/api') + ';',
+  `export const apiUrl = ${JSON.stringify(`${process.env.API_URL}/api`)};`,
   '',
   '/** Clave AES-256-GCM compartida con el backend para cifrar los payloads. */',
-  'export const encryptionKey = ' + JSON.stringify(process.env.ENCRYPTION_KEY) + ';',
+  `export const encryptionKey = ${JSON.stringify(process.env.ENCRYPTION_KEY)};`,
   '',
 ].join('\n');
 

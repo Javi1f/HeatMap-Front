@@ -116,6 +116,18 @@ export class PublicSection implements OnInit, OnDestroy {
     return this.mapa()?.situados ?? null;
   });
 
+  /**
+   * `true` si hay mapa cargado y la ventana salió vacía.
+   *
+   * Va aquí y no como dos `@if` anidados en la plantilla porque «no ha llegado
+   * el mapa» y «el mapa llegó vacío» son estados distintos que sólo en
+   * combinación justifican el aviso.
+   */
+  sinDetecciones = computed(() => {
+    const mapa = this.mapa();
+    return mapa !== null && mapa.situados === 0;
+  });
+
   /** Aclara a qué momento se refiere la cifra de arriba. */
   conteoLeyenda = computed<string>(() => {
     if (this.enDirecto()) return 'ahora';
@@ -136,41 +148,60 @@ export class PublicSection implements OnInit, OnDestroy {
     return (this.mapa()?.situados ?? 0) === 0;
   }
 
+  /**
+   * Arranca la carga inicial, el refresco periódico y la escucha del socket.
+   *
+   * El sondeo convive con el socket porque cubren cosas distintas: el socket
+   * trae el pulso de cada nodo, mientras que el mapa entero lo recalcula el
+   * backend y solo llega al pedirlo.
+   */
   ngOnInit(): void {
     this.cargarZonas();
     this.temporizador = setInterval(() => this.cargarMapa(true), REFRESCO_MS);
 
     this.suscripciones.add(
-      this.socketService.connected$.subscribe((c) => this.enVivo.set(c)),
+      this.socketService.connected$.subscribe((conectado) => this.enVivo.set(conectado)),
     );
     this.suscripciones.add(
-      this.socketService.sensorData$.subscribe((r) =>
-        this.conteoPorNodo.update((prev) => ({ ...prev, [r.sensor_id]: r.total_devices })),
+      this.socketService.sensorData$.subscribe((resumen) =>
+        this.conteoPorNodo.update((previo) => ({
+          ...previo,
+          [resumen.sensor_id]: resumen.total_devices,
+        })),
       ),
     );
   }
 
+  /**
+   * Detiene el refresco y cancela las suscripciones.
+   *
+   * Sin esto el temporizador seguiría pidiendo el mapa después de salir de la
+   * página, y cada visita dejaría una suscripción más viva.
+   */
   ngOnDestroy(): void {
     if (this.temporizador !== null) clearInterval(this.temporizador);
     this.suscripciones.unsubscribe();
   }
 
+  /*
+   * Los dos ayudantes que siguen no dependen del estado del componente. Se
+   * declaran como propiedades con función y no como métodos porque la
+   * alternativa de convertirlos en estáticos no sirve aquí: una plantilla de
+   * Angular solo resuelve miembros de la instancia.
+   */
+
   /** Texto legible de un nivel de ocupación. */
-  etiquetaNivel(nivel: string): string {
-    return ETIQUETA_NIVEL[nivel] ?? nivel;
-  }
+  readonly etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
 
   /**
    * Clase CSS de un nivel de ocupación.
    *
    * El nivel llega como `sin datos`, con espacio, y un atributo `class` se
-   * parte por los espacios: concatenarlo daba dos clases sueltas
+   * parte por los espacios: componerlo tal cual daba dos clases sueltas
    * (`nivel-sin` y `datos`) y ninguna regla llegaba a aplicarse, así que el
    * distintivo salía transparente y con el borde en blanco.
    */
-  claseNivel(nivel: string): string {
-    return 'nivel-' + nivel.replace(/\s+/g, '-');
-  }
+  readonly claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
 
   /** Carga los espacios y selecciona el primero. */
   private cargarZonas(): void {

@@ -106,8 +106,8 @@ export class Dashboard implements OnInit, OnDestroy {
    * caída, los ceros de ocupación significan «no se sabe», no «vacío».
    */
   redCaida = computed(() => {
-    const o = this.overview();
-    return o !== null && o.sensoresTotal > 0 && o.sensoresEnLinea === 0;
+    const resumen = this.overview();
+    return resumen !== null && resumen.sensoresTotal > 0 && resumen.sensoresEnLinea === 0;
   });
 
   /** `true` si no hay ningún nodo registrado todavía. */
@@ -185,10 +185,10 @@ export class Dashboard implements OnInit, OnDestroy {
    * emitiendo, correcto.
    */
   sensorTone(): MetricTone {
-    const o = this.overview();
-    if (!o || o.sensoresTotal === 0) return 'neutral';
-    if (o.sensoresEnLinea === 0) return 'danger';
-    return o.sensoresEnLinea < o.sensoresTotal ? 'warn' : 'ok';
+    const resumen = this.overview();
+    if (!resumen || resumen.sensoresTotal === 0) return 'neutral';
+    if (resumen.sensoresEnLinea === 0) return 'danger';
+    return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
   }
 
   /** Tono de la tarjeta de alertas: cualquier alerta abierta es un aviso. */
@@ -209,22 +209,24 @@ export class Dashboard implements OnInit, OnDestroy {
     return 'neutral';
   }
 
+  /*
+   * Los tres ayudantes que siguen no dependen del estado del componente. Se
+   * declaran como propiedades con función y no como métodos porque la
+   * alternativa que sugiere el análisis —convertirlos en estáticos— no sirve
+   * aquí: una plantilla de Angular solo resuelve miembros de la instancia.
+   */
+
   /** Clase CSS de la barra de aforo según el nivel de ocupación. */
-  levelClass(nivel: string): string {
-    return `level-${nivel}`;
-  }
+  readonly levelClass = (nivel: string): string => `level-${nivel}`;
 
   /**
    * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
    * ocupación no desborde la celda.
    */
-  aforoWidth(zone: ZoneOccupancy): number {
-    return Math.min(zone.porcentajeAforo ?? 0, 100);
-  }
+  readonly aforoWidth = (zone: ZoneOccupancy): number =>
+    Math.min(zone.porcentajeAforo ?? 0, 100);
 
   /** Formatea un valor que puede no existir todavía. */
-  fmt(value: number | null | undefined, suffix = ''): string {
-    if (value === null || value === undefined) return '—';
-    return `${value}${suffix}`;
-  }
+  readonly fmt = (value: number | null | undefined, suffix = ''): string =>
+    value === null || value === undefined ? '—' : `${value}${suffix}`;
 }

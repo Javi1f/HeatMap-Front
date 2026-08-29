@@ -29,7 +29,7 @@
     @for (item of navItems; track item.route) {
       <a class="nav-item" (click)="navigate(item.route)">
         <span class="material-icons">{{ item.icon }}</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span class="nav-label">{{ item.label }}</span>
         }
       </a>
@@ -39,7 +39,7 @@
       @for (item of adminItems; track item.route) {
         <a class="nav-item admin-item" (click)="navigate(item.route)">
           <span class="material-icons">{{ item.icon }}</span>
-          @if (!isCollapsed() || isMobileOpen()) {
+          @if (mostrarEtiquetas()) {
             <span class="nav-label">{{ item.label }}</span>
           }
         </a>
@@ -51,7 +51,7 @@
 
     <button class="theme-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
       <span class="material-icons">{{ isDark() ? 'light_mode' : 'dark_mode' }}</span>
-      @if (!isCollapsed() || isMobileOpen()) {
+      @if (mostrarEtiquetas()) {
         <span>{{ isDark() ? 'Modo claro' : 'Modo oscuro' }}</span>
       }
     </button>
@@ -59,20 +59,20 @@
     @if (isLoggedIn()) {
       <div class="admin-info">
         <span class="material-icons">account_circle</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span class="admin-name">{{ currentAdmin()?.username }}</span>
         }
       </div>
       <button class="logout-btn" (click)="logout()">
         <span class="material-icons">logout</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span>Cerrar sesión</span>
         }
       </button>
     } @else {
       <button class="login-btn" (click)="openLogin()">
         <span class="material-icons">login</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span>Iniciar sesión</span>
         }
       </button>

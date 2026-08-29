@@ -147,15 +147,15 @@ export class Reportes implements OnInit {
     this.isGenerando.set(true);
     this.error.set('');
 
-    const v = this.form.value;
+    const valores = this.form.value;
     this.reportesService
       .crear({
-        tipoReporte: v.tipoReporte,
+        tipoReporte: valores.tipoReporte,
         // El input de tipo date da solo la fecha; se extiende al día completo
         // para que el rango incluya lo ocurrido durante la jornada final.
-        rangoInicio: new Date(`${v.rangoInicio}T00:00:00`).toISOString(),
-        rangoFin: new Date(`${v.rangoFin}T23:59:59`).toISOString(),
-        idZona: v.idZona || undefined,
+        rangoInicio: new Date(`${valores.rangoInicio}T00:00:00`).toISOString(),
+        rangoFin: new Date(`${valores.rangoFin}T23:59:59`).toISOString(),
+        idZona: valores.idZona || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -232,8 +232,8 @@ export class Reportes implements OnInit {
  * Se construye a partir de los componentes locales y no de `toISOString`, que
  * convierte a UTC y en zonas con desfase negativo devolvería el día anterior.
  */
-function paraInputDate(fecha: Date): string {
+const paraInputDate = (fecha: Date): string => {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   const dia = String(fecha.getDate()).padStart(2, '0');
   return `${fecha.getFullYear()}-${mes}-${dia}`;
-}
+};

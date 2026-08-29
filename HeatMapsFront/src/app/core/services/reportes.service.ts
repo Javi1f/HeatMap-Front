@@ -139,7 +139,7 @@ export class ReportesService {
  * @param nombreArchivo - Nombre con el que se guarda.
  * @param contenido     - Texto completo del archivo.
  */
-function descargar(nombreArchivo: string, contenido: string): void {
+const descargar = (nombreArchivo: string, contenido: string): void => {
   const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
 
@@ -151,4 +151,4 @@ function descargar(nombreArchivo: string, contenido: string): void {
   document.body.removeChild(enlace);
 
   URL.revokeObjectURL(url);
-}
+};

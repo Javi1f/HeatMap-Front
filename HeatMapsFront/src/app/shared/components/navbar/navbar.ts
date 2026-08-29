@@ -57,6 +57,16 @@ export class NavbarComponent {
   /** `true` cuando el menú móvil superpuesto está visible. */
   isMobileOpen = computed(() => this.sidebarService.isMobileOpen());
 
+  /**
+   * `true` cuando hay sitio para el texto de cada entrada.
+   *
+   * La regla es una sola —caben si la barra no está plegada, o si está abierta
+   * como cajón en teléfono— y antes se repetía en las cinco entradas de la
+   * plantilla. Centralizarla evita que una de ellas se quede atrás el día que
+   * la condición cambie, que es justo lo que le pasó al botón de tema.
+   */
+  mostrarEtiquetas = computed(() => !this.isCollapsed() || this.isMobileOpen());
+
   /** `true` si hay un administrador autenticado. Controla qué secciones se muestran. */
   isLoggedIn   = computed(() => this.authService.isAuthenticated());
 

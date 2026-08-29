@@ -30,7 +30,7 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { MapaDibujable } from '../../../core/models/mapa.model';
+import { MapaDibujable, NodoDibujable } from '../../../core/models/mapa.model';
 
 /**
  * Rampa de color de la intensidad, de menor a mayor ocupación.
@@ -92,16 +92,28 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
   /** Ancho con el que se hizo el último dibujado, en píxeles CSS. */
   private anchoDibujado = 0;
 
+  /**
+   * Habilita el dibujado en cuanto existe el lienzo y empieza a vigilar su
+   * tamaño. Antes de este punto no hay elemento sobre el que medir ni pintar.
+   */
   ngAfterViewInit(): void {
     this.listo = true;
     this.dibujar();
     this.vigilarTamano();
   }
 
+  /**
+   * Redibuja cuando llega un mapa nuevo. La guarda evita pintar antes de que
+   * la vista exista, porque el primer cambio de entrada se recibe antes.
+   */
   ngOnChanges(): void {
     if (this.listo) this.dibujar();
   }
 
+  /**
+   * Desconecta el observador de tamaño. Sin esto seguiría vivo tras destruir
+   * el componente, sujetando en memoria el contenedor que observaba.
+   */
   ngOnDestroy(): void {
     this.observador?.disconnect();
     this.observador = null;
@@ -155,16 +167,48 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
    * conserva restos de un dibujo anterior.
    */
   private dibujar(): void {
-    const canvas = this.lienzoRef?.nativeElement;
-    const mapa = this.mapa;
-    if (!canvas) return;
+    const lienzo = this.prepararLienzo();
+    if (!lienzo) return;
 
-    const contenedor = canvas.parentElement;
-    if (!contenedor) return;
+    const mapa = this.mapa;
+    if (!mapa) return;
+
+    const { ctx, anchoPlano, altoPlano } = lienzo;
+    const escala = anchoPlano / mapa.ancho;
+
+    this.dibujarPlano(ctx, anchoPlano, altoPlano, escala);
+
+    if (mapa.maximo > 0) {
+      this.dibujarCalor(ctx, mapa, escala, anchoPlano, altoPlano);
+    }
+
+    this.dibujarNodos(ctx, mapa, escala, altoPlano);
+    this.dibujarEscalaMetros(ctx, mapa, escala, altoPlano);
+  }
+
+  /**
+   * Ajusta el tamaño del lienzo al espacio disponible y lo deja limpio.
+   *
+   * Va aparte del pintado porque son dos asuntos distintos: aquí se decide
+   * cuánto mide el dibujo y allí qué se dibuja. Se ejecuta aunque no haya
+   * mapa, para que el lienzo vacío ocupe ya su sitio y la página no dé un
+   * salto cuando lleguen los datos.
+   *
+   * @returns El contexto y las medidas del plano, o `null` si todavía no se
+   *          puede dibujar.
+   */
+  private prepararLienzo(): {
+    ctx: CanvasRenderingContext2D;
+    anchoPlano: number;
+    altoPlano: number;
+  } | null {
+    const canvas = this.lienzoRef?.nativeElement;
+    const contenedor = canvas?.parentElement;
+    if (!canvas || !contenedor) return null;
 
     // El plano manda en la proporción: el alto se deduce del ancho disponible
     // para que un espacio de 17,64 x 9,10 m no salga deformado.
-    const proporcion = mapa ? mapa.alto / mapa.ancho : 0.5;
+    const proporcion = this.mapa ? this.mapa.alto / this.mapa.ancho : 0.5;
     const anchoCss = contenedor.clientWidth;
     this.margen = anchoCss < ANCHO_ESTRECHO ? MARGEN_ESTRECHO : MARGEN_AMPLIO;
     this.anchoDibujado = anchoCss;
@@ -179,25 +223,16 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     canvas.style.height = `${altoCss}px`;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) return null;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, anchoCss, altoCss);
 
-    if (!mapa) return;
-
-    const anchoPlano = anchoCss - this.margen * 2;
-    const altoPlano = altoCss - this.margen * 2;
-    const escala = anchoPlano / mapa.ancho;
-
-    this.dibujarPlano(ctx, anchoPlano, altoPlano, escala);
-
-    if (mapa.maximo > 0) {
-      this.dibujarCalor(ctx, mapa, escala, anchoPlano, altoPlano);
-    }
-
-    this.dibujarNodos(ctx, mapa, escala, altoPlano);
-    this.dibujarEscalaMetros(ctx, mapa, escala, altoPlano);
+    return {
+      ctx,
+      anchoPlano: anchoCss - this.margen * 2,
+      altoPlano: altoCss - this.margen * 2,
+    };
   }
 
   /** Fondo y borde del espacio. */
@@ -215,14 +250,33 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     ctx.fillStyle = fondo;
     ctx.fillRect(this.margen, this.margen, ancho, alto);
 
-    // Retícula de un metro. Da referencia de tamaño sin competir con el calor,
-    // que se dibuja encima: leer «ese grupo ocupa unos tres metros» es más útil
-    // que ver una mancha flotando en un rectángulo vacío.
+    this.dibujarReticula(ctx, ancho, alto, escala, retic);
+
+    ctx.strokeStyle = borde;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(this.margen, this.margen, ancho, alto);
+  }
+
+  /**
+   * Traza la retícula de un metro dentro del plano.
+   *
+   * Da referencia de tamaño sin competir con el calor, que se dibuja encima:
+   * leer «ese grupo ocupa unos tres metros» es más útil que ver una mancha
+   * flotando en un rectángulo vacío. El recorte impide que las líneas se
+   * salgan por el margen donde van las cotas.
+   */
+  private dibujarReticula(
+    ctx: CanvasRenderingContext2D,
+    ancho: number,
+    alto: number,
+    escala: number,
+    color: string,
+  ): void {
     ctx.save();
     ctx.beginPath();
     ctx.rect(this.margen, this.margen, ancho, alto);
     ctx.clip();
-    ctx.strokeStyle = retic;
+    ctx.strokeStyle = color;
     ctx.lineWidth = 1;
 
     for (let x = escala; x < ancho; x += escala) {
@@ -240,10 +294,6 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
       ctx.stroke();
     }
     ctx.restore();
-
-    ctx.strokeStyle = borde;
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(this.margen, this.margen, ancho, alto);
   }
 
   /**
@@ -305,30 +355,61 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     for (const nodo of mapa.nodos) {
       const x = this.margen + nodo.x * escala;
       const y = this.margen + alto - nodo.y * escala;
-      const color = nodo.aportoDatos ? activo : inactivo;
 
-      // Halo, para que el nodo se distinga aunque caiga sobre una mancha.
-      ctx.beginPath();
-      ctx.arc(x, y, 9, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(x, y, 5.5, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-      ctx.stroke();
-
-      ctx.fillStyle = texto;
-      ctx.font = '600 12px "Roboto", system-ui, sans-serif';
-      ctx.textAlign = nodo.x > mapa.ancho / 2 ? 'right' : 'left';
-      ctx.textBaseline = nodo.y > mapa.alto / 2 ? 'top' : 'bottom';
-      const dx = nodo.x > mapa.ancho / 2 ? -11 : 11;
-      const dy = nodo.y > mapa.alto / 2 ? 8 : -8;
-      ctx.fillText(nodo.nombre, x + dx, y + dy);
+      this.dibujarMarcaNodo(ctx, x, y, nodo.aportoDatos ? activo : inactivo);
+      this.dibujarEtiquetaNodo(ctx, nodo, mapa, x, y, texto);
     }
+  }
+
+  /**
+   * Pinta el punto que representa un nodo.
+   *
+   * Lleva halo oscuro debajo y filo claro encima para que se distinga tanto
+   * sobre una mancha saturada como sobre el plano vacío.
+   */
+  private dibujarMarcaNodo(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    color: string,
+  ): void {
+    ctx.beginPath();
+    ctx.arc(x, y, 9, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x, y, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.stroke();
+  }
+
+  /**
+   * Rotula un nodo hacia el interior del plano.
+   *
+   * La etiqueta se coloca del lado contrario al borde más cercano, decidido
+   * por el cuadrante que ocupa el nodo: puesta siempre al mismo lado, la de
+   * los nodos de las esquinas se saldría del lienzo.
+   */
+  private dibujarEtiquetaNodo(
+    ctx: CanvasRenderingContext2D,
+    nodo: NodoDibujable,
+    mapa: MapaDibujable,
+    x: number,
+    y: number,
+    color: string,
+  ): void {
+    const haciaLaIzquierda = nodo.x > mapa.ancho / 2;
+    const haciaAbajo = nodo.y > mapa.alto / 2;
+
+    ctx.fillStyle = color;
+    ctx.font = '600 12px "Roboto", system-ui, sans-serif';
+    ctx.textAlign = haciaLaIzquierda ? 'right' : 'left';
+    ctx.textBaseline = haciaAbajo ? 'top' : 'bottom';
+    ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
   }
 
   /** Rotula las medidas del espacio en los dos ejes. */
@@ -361,7 +442,7 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
  * Recorre el mapa de píxeles una sola vez y usa una tabla de 256 entradas
  * precalculada, en lugar de interpolar en cada píxel.
  */
-function colorear(ctx: CanvasRenderingContext2D, ancho: number, alto: number): void {
+const colorear = (ctx: CanvasRenderingContext2D, ancho: number, alto: number): void => {
   const imagen = ctx.getImageData(0, 0, ancho, alto);
   const px = imagen.data;
   const tabla = tablaDeColor();
@@ -369,18 +450,18 @@ function colorear(ctx: CanvasRenderingContext2D, ancho: number, alto: number): v
   for (let i = 0; i < px.length; i += 4) {
     const alfa = px[i + 3];
     if (alfa === 0) continue;
-    const c = tabla[alfa];
-    px[i] = c[0];
-    px[i + 1] = c[1];
-    px[i + 2] = c[2];
-    px[i + 3] = c[3];
+    const color = tabla[alfa];
+    px[i] = color[0];
+    px[i + 1] = color[1];
+    px[i + 2] = color[2];
+    px[i + 3] = color[3];
   }
 
   ctx.putImageData(imagen, 0, 0);
-}
+};
 
 /** Tabla precalculada de 256 colores, uno por nivel de opacidad. */
-function tablaDeColor(): [number, number, number, number][] {
+const tablaDeColor = (): [number, number, number, number][] => {
   const aux = document.createElement('canvas');
   aux.width = 256;
   aux.height = 1;
@@ -395,8 +476,13 @@ function tablaDeColor(): [number, number, number, number][] {
   const datos = ctx.getImageData(0, 0, 256, 1).data;
   const tabla: [number, number, number, number][] = [];
   for (let i = 0; i < 256; i++) {
-    const o = i * 4;
-    tabla.push([datos[o], datos[o + 1], datos[o + 2], datos[o + 3]]);
+    const desplazamiento = i * 4;
+    tabla.push([
+      datos[desplazamiento],
+      datos[desplazamiento + 1],
+      datos[desplazamiento + 2],
+      datos[desplazamiento + 3],
+    ]);
   }
   return tabla;
-}
+};
