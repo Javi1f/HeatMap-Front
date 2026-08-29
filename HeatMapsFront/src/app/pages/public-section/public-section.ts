@@ -37,6 +37,23 @@ const ETIQUETA_NIVEL: Record<string, string> = {
   'sin datos': 'Sin datos',
 };
 
+/* ── Ayudantes de presentación ────────────────────────────────────
+   Funciones puras, definidas antes del componente porque con `const` no hay
+   izado que las adelante. */
+
+/** Texto legible de un nivel de ocupación. */
+const etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
+
+/**
+ * Clase CSS de un nivel de ocupación.
+ *
+ * El nivel llega como `sin datos`, con espacio, y un atributo `class` se parte
+ * por los espacios: componerlo tal cual daba dos clases sueltas (`nivel-sin` y
+ * `datos`) y ninguna regla llegaba a aplicarse, así que el distintivo salía
+ * transparente y con el borde en blanco.
+ */
+const claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
+
 @Component({
   selector: 'app-public-section',
   standalone: true,
@@ -116,6 +133,18 @@ export class PublicSection implements OnInit, OnDestroy {
     return this.mapa()?.situados ?? null;
   });
 
+  /**
+   * `true` si hay mapa cargado y la ventana salió vacía.
+   *
+   * Va aquí y no como dos `@if` anidados en la plantilla porque «no ha llegado
+   * el mapa» y «el mapa llegó vacío» son estados distintos que sólo en
+   * combinación justifican el aviso.
+   */
+  sinDetecciones = computed(() => {
+    const mapa = this.mapa();
+    return mapa !== null && mapa.situados === 0;
+  });
+
   /** Aclara a qué momento se refiere la cifra de arriba. */
   conteoLeyenda = computed<string>(() => {
     if (this.enDirecto()) return 'ahora';
@@ -124,53 +153,73 @@ export class PublicSection implements OnInit, OnDestroy {
   });
 
   /**
-   * `true` si merece la pena mostrar el distintivo de nivel.
+   * Datos del distintivo de nivel, o `null` si no procede mostrarlo.
    *
-   * El nivel sale de las ventanas ya consolidadas y el mapa de las detecciones
-   * recientes, así que al arrancar puede haber mapa con manchas y todavía
-   * ningún nivel. En ese caso el distintivo decía «Sin datos» al lado de un
-   * mapa con datos; se calla y deja hablar a la cifra de la portada.
+   * Reúne las tres decisiones que antes estaban sueltas en la plantilla —si se
+   * muestra, con qué clase y con qué texto—, que en realidad son la misma cosa
+   * mirada por tres lados.
+   *
+   * Se calla cuando diría «Sin datos» habiendo mapa con detecciones: el nivel
+   * sale de las ventanas ya consolidadas y el mapa de lo captado hace un rato,
+   * así que al arrancar puede haber manchas y todavía ningún nivel, y el
+   * distintivo contradiría al mapa que tiene al lado.
    */
-  mostrarNivel(nivel: string): boolean {
-    if (nivel !== 'sin datos') return true;
-    return (this.mapa()?.situados ?? 0) === 0;
-  }
+  nivelVista = computed<{ clase: string; etiqueta: string } | null>(() => {
+    const zona = this.zonaActual();
+    if (!zona) return null;
 
+    const nivel = zona.nivelOcupacion;
+    if (nivel === 'sin datos' && (this.mapa()?.situados ?? 0) > 0) return null;
+
+    return { clase: claseNivel(nivel), etiqueta: etiquetaNivel(nivel) };
+  });
+
+  /**
+   * Arranca la carga inicial, el refresco periódico y la escucha del socket.
+   *
+   * El sondeo convive con el socket porque cubren cosas distintas: el socket
+   * trae el pulso de cada nodo, mientras que el mapa entero lo recalcula el
+   * backend y solo llega al pedirlo.
+   */
   ngOnInit(): void {
     this.cargarZonas();
     this.temporizador = setInterval(() => this.cargarMapa(true), REFRESCO_MS);
 
     this.suscripciones.add(
-      this.socketService.connected$.subscribe((c) => this.enVivo.set(c)),
+      this.socketService.connected$.subscribe((conectado) => this.enVivo.set(conectado)),
     );
     this.suscripciones.add(
-      this.socketService.sensorData$.subscribe((r) =>
-        this.conteoPorNodo.update((prev) => ({ ...prev, [r.sensor_id]: r.total_devices })),
+      this.socketService.sensorData$.subscribe((resumen) =>
+        this.conteoPorNodo.update((previo) => ({
+          ...previo,
+          [resumen.sensor_id]: resumen.total_devices,
+        })),
       ),
     );
   }
 
+  /**
+   * Detiene el refresco y cancela las suscripciones.
+   *
+   * Sin esto el temporizador seguiría pidiendo el mapa después de salir de la
+   * página, y cada visita dejaría una suscripción más viva.
+   */
   ngOnDestroy(): void {
     if (this.temporizador !== null) clearInterval(this.temporizador);
     this.suscripciones.unsubscribe();
   }
 
-  /** Texto legible de un nivel de ocupación. */
-  etiquetaNivel(nivel: string): string {
-    return ETIQUETA_NIVEL[nivel] ?? nivel;
-  }
-
-  /**
-   * Clase CSS de un nivel de ocupación.
-   *
-   * El nivel llega como `sin datos`, con espacio, y un atributo `class` se
-   * parte por los espacios: concatenarlo daba dos clases sueltas
-   * (`nivel-sin` y `datos`) y ninguna regla llegaba a aplicarse, así que el
-   * distintivo salía transparente y con el borde en blanco.
+  /*
+   * Los dos ayudantes que siguen viven en el módulo, no en la clase: no
+   * dependen de su estado. La clase se limita a exponerlos, porque una
+   * plantilla de Angular solo resuelve miembros de la instancia.
    */
-  claseNivel(nivel: string): string {
-    return 'nivel-' + nivel.replace(/\s+/g, '-');
-  }
+
+  /** Texto legible de un nivel de ocupación. */
+  readonly etiquetaNivel = etiquetaNivel;
+
+  /** Clase CSS de un nivel de ocupación. */
+  readonly claseNivel = claseNivel;
 
   /** Carga los espacios y selecciona el primero. */
   private cargarZonas(): void {

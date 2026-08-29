@@ -58,6 +58,23 @@ const REFRESH_INTERVAL_MS = 60_000;
 /**
  * Componente del dashboard de métricas.
  */
+/* ── Ayudantes de presentación ────────────────────────────────────
+   Funciones puras: reciben lo que necesitan y no tocan estado alguno. Se
+   definen antes del componente porque con `const` no hay izado. */
+
+/** Clase CSS de la barra de aforo según el nivel de ocupación. */
+const levelClass = (nivel: string): string => `level-${nivel}`;
+
+/**
+ * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
+ * ocupación no desborde la celda.
+ */
+const aforoWidth = (zone: ZoneOccupancy): number => Math.min(zone.porcentajeAforo ?? 0, 100);
+
+/** Formatea un valor que puede no existir todavía. */
+const fmt = (value: number | null | undefined, suffix = ''): string =>
+  value === null || value === undefined ? '—' : `${value}${suffix}`;
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -106,8 +123,8 @@ export class Dashboard implements OnInit, OnDestroy {
    * caída, los ceros de ocupación significan «no se sabe», no «vacío».
    */
   redCaida = computed(() => {
-    const o = this.overview();
-    return o !== null && o.sensoresTotal > 0 && o.sensoresEnLinea === 0;
+    const resumen = this.overview();
+    return resumen !== null && resumen.sensoresTotal > 0 && resumen.sensoresEnLinea === 0;
   });
 
   /** `true` si no hay ningún nodo registrado todavía. */
@@ -185,10 +202,10 @@ export class Dashboard implements OnInit, OnDestroy {
    * emitiendo, correcto.
    */
   sensorTone(): MetricTone {
-    const o = this.overview();
-    if (!o || o.sensoresTotal === 0) return 'neutral';
-    if (o.sensoresEnLinea === 0) return 'danger';
-    return o.sensoresEnLinea < o.sensoresTotal ? 'warn' : 'ok';
+    const resumen = this.overview();
+    if (!resumen || resumen.sensoresTotal === 0) return 'neutral';
+    if (resumen.sensoresEnLinea === 0) return 'danger';
+    return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
   }
 
   /** Tono de la tarjeta de alertas: cualquier alerta abierta es un aviso. */
@@ -209,22 +226,19 @@ export class Dashboard implements OnInit, OnDestroy {
     return 'neutral';
   }
 
-  /** Clase CSS de la barra de aforo según el nivel de ocupación. */
-  levelClass(nivel: string): string {
-    return `level-${nivel}`;
-  }
-
-  /**
-   * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
-   * ocupación no desborde la celda.
+  /*
+   * Los tres ayudantes que siguen viven en el módulo, no en la clase: no
+   * dependen de su estado. La clase se limita a exponerlos, porque una
+   * plantilla de Angular solo resuelve miembros de la instancia y por eso no
+   * pueden declararse estáticos.
    */
-  aforoWidth(zone: ZoneOccupancy): number {
-    return Math.min(zone.porcentajeAforo ?? 0, 100);
-  }
+
+  /** Clase CSS de la barra de aforo según el nivel de ocupación. */
+  readonly levelClass = levelClass;
+
+  /** Anchura de la barra de aforo, acotada al 100 %. */
+  readonly aforoWidth = aforoWidth;
 
   /** Formatea un valor que puede no existir todavía. */
-  fmt(value: number | null | undefined, suffix = ''): string {
-    if (value === null || value === undefined) return '—';
-    return `${value}${suffix}`;
-  }
+  readonly fmt = fmt;
 }

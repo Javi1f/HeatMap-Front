@@ -62,10 +62,10 @@
               <p class="lugar-desc">{{ z.descripcion }}</p>
             }
           </div>
-          @if (mostrarNivel(z.nivelOcupacion)) {
-            <div class="estado" [class]="claseNivel(z.nivelOcupacion)">
+          @if (nivelVista(); as nivel) {
+            <div class="estado" [class]="nivel.clase">
               <span class="estado-punto"></span>
-              {{ etiquetaNivel(z.nivelOcupacion) }}
+              {{ nivel.etiqueta }}
             </div>
           }
         </div>
@@ -84,13 +84,11 @@
         <span class="leyenda-nodo"><i class="punto-nodo"></i> nodo de captura</span>
       </div>
 
-      @if (mapa(); as m) {
-        @if (m.situados === 0) {
-          <div class="aviso aviso-neutro">
-            <span class="material-icons">sensors_off</span>
-            Sin detecciones en los últimos {{ m.ventanaMinutos }} minutos.
-          </div>
-        }
+      @if (sinDetecciones()) {
+        <div class="aviso aviso-neutro">
+          <span class="material-icons">sensors_off</span>
+          Sin detecciones en los últimos {{ mapa()?.ventanaMinutos }} minutos.
+        </div>
       }
     </section>
 

@@ -216,7 +216,11 @@ export class Users implements OnInit {
 
         if (session.esActual) {
           this.authService.clearSession();
-          void this.router.navigate(['/']);
+          // La navegación puede rechazar si un guard la bloquea. La sesión ya
+          // está cerrada en ese punto, así que lo peor que puede pasar es
+          // quedarse en la misma pantalla; se atiende el rechazo para no
+          // dejarlo sin manejar.
+          this.router.navigate(['/']).catch(() => undefined);
           return;
         }
 

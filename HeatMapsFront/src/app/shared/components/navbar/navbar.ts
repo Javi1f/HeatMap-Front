@@ -34,6 +34,8 @@ export interface NavItem {
   route: string;
   /** Nombre del icono de Material Icons. */
   icon: string;
+  /** `true` si la entrada pertenece al área de administración. */
+  esAdmin?: boolean;
 }
 
 /**
@@ -57,6 +59,16 @@ export class NavbarComponent {
   /** `true` cuando el menú móvil superpuesto está visible. */
   isMobileOpen = computed(() => this.sidebarService.isMobileOpen());
 
+  /**
+   * `true` cuando hay sitio para el texto de cada entrada.
+   *
+   * La regla es una sola —caben si la barra no está plegada, o si está abierta
+   * como cajón en teléfono— y antes se repetía en las cinco entradas de la
+   * plantilla. Centralizarla evita que una de ellas se quede atrás el día que
+   * la condición cambie, que es justo lo que le pasó al botón de tema.
+   */
+  mostrarEtiquetas = computed(() => !this.isCollapsed() || this.isMobileOpen());
+
   /** `true` si hay un administrador autenticado. Controla qué secciones se muestran. */
   isLoggedIn   = computed(() => this.authService.isAuthenticated());
 
@@ -74,10 +86,47 @@ export class NavbarComponent {
 
   /** Elementos de navegación exclusivos del área de administración. */
   adminItems: NavItem[] = [
-    { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard'        },
-    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts'  },
-    { label: 'Reportes',  route: '/admin/reportes',  icon: 'description'      }
+    { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard',       esAdmin: true },
+    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts', esAdmin: true },
+    { label: 'Reportes',  route: '/admin/reportes',  icon: 'description',     esAdmin: true }
   ];
+
+  /**
+   * Entradas que toca pintar ahora mismo.
+   *
+   * Las dos listas se recorrían con dos bucles casi idénticos que solo se
+   * diferenciaban en una clase CSS. Unirlas deja un único recorrido y quita el
+   * riesgo de tocar uno y olvidar el otro; la distinción viaja ahora en el
+   * propio elemento.
+   */
+  entradas = computed<NavItem[]>(() =>
+    this.isLoggedIn() ? [...this.navItems, ...this.adminItems] : this.navItems,
+  );
+
+  /** Icono y rótulo del cambio de tema, que son una misma decisión. */
+  tema = computed(() =>
+    this.isDark()
+      ? { icono: 'light_mode', texto: 'Modo claro' }
+      : { icono: 'dark_mode', texto: 'Modo oscuro' },
+  );
+
+  /**
+   * Aspecto del botón de sesión.
+   *
+   * Iniciar y cerrar sesión eran dos botones en ramas opuestas de un `@else`,
+   * con la misma forma y el mismo sitio. Es un botón con dos estados.
+   */
+  accionSesion = computed(() =>
+    this.isLoggedIn()
+      ? { clase: 'logout-btn', icono: 'logout', texto: 'Cerrar sesión' }
+      : { clase: 'login-btn',  icono: 'login',  texto: 'Iniciar sesión' },
+  );
+
+  /** Icono del control que pliega la barra o cierra el cajón. */
+  iconoDelPliegue = computed(() => {
+    if (this.isMobileOpen()) return 'close';
+    return this.isCollapsed() ? 'chevron_right' : 'chevron_left';
+  });
 
   /** Decide si se muestran las entradas de administracion y el logout. */
   private authService    = inject(AuthService);
@@ -112,6 +161,12 @@ export class NavbarComponent {
 
   /** Alterna entre tema oscuro y claro. */
   toggleTheme(): void    { this.themeService.toggle(); }
+
+  /** Cierra la sesión o abre el modal de acceso, según el estado actual. */
+  alPulsarSesion(): void {
+    if (this.isLoggedIn()) this.logout();
+    else this.openLogin();
+  }
 
   /**
    * Abre el modal de login global y cierra el menú móvil si estaba abierto.

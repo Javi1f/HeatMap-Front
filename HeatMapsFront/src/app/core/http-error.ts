@@ -11,6 +11,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
 /**
+ * Mensaje propio para los códigos de estado que se explican mejor por sí solos
+ * que por el cuerpo de la respuesta.
+ *
+ * Es una tabla y no una cadena de `case` para que añadir un código sea agregar
+ * una línea, sin sumar un camino más a la función que la consulta.
+ */
+const MENSAJE_POR_ESTADO: Readonly<Record<number, string>> = {
+  0: 'No hay conexión con el servidor. Comprueba que el backend esté levantado.',
+  401: 'Tu sesión caducó o fue cerrada. Vuelve a iniciar sesión.',
+  429: 'Demasiadas peticiones seguidas. Espera unos minutos y recarga.',
+  500: 'El servidor devolvió un error. Revisa sus registros.',
+  502: 'El servidor devolvió un error. Revisa sus registros.',
+  503: 'El servidor devolvió un error. Revisa sus registros.',
+};
+
+/**
  * Devuelve un mensaje legible para un error de petición.
  *
  * Da prioridad al mensaje que envía el backend, que suele ser el más preciso,
@@ -19,22 +35,9 @@ import { HttpErrorResponse } from '@angular/common/http';
  *
  * @param err      - Error emitido por `HttpClient`.
  * @param fallback - Texto a usar cuando no se puede decir nada más concreto.
+ * @returns Texto listo para mostrar al usuario.
  */
-export function describeHttpError(err: unknown, fallback: string): string {
+export const describeHttpError = (err: unknown, fallback: string): string => {
   if (!(err instanceof HttpErrorResponse)) return fallback;
-
-  switch (err.status) {
-    case 0:
-      return 'No hay conexión con el servidor. Comprueba que el backend esté levantado.';
-    case 401:
-      return 'Tu sesión caducó o fue cerrada. Vuelve a iniciar sesión.';
-    case 429:
-      return 'Demasiadas peticiones seguidas. Espera unos minutos y recarga.';
-    case 500:
-    case 502:
-    case 503:
-      return 'El servidor devolvió un error. Revisa sus registros.';
-    default:
-      return err.error?.message ?? fallback;
-  }
-}
+  return MENSAJE_POR_ESTADO[err.status] ?? err.error?.message ?? fallback;
+};

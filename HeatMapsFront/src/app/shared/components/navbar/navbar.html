@@ -16,67 +16,52 @@
 >
 
   <button class="toggle-btn" (click)="toggleSidebar()">
-    <span class="material-icons">
-      {{ isMobileOpen() ? 'close' : isCollapsed() ? 'chevron_right' : 'chevron_left' }}
-    </span>
+    <span class="material-icons">{{ iconoDelPliegue() }}</span>
   </button>
 
   <div class="sidebar-image">
     <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'" />
   </div>
 
+  <!-- Un único recorrido: las entradas de administración solo se diferencian
+       por su clase, y esa marca viaja ya en el propio elemento. -->
   <nav class="nav-links">
-    @for (item of navItems; track item.route) {
-      <a class="nav-item" (click)="navigate(item.route)">
+    @for (item of entradas(); track item.route) {
+      <a class="nav-item" [class.admin-item]="item.esAdmin" (click)="navigate(item.route)">
         <span class="material-icons">{{ item.icon }}</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span class="nav-label">{{ item.label }}</span>
         }
       </a>
-    }
-
-    @if (isLoggedIn()) {
-      @for (item of adminItems; track item.route) {
-        <a class="nav-item admin-item" (click)="navigate(item.route)">
-          <span class="material-icons">{{ item.icon }}</span>
-          @if (!isCollapsed() || isMobileOpen()) {
-            <span class="nav-label">{{ item.label }}</span>
-          }
-        </a>
-      }
     }
   </nav>
 
   <div class="sidebar-footer">
 
-    <button class="theme-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
-      <span class="material-icons">{{ isDark() ? 'light_mode' : 'dark_mode' }}</span>
-      @if (!isCollapsed() || isMobileOpen()) {
-        <span>{{ isDark() ? 'Modo claro' : 'Modo oscuro' }}</span>
+    <button class="theme-btn" (click)="toggleTheme()" [title]="tema().texto">
+      <span class="material-icons">{{ tema().icono }}</span>
+      @if (mostrarEtiquetas()) {
+        <span>{{ tema().texto }}</span>
       }
     </button>
 
     @if (isLoggedIn()) {
       <div class="admin-info">
         <span class="material-icons">account_circle</span>
-        @if (!isCollapsed() || isMobileOpen()) {
+        @if (mostrarEtiquetas()) {
           <span class="admin-name">{{ currentAdmin()?.username }}</span>
         }
       </div>
-      <button class="logout-btn" (click)="logout()">
-        <span class="material-icons">logout</span>
-        @if (!isCollapsed() || isMobileOpen()) {
-          <span>Cerrar sesión</span>
-        }
-      </button>
-    } @else {
-      <button class="login-btn" (click)="openLogin()">
-        <span class="material-icons">login</span>
-        @if (!isCollapsed() || isMobileOpen()) {
-          <span>Iniciar sesión</span>
-        }
-      </button>
     }
+
+    <!-- Iniciar y cerrar sesión son el mismo botón en dos estados; el
+         componente decide cuál toca. -->
+    <button [class]="accionSesion().clase" (click)="alPulsarSesion()">
+      <span class="material-icons">{{ accionSesion().icono }}</span>
+      @if (mostrarEtiquetas()) {
+        <span>{{ accionSesion().texto }}</span>
+      }
+    </button>
   </div>
 
 </aside>

@@ -37,6 +37,19 @@ const TIPOS = Object.entries(ETIQUETAS_TIPO) as [TipoReporte, string][];
 /** Días que abarca el rango propuesto por defecto al abrir la pantalla. */
 const DIAS_POR_DEFECTO = 7;
 
+/**
+ * Formatea una fecha como `YYYY-MM-DD`, que es lo que espera `<input type="date">`.
+ *
+ * Se construye a partir de los componentes locales y no de `toISOString`, que
+ * convierte a UTC y en zonas con desfase negativo devolvería el día anterior.
+ */
+const paraInputDate = (fecha: Date): string => {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
+};
+
+
 @Component({
   selector: 'app-reportes',
   standalone: true,
@@ -92,6 +105,12 @@ export class Reportes implements OnInit {
     idZona: [''],
   });
 
+  /**
+   * Deja la pantalla lista para generar un reporte sin teclear nada.
+   *
+   * Propone el rango antes de pedir datos: así el formulario aparece ya
+   * relleno aunque las dos consultas tarden en responder.
+   */
   ngOnInit(): void {
     this.proponerRango();
     this.cargarZonas();
@@ -147,15 +166,15 @@ export class Reportes implements OnInit {
     this.isGenerando.set(true);
     this.error.set('');
 
-    const v = this.form.value;
+    const valores = this.form.value;
     this.reportesService
       .crear({
-        tipoReporte: v.tipoReporte,
+        tipoReporte: valores.tipoReporte,
         // El input de tipo date da solo la fecha; se extiende al día completo
         // para que el rango incluya lo ocurrido durante la jornada final.
-        rangoInicio: new Date(`${v.rangoInicio}T00:00:00`).toISOString(),
-        rangoFin: new Date(`${v.rangoFin}T23:59:59`).toISOString(),
-        idZona: v.idZona || undefined,
+        rangoInicio: new Date(`${valores.rangoInicio}T00:00:00`).toISOString(),
+        rangoFin: new Date(`${valores.rangoFin}T23:59:59`).toISOString(),
+        idZona: valores.idZona || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -226,14 +245,3 @@ export class Reportes implements OnInit {
   }
 }
 
-/**
- * Formatea una fecha como `YYYY-MM-DD`, que es lo que espera `<input type="date">`.
- *
- * Se construye a partir de los componentes locales y no de `toISOString`, que
- * convierte a UTC y en zonas con desfase negativo devolvería el día anterior.
- */
-function paraInputDate(fecha: Date): string {
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-  const dia = String(fecha.getDate()).padStart(2, '0');
-  return `${fecha.getFullYear()}-${mes}-${dia}`;
-}
