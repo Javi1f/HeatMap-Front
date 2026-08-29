@@ -22,7 +22,7 @@ const REQUIRED = ['API_URL', 'ENCRYPTION_KEY'];
 
 const missing = REQUIRED.filter((name) => !process.env[name]);
 if (missing.length > 0) {
-  console.error(`ERROR: faltan ${missing.join(', ')} en .env`);
+  process.stderr.write(`ERROR: faltan ${missing.join(', ')} en .env\n`);
   process.exit(1);
 }
 
@@ -45,4 +45,7 @@ const contents = [
 ].join('\n');
 
 fs.writeFileSync(OUTPUT, contents);
-console.log('config.ts generado desde .env');
+// `process.stdout` y no `console`: esto es un script de Node del proceso de
+// compilación, no código que llegue al navegador, y así queda dicho también
+// para quien lo lea.
+process.stdout.write('config.ts generado desde .env\n');

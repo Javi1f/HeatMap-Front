@@ -58,6 +58,23 @@ const REFRESH_INTERVAL_MS = 60_000;
 /**
  * Componente del dashboard de métricas.
  */
+/* ── Ayudantes de presentación ────────────────────────────────────
+   Funciones puras: reciben lo que necesitan y no tocan estado alguno. Se
+   definen antes del componente porque con `const` no hay izado. */
+
+/** Clase CSS de la barra de aforo según el nivel de ocupación. */
+const levelClass = (nivel: string): string => `level-${nivel}`;
+
+/**
+ * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
+ * ocupación no desborde la celda.
+ */
+const aforoWidth = (zone: ZoneOccupancy): number => Math.min(zone.porcentajeAforo ?? 0, 100);
+
+/** Formatea un valor que puede no existir todavía. */
+const fmt = (value: number | null | undefined, suffix = ''): string =>
+  value === null || value === undefined ? '—' : `${value}${suffix}`;
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -210,23 +227,18 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   /*
-   * Los tres ayudantes que siguen no dependen del estado del componente. Se
-   * declaran como propiedades con función y no como métodos porque la
-   * alternativa que sugiere el análisis —convertirlos en estáticos— no sirve
-   * aquí: una plantilla de Angular solo resuelve miembros de la instancia.
+   * Los tres ayudantes que siguen viven en el módulo, no en la clase: no
+   * dependen de su estado. La clase se limita a exponerlos, porque una
+   * plantilla de Angular solo resuelve miembros de la instancia y por eso no
+   * pueden declararse estáticos.
    */
 
   /** Clase CSS de la barra de aforo según el nivel de ocupación. */
-  readonly levelClass = (nivel: string): string => `level-${nivel}`;
+  readonly levelClass = levelClass;
 
-  /**
-   * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
-   * ocupación no desborde la celda.
-   */
-  readonly aforoWidth = (zone: ZoneOccupancy): number =>
-    Math.min(zone.porcentajeAforo ?? 0, 100);
+  /** Anchura de la barra de aforo, acotada al 100 %. */
+  readonly aforoWidth = aforoWidth;
 
   /** Formatea un valor que puede no existir todavía. */
-  readonly fmt = (value: number | null | undefined, suffix = ''): string =>
-    value === null || value === undefined ? '—' : `${value}${suffix}`;
+  readonly fmt = fmt;
 }

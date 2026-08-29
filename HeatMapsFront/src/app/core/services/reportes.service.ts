@@ -91,6 +91,30 @@ export interface ExportacionCsv {
 /**
  * Servicio singleton de reportes.
  */
+/**
+ * Provoca la descarga de un archivo de texto en el navegador.
+ *
+ * El enlace se crea, se pulsa y se retira sin llegar a mostrarse. La URL del
+ * blob se libera después: sin `revokeObjectURL` el contenido quedaría retenido
+ * en memoria hasta recargar la página, y un reporte grande no es pequeño.
+ *
+ * @param nombreArchivo - Nombre con el que se guarda.
+ * @param contenido     - Texto completo del archivo.
+ */
+const descargar = (nombreArchivo: string, contenido: string): void => {
+  const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombreArchivo;
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+
+  URL.revokeObjectURL(url);
+};
+
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
   /** Cliente HTTP con los interceptores de auth y cifrado ya aplicados. */
@@ -128,27 +152,3 @@ export class ReportesService {
       .pipe(tap((res) => descargar(res.data.nombreArchivo, res.data.contenido)));
   }
 }
-
-/**
- * Provoca la descarga de un archivo de texto en el navegador.
- *
- * El enlace se crea, se pulsa y se retira sin llegar a mostrarse. La URL del
- * blob se libera después: sin `revokeObjectURL` el contenido quedaría retenido
- * en memoria hasta recargar la página, y un reporte grande no es pequeño.
- *
- * @param nombreArchivo - Nombre con el que se guarda.
- * @param contenido     - Texto completo del archivo.
- */
-const descargar = (nombreArchivo: string, contenido: string): void => {
-  const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const enlace = document.createElement('a');
-  enlace.href = url;
-  enlace.download = nombreArchivo;
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
-
-  URL.revokeObjectURL(url);
-};

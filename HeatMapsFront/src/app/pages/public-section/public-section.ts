@@ -37,6 +37,23 @@ const ETIQUETA_NIVEL: Record<string, string> = {
   'sin datos': 'Sin datos',
 };
 
+/* ── Ayudantes de presentación ────────────────────────────────────
+   Funciones puras, definidas antes del componente porque con `const` no hay
+   izado que las adelante. */
+
+/** Texto legible de un nivel de ocupación. */
+const etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
+
+/**
+ * Clase CSS de un nivel de ocupación.
+ *
+ * El nivel llega como `sin datos`, con espacio, y un atributo `class` se parte
+ * por los espacios: componerlo tal cual daba dos clases sueltas (`nivel-sin` y
+ * `datos`) y ninguna regla llegaba a aplicarse, así que el distintivo salía
+ * transparente y con el borde en blanco.
+ */
+const claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
+
 @Component({
   selector: 'app-public-section',
   standalone: true,
@@ -154,7 +171,7 @@ export class PublicSection implements OnInit, OnDestroy {
     const nivel = zona.nivelOcupacion;
     if (nivel === 'sin datos' && (this.mapa()?.situados ?? 0) > 0) return null;
 
-    return { clase: this.claseNivel(nivel), etiqueta: this.etiquetaNivel(nivel) };
+    return { clase: claseNivel(nivel), etiqueta: etiquetaNivel(nivel) };
   });
 
   /**
@@ -193,24 +210,16 @@ export class PublicSection implements OnInit, OnDestroy {
   }
 
   /*
-   * Los dos ayudantes que siguen no dependen del estado del componente. Se
-   * declaran como propiedades con función y no como métodos porque la
-   * alternativa de convertirlos en estáticos no sirve aquí: una plantilla de
-   * Angular solo resuelve miembros de la instancia.
+   * Los dos ayudantes que siguen viven en el módulo, no en la clase: no
+   * dependen de su estado. La clase se limita a exponerlos, porque una
+   * plantilla de Angular solo resuelve miembros de la instancia.
    */
 
   /** Texto legible de un nivel de ocupación. */
-  readonly etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
+  readonly etiquetaNivel = etiquetaNivel;
 
-  /**
-   * Clase CSS de un nivel de ocupación.
-   *
-   * El nivel llega como `sin datos`, con espacio, y un atributo `class` se
-   * parte por los espacios: componerlo tal cual daba dos clases sueltas
-   * (`nivel-sin` y `datos`) y ninguna regla llegaba a aplicarse, así que el
-   * distintivo salía transparente y con el borde en blanco.
-   */
-  readonly claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
+  /** Clase CSS de un nivel de ocupación. */
+  readonly claseNivel = claseNivel;
 
   /** Carga los espacios y selecciona el primero. */
   private cargarZonas(): void {
