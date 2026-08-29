@@ -136,17 +136,26 @@ export class PublicSection implements OnInit, OnDestroy {
   });
 
   /**
-   * `true` si merece la pena mostrar el distintivo de nivel.
+   * Datos del distintivo de nivel, o `null` si no procede mostrarlo.
    *
-   * El nivel sale de las ventanas ya consolidadas y el mapa de las detecciones
-   * recientes, así que al arrancar puede haber mapa con manchas y todavía
-   * ningún nivel. En ese caso el distintivo decía «Sin datos» al lado de un
-   * mapa con datos; se calla y deja hablar a la cifra de la portada.
+   * Reúne las tres decisiones que antes estaban sueltas en la plantilla —si se
+   * muestra, con qué clase y con qué texto—, que en realidad son la misma cosa
+   * mirada por tres lados.
+   *
+   * Se calla cuando diría «Sin datos» habiendo mapa con detecciones: el nivel
+   * sale de las ventanas ya consolidadas y el mapa de lo captado hace un rato,
+   * así que al arrancar puede haber manchas y todavía ningún nivel, y el
+   * distintivo contradiría al mapa que tiene al lado.
    */
-  mostrarNivel(nivel: string): boolean {
-    if (nivel !== 'sin datos') return true;
-    return (this.mapa()?.situados ?? 0) === 0;
-  }
+  nivelVista = computed<{ clase: string; etiqueta: string } | null>(() => {
+    const zona = this.zonaActual();
+    if (!zona) return null;
+
+    const nivel = zona.nivelOcupacion;
+    if (nivel === 'sin datos' && (this.mapa()?.situados ?? 0) > 0) return null;
+
+    return { clase: this.claseNivel(nivel), etiqueta: this.etiquetaNivel(nivel) };
+  });
 
   /**
    * Arranca la carga inicial, el refresco periódico y la escucha del socket.

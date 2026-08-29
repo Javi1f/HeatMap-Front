@@ -66,6 +66,134 @@ const MARGEN_ESTRECHO = 16;
 /** Ancho de lienzo por debajo del cual se usa el margen estrecho. */
 const ANCHO_ESTRECHO = 420;
 
+/**
+ * Lee un token CSS del lienzo, con valor de respaldo.
+ *
+ * El patrón «leer, recortar y caer al valor por defecto» se repetía en cada
+ * color de cada método de dibujo, sumando una bifurcación cada vez.
+ */
+const tokenCss = (estilo: CSSStyleDeclaration, nombre: string, porDefecto: string): string =>
+  estilo.getPropertyValue(nombre).trim() || porDefecto;
+
+/** Proporción alto/ancho del plano; 0.5 mientras no hay mapa que consultar. */
+const proporcionDe = (mapa: MapaDibujable | null): number =>
+  mapa ? mapa.alto / mapa.ancho : 0.5;
+
+/** Margen que corresponde a un ancho de lienzo dado. */
+const margenPara = (anchoCss: number): number =>
+  anchoCss < ANCHO_ESTRECHO ? MARGEN_ESTRECHO : MARGEN_AMPLIO;
+
+/** Densidad de la pantalla, con respaldo para entornos que no la exponen. */
+const densidadPantalla = (): number => window.devicePixelRatio || 1;
+
+/* ── Ayudantes de dibujo ──────────────────────────────────────────
+   Viven en el modulo y no en la clase porque no tocan su estado: reciben
+   todo lo que necesitan por parametro. Van antes del componente para que
+   esten definidos donde se usan; con `const` no hay izado que valga. */
+
+/** Tabla precalculada de 256 colores, uno por nivel de opacidad. */
+const tablaDeColor = (): [number, number, number, number][] => {
+  const aux = document.createElement('canvas');
+  aux.width = 256;
+  aux.height = 1;
+  const ctx = aux.getContext('2d');
+  if (!ctx) return new Array(256).fill([0, 0, 0, 0]);
+
+  const degradado = ctx.createLinearGradient(0, 0, 256, 0);
+  for (const [parada, color] of RAMPA) degradado.addColorStop(parada, color);
+  ctx.fillStyle = degradado;
+  ctx.fillRect(0, 0, 256, 1);
+
+  const datos = ctx.getImageData(0, 0, 256, 1).data;
+  const tabla: [number, number, number, number][] = [];
+  for (let i = 0; i < 256; i++) {
+    const desplazamiento = i * 4;
+    tabla.push([
+      datos[desplazamiento],
+      datos[desplazamiento + 1],
+      datos[desplazamiento + 2],
+      datos[desplazamiento + 3],
+    ]);
+  }
+  return tabla;
+};
+
+/**
+ * Sustituye la opacidad acumulada por el color de la rampa.
+ *
+ * Recorre el mapa de píxeles una sola vez y usa una tabla de 256 entradas
+ * precalculada, en lugar de interpolar en cada píxel.
+ */
+const colorear = (ctx: CanvasRenderingContext2D, ancho: number, alto: number): void => {
+  const imagen = ctx.getImageData(0, 0, ancho, alto);
+  const px = imagen.data;
+  const tabla = tablaDeColor();
+
+  for (let i = 0; i < px.length; i += 4) {
+    const alfa = px[i + 3];
+    if (alfa === 0) continue;
+    const color = tabla[alfa];
+    px[i] = color[0];
+    px[i + 1] = color[1];
+    px[i + 2] = color[2];
+    px[i + 3] = color[3];
+  }
+
+  ctx.putImageData(imagen, 0, 0);
+};
+
+
+/**
+ * Pinta el punto que representa un nodo.
+ *
+ * Lleva halo oscuro debajo y filo claro encima para que se distinga tanto
+ * sobre una mancha saturada como sobre el plano vacío.
+ */
+const dibujarMarcaNodo = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  color: string,
+): void => {
+  ctx.beginPath();
+  ctx.arc(x, y, 9, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x, y, 5.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.stroke();
+};
+
+/**
+ * Rotula un nodo hacia el interior del plano.
+ *
+ * La etiqueta se coloca del lado contrario al borde más cercano, decidido
+ * por el cuadrante que ocupa el nodo: puesta siempre al mismo lado, la de
+ * los nodos de las esquinas se saldría del lienzo.
+ */
+const dibujarEtiquetaNodo = (
+  ctx: CanvasRenderingContext2D,
+  nodo: NodoDibujable,
+  mapa: MapaDibujable,
+  x: number,
+  y: number,
+  color: string,
+): void => {
+  const haciaLaIzquierda = nodo.x > mapa.ancho / 2;
+  const haciaAbajo = nodo.y > mapa.alto / 2;
+
+  ctx.fillStyle = color;
+  ctx.font = '600 12px "Roboto", system-ui, sans-serif';
+  ctx.textAlign = haciaLaIzquierda ? 'right' : 'left';
+  ctx.textBaseline = haciaAbajo ? 'top' : 'bottom';
+  ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
+};
+
 @Component({
   selector: 'app-mapa-lienzo',
   standalone: true,
@@ -208,15 +336,15 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     // El plano manda en la proporción: el alto se deduce del ancho disponible
     // para que un espacio de 17,64 x 9,10 m no salga deformado.
-    const proporcion = this.mapa ? this.mapa.alto / this.mapa.ancho : 0.5;
     const anchoCss = contenedor.clientWidth;
-    this.margen = anchoCss < ANCHO_ESTRECHO ? MARGEN_ESTRECHO : MARGEN_AMPLIO;
+    this.margen = margenPara(anchoCss);
     this.anchoDibujado = anchoCss;
-    const altoCss = Math.round((anchoCss - this.margen * 2) * proporcion) + this.margen * 2;
+    const altoCss =
+      Math.round((anchoCss - this.margen * 2) * proporcionDe(this.mapa)) + this.margen * 2;
 
     // El lienzo se dibuja a la resolución real de la pantalla y se muestra al
     // tamaño CSS; sin esto, en pantallas de alta densidad se ve borroso.
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = densidadPantalla();
     canvas.width = Math.round(anchoCss * dpr);
     canvas.height = Math.round(altoCss * dpr);
     canvas.style.width = `${anchoCss}px`;
@@ -243,9 +371,9 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     escala: number,
   ): void {
     const estilo = getComputedStyle(this.lienzoRef.nativeElement);
-    const fondo = estilo.getPropertyValue('--plano-fondo').trim() || '#1a1f27';
-    const borde = estilo.getPropertyValue('--plano-borde').trim() || '#39424f';
-    const retic = estilo.getPropertyValue('--plano-reticula').trim() || 'rgba(255,255,255,0.05)';
+    const fondo = tokenCss(estilo, '--plano-fondo', '#1a1f27');
+    const borde = tokenCss(estilo, '--plano-borde', '#39424f');
+    const retic = tokenCss(estilo, '--plano-reticula', 'rgba(255,255,255,0.05)');
 
     ctx.fillStyle = fondo;
     ctx.fillRect(this.margen, this.margen, ancho, alto);
@@ -348,69 +476,19 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     alto: number,
   ): void {
     const estilo = getComputedStyle(this.lienzoRef.nativeElement);
-    const activo = estilo.getPropertyValue('--nodo-activo').trim() || '#e8640c';
-    const inactivo = estilo.getPropertyValue('--nodo-inactivo').trim() || '#6b7481';
-    const texto = estilo.getPropertyValue('--plano-texto').trim() || '#c8cfd9';
+    const activo = tokenCss(estilo, '--nodo-activo', '#e8640c');
+    const inactivo = tokenCss(estilo, '--nodo-inactivo', '#6b7481');
+    const texto = tokenCss(estilo, '--plano-texto', '#c8cfd9');
 
     for (const nodo of mapa.nodos) {
       const x = this.margen + nodo.x * escala;
       const y = this.margen + alto - nodo.y * escala;
 
-      this.dibujarMarcaNodo(ctx, x, y, nodo.aportoDatos ? activo : inactivo);
-      this.dibujarEtiquetaNodo(ctx, nodo, mapa, x, y, texto);
+      dibujarMarcaNodo(ctx, x, y, nodo.aportoDatos ? activo : inactivo);
+      dibujarEtiquetaNodo(ctx, nodo, mapa, x, y, texto);
     }
   }
 
-  /**
-   * Pinta el punto que representa un nodo.
-   *
-   * Lleva halo oscuro debajo y filo claro encima para que se distinga tanto
-   * sobre una mancha saturada como sobre el plano vacío.
-   */
-  private dibujarMarcaNodo(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    color: string,
-  ): void {
-    ctx.beginPath();
-    ctx.arc(x, y, 9, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(x, y, 5.5, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-    ctx.stroke();
-  }
-
-  /**
-   * Rotula un nodo hacia el interior del plano.
-   *
-   * La etiqueta se coloca del lado contrario al borde más cercano, decidido
-   * por el cuadrante que ocupa el nodo: puesta siempre al mismo lado, la de
-   * los nodos de las esquinas se saldría del lienzo.
-   */
-  private dibujarEtiquetaNodo(
-    ctx: CanvasRenderingContext2D,
-    nodo: NodoDibujable,
-    mapa: MapaDibujable,
-    x: number,
-    y: number,
-    color: string,
-  ): void {
-    const haciaLaIzquierda = nodo.x > mapa.ancho / 2;
-    const haciaAbajo = nodo.y > mapa.alto / 2;
-
-    ctx.fillStyle = color;
-    ctx.font = '600 12px "Roboto", system-ui, sans-serif';
-    ctx.textAlign = haciaLaIzquierda ? 'right' : 'left';
-    ctx.textBaseline = haciaAbajo ? 'top' : 'bottom';
-    ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
-  }
 
   /** Rotula las medidas del espacio en los dos ejes. */
   private dibujarEscalaMetros(
@@ -420,7 +498,7 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     alto: number,
   ): void {
     const estilo = getComputedStyle(this.lienzoRef.nativeElement);
-    ctx.fillStyle = estilo.getPropertyValue('--plano-cota').trim() || '#8a929e';
+    ctx.fillStyle = tokenCss(estilo, '--plano-cota', '#8a929e');
     ctx.font = '500 11px "Roboto", system-ui, sans-serif';
 
     ctx.textAlign = 'center';
@@ -435,54 +513,3 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     ctx.restore();
   }
 }
-
-/**
- * Sustituye la opacidad acumulada por el color de la rampa.
- *
- * Recorre el mapa de píxeles una sola vez y usa una tabla de 256 entradas
- * precalculada, en lugar de interpolar en cada píxel.
- */
-const colorear = (ctx: CanvasRenderingContext2D, ancho: number, alto: number): void => {
-  const imagen = ctx.getImageData(0, 0, ancho, alto);
-  const px = imagen.data;
-  const tabla = tablaDeColor();
-
-  for (let i = 0; i < px.length; i += 4) {
-    const alfa = px[i + 3];
-    if (alfa === 0) continue;
-    const color = tabla[alfa];
-    px[i] = color[0];
-    px[i + 1] = color[1];
-    px[i + 2] = color[2];
-    px[i + 3] = color[3];
-  }
-
-  ctx.putImageData(imagen, 0, 0);
-};
-
-/** Tabla precalculada de 256 colores, uno por nivel de opacidad. */
-const tablaDeColor = (): [number, number, number, number][] => {
-  const aux = document.createElement('canvas');
-  aux.width = 256;
-  aux.height = 1;
-  const ctx = aux.getContext('2d');
-  if (!ctx) return new Array(256).fill([0, 0, 0, 0]);
-
-  const degradado = ctx.createLinearGradient(0, 0, 256, 0);
-  for (const [parada, color] of RAMPA) degradado.addColorStop(parada, color);
-  ctx.fillStyle = degradado;
-  ctx.fillRect(0, 0, 256, 1);
-
-  const datos = ctx.getImageData(0, 0, 256, 1).data;
-  const tabla: [number, number, number, number][] = [];
-  for (let i = 0; i < 256; i++) {
-    const desplazamiento = i * 4;
-    tabla.push([
-      datos[desplazamiento],
-      datos[desplazamiento + 1],
-      datos[desplazamiento + 2],
-      datos[desplazamiento + 3],
-    ]);
-  }
-  return tabla;
-};

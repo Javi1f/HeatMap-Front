@@ -10,7 +10,6 @@ exclude_patterns = [
 name = "javascript"
 
   [analyzers.meta]
-  plugins = ["angular"]
   environment = ["browser", "nodejs"]
   dialect = "typescript"
   cyclomatic_complexity_threshold = "high"
