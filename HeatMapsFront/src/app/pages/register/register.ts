@@ -197,14 +197,12 @@ export class Register {
         const body = err.error as VerifyCodeErrorResponse;
 
         if (body?.details?.attemptsLeft === 0) {
-          // Intentos agotados: el backend eliminó el pending; reiniciar flujo
           this.showModal.set(false);
           this.registerForm.reset();
           this.verificationCodeValue = '';
           this.verificationService.reset();
           this.formError.set('Verificación errónea. Solicita un nuevo código.');
         } else {
-          // Código incorrecto pero quedan intentos: actualizar el modal
           this.verificationService.handleServerError(body?.details?.attemptsLeft ?? 0);
         }
       }
@@ -218,7 +216,6 @@ export class Register {
    * cierra el modal y resetea el formulario de registro.
    */
   onCloseModal(): void {
-    // Notificar al backend para que elimine el registro pendiente
     this.authService.cancelVerification(this.pendingEmail).subscribe();
     this.showModal.set(false);
     this.pendingEmail = '';

@@ -1,183 +1,227 @@
 /**
  * @file public-section.ts
- * @description Sección pública de monitoreo de sensores en tiempo real (`/public`).
+ * @description Ocupación en tiempo real, abierta a cualquiera (`/public`).
  *
- * Muestra una tabla que se actualiza automáticamente con los datos emitidos
- * por el backend a través de Socket.IO cada vez que llega una lectura del
- * broker Kafka. No requiere autenticación.
+ * ## Qué muestra
+ * El plano del espacio con sus nodos situados y el calor de la ocupación. Nada
+ * más: ni direcciones MAC, ni identificadores de dispositivo, ni medidas por
+ * dispositivo. Antes esta pantalla listaba cada dispositivo detectado con su
+ * MAC, lo que permitía a cualquier visitante seguir a una persona por el
+ * espacio; ahora el backend ni siquiera envía ese dato.
  *
- * ## Estrategia de actualización
- * Se mantiene un `Map<sensor_id, SensorData>` indexado por ID de sensor.
- * Cada mensaje de `sensor-data` sobreescribe la entrada del sensor correspondiente,
- * de modo que la tabla siempre muestra la **lectura más reciente por sensor**,
- * sin acumular histórico en memoria.
- *
- * ## Tabla expandible
- * La fila principal de cada sensor es clicable (también accesible por teclado)
- * y expande una sub-tabla con el detalle de todos los dispositivos detectados
- * en esa lectura. Solo un sensor puede estar expandido a la vez.
- *
- * ## Ciclo de vida de las suscripciones
- * Las suscripciones a `SocketService.sensorData$` y `connected$` se agrupan
- * en un único `Subscription` compuesto para simplificar el cleanup en `ngOnDestroy`.
- *
- * @see {@link SocketService} — fuente de los datos en tiempo real.
- * @see {@link SensorData} — forma del payload del evento `sensor-data`.
+ * ## Dos fuentes, dos ritmos
+ * El mapa se pide por HTTP y se refresca cada {@link REFRESCO_MS}, porque
+ * situar dispositivos exige consultar la base. El contador de la cabecera llega
+ * por WebSocket en cuanto un nodo emite, y da la sensación de inmediatez que el
+ * sondeo no puede dar.
  */
 
-import { Component, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { describeHttpError } from '../../core/http-error';
+import { MapaPublico, PublicoService, ZonaPublica } from '../../core/services/publico.service';
+import { MapaLienzoComponent } from '../../shared/components/mapa-lienzo/mapa-lienzo';
 import { SocketService } from '../../socket/socket.service';
-import { SensorData, SensorDevice } from '../../socket/sensor-data.model';
-import { SensorDevicesRowComponent } from './sensor-devices-row';
 
-// ── Funciones de utilidad puras (sin estado de instancia) ──────────────────
+/** Periodo de refresco del mapa, en milisegundos. */
+const REFRESCO_MS = 30_000;
 
-/**
- * Formatea un número de bytes a una cadena legible con la unidad apropiada.
- *
- * @param bytes - Número de bytes a formatear.
- * @returns Cadena con la unidad: `"1023 B"`, `"1.5 KB"`, `"2.34 MB"`, etc.
- */
-const formatBytes = (bytes: number): string => {
-  if (bytes < 1024)       return `${bytes} B`;
-  if (bytes < 1_048_576)  return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1_048_576).toFixed(2)} MB`;
+/** Etiquetas de cada nivel de ocupación. */
+const ETIQUETA_NIVEL: Record<string, string> = {
+  baja: 'Poca gente',
+  media: 'Moderado',
+  alta: 'Muy concurrido',
+  'sin datos': 'Sin datos',
 };
 
-/**
- * Calcula el RSSI promedio de todos los dispositivos de una lectura.
- *
- * @param data - Lectura del sensor con la lista de dispositivos.
- * @returns El RSSI promedio redondeado al entero más cercano,
- *          o `null` si la lectura no contiene dispositivos.
- */
-const averageRssi = (data: SensorData): number | null => {
-  if (data.devices.length === 0) return null;
-  const sum = data.devices.reduce((acc: number, d: SensorDevice) => acc + d.rssi, 0);
-  return Math.round(sum / data.devices.length);
-};
-
-/**
- * Devuelve la clase CSS de calidad para un valor RSSI dado.
- *
- * | Rango dBm     | Clase CSS        | Calidad   |
- * |---------------|------------------|-----------|
- * | `>= -50`      | `rssi-excellent` | Excelente |
- * | `-50` a `-70` | `rssi-good`      | Buena     |
- * | `-70` a `-85` | `rssi-fair`      | Aceptable |
- * | `< -85`       | `rssi-poor`      | Débil     |
- *
- * @param rssi - Valor RSSI en dBm (número negativo).
- * @returns Nombre de la clase CSS correspondiente a la calidad de la señal.
- */
-const rssiClass = (rssi: number): string => {
-  if (rssi >= -50) return 'rssi-excellent';
-  if (rssi >= -70) return 'rssi-good';
-  if (rssi >= -85) return 'rssi-fair';
-  return 'rssi-poor';
-};
-
-/**
- * Componente de la sección pública de monitoreo de sensores.
- * Accesible sin autenticación; consume el WebSocket de {@link SocketService}.
- */
 @Component({
   selector: 'app-public-section',
   standalone: true,
-  imports: [CommonModule, SensorDevicesRowComponent],
+  imports: [CommonModule, FormsModule, MapaLienzoComponent],
   templateUrl: './public-section.html',
-  styleUrl: './public-section.css',
+  styleUrl: './public-section.css'
 })
 export class PublicSection implements OnInit, OnDestroy {
+  /** Origen de las zonas y del mapa. */
+  private publicoService = inject(PublicoService);
+
+  /** Flujo en vivo del conteo por nodo. */
   private readonly socketService = inject(SocketService);
 
-  /**
-   * Suscripciones compuestas a los observables del socket.
-   * Se cancela completa en `ngOnDestroy` para evitar fugas de memoria.
-   */
-  private readonly subscriptions = new Subscription();
+  /** Suscripciones al socket, que se cierran al salir. */
+  private suscripciones = new Subscription();
 
-  /** `true` cuando el WebSocket está conectado al servidor. */
-  readonly isConnected = signal<boolean>(false);
+  /** Temporizador del refresco del mapa. */
+  private temporizador: ReturnType<typeof setInterval> | null = null;
+
+  /** Espacios consultables. */
+  zonas = signal<ZonaPublica[]>([]);
+
+  /** Zona seleccionada. */
+  zonaSeleccionada = signal<string>('');
+
+  /** Mapa recibido, o `null` mientras no llegue. */
+  mapa = signal<MapaPublico | null>(null);
+
+  /** `true` durante la primera carga. */
+  cargando = signal<boolean>(true);
+
+  /** Mensaje de error, vacío si no hay ninguno. */
+  error = signal<string>('');
+
+  /** `true` mientras el WebSocket está conectado. */
+  enVivo = signal<boolean>(false);
 
   /**
-   * Fecha y hora de la última lectura recibida.
-   * `null` mientras no se haya recibido ningún dato.
-   */
-  readonly lastUpdated = signal<Date | null>(null);
-
-  /**
-   * Mapa privado indexado por `sensor_id` con la última lectura de cada sensor.
-   * Se actualiza en cada mensaje de `sensor-data`; los datos se acumulan por sensor
-   * pero solo se guarda la lectura más reciente de cada uno.
+   * Último conteo comunicado por cada nodo.
    *
-   * Privado: los componentes externos solo acceden a través de `sensorList`.
+   * Se guarda por nodo y no como total acumulado porque cada uno emite a su
+   * ritmo: sumar lecturas de instantes distintos daría una cifra que nunca
+   * existió.
    */
-  private readonly sensorMap = signal<ReadonlyMap<string, SensorData>>(new Map());
+  private conteoPorNodo = signal<Record<string, number>>({});
+
+  /** Dispositivos vistos ahora mismo, sumando la última lectura de cada nodo. */
+  enVivoTotal = computed(() =>
+    Object.values(this.conteoPorNodo()).reduce((a, b) => a + b, 0),
+  );
+
+  /** Zona seleccionada, resuelta a su objeto. */
+  zonaActual = computed(() =>
+    this.zonas().find((z) => z.idZona === this.zonaSeleccionada()) ?? null,
+  );
 
   /**
-   * Lista ordenada de las últimas lecturas por sensor, derivada de `sensorMap`.
-   * Se usa directamente en el `@for` del template para renderizar las filas.
+   * `true` sólo si están llegando lecturas ahora mismo.
+   *
+   * No basta con que el WebSocket esté conectado: se conecta al abrir la
+   * página, y hasta que un nodo emite el conteo es cero. Anunciar «0
+   * dispositivos ahora» sobre un mapa lleno de manchas hacía dudar de las dos
+   * cifras a la vez.
    */
-  readonly sensorList = computed(() => Array.from(this.sensorMap().values()));
+  enDirecto = computed(() => this.enVivo() && this.enVivoTotal() > 0);
 
   /**
-   * ID del sensor cuya fila de dispositivos está actualmente expandida.
-   * `null` cuando ninguna fila está expandida.
-   * Solo un sensor puede estar expandido a la vez.
+   * Cifra que encabeza la página.
+   *
+   * Prefiere el directo cuando lo hay y, si no, cae en el conteo que el
+   * backend ya calculó para dibujar el mapa. Así el número y las manchas
+   * salen siempre del mismo hecho.
    */
-  readonly expandedSensorId = signal<string | null>(null);
+  conteoVisible = computed<number | null>(() => {
+    if (this.enDirecto()) return this.enVivoTotal();
+    return this.mapa()?.situados ?? null;
+  });
+
+  /** Aclara a qué momento se refiere la cifra de arriba. */
+  conteoLeyenda = computed<string>(() => {
+    if (this.enDirecto()) return 'ahora';
+    const minutos = this.mapa()?.ventanaMinutos;
+    return minutos ? `en los últimos ${minutos} min` : '';
+  });
+
+  /**
+   * `true` si merece la pena mostrar el distintivo de nivel.
+   *
+   * El nivel sale de las ventanas ya consolidadas y el mapa de las detecciones
+   * recientes, así que al arrancar puede haber mapa con manchas y todavía
+   * ningún nivel. En ese caso el distintivo decía «Sin datos» al lado de un
+   * mapa con datos; se calla y deja hablar a la cifra de la portada.
+   */
+  mostrarNivel(nivel: string): boolean {
+    if (nivel !== 'sin datos') return true;
+    return (this.mapa()?.situados ?? 0) === 0;
+  }
 
   ngOnInit(): void {
-    // Suscribirse al estado de conexión del WebSocket
-    this.subscriptions.add(
-      this.socketService.connected$.subscribe(connected => {
-        this.isConnected.set(connected);
-      })
-    );
+    this.cargarZonas();
+    this.temporizador = setInterval(() => this.cargarMapa(true), REFRESCO_MS);
 
-    // Suscribirse al flujo de datos de sensores
-    this.subscriptions.add(
-      this.socketService.sensorData$.subscribe(data => {
-        // Sobreescribir la entrada del sensor con la lectura más reciente
-        this.sensorMap.update(map => new Map(map).set(data.sensor_id, data));
-        this.lastUpdated.set(new Date(data.received_at));
-      })
+    this.suscripciones.add(
+      this.socketService.connected$.subscribe((c) => this.enVivo.set(c)),
+    );
+    this.suscripciones.add(
+      this.socketService.sensorData$.subscribe((r) =>
+        this.conteoPorNodo.update((prev) => ({ ...prev, [r.sensor_id]: r.total_devices })),
+      ),
     );
   }
 
-  /**
-   * Alterna la expansión de la fila de dispositivos de un sensor.
-   * Si el sensor ya estaba expandido, lo colapsa. Solo uno puede estar abierto.
-   *
-   * @param sensorId - ID del sensor cuya fila se quiere expandir/colapsar.
-   */
-  toggleExpand(sensorId: string): void {
-    this.expandedSensorId.update(id => (id === sensorId ? null : sensorId));
-  }
-
-  /**
-   * Comprueba si la fila de dispositivos de un sensor está expandida.
-   *
-   * @param sensorId - ID del sensor a verificar.
-   * @returns `true` si la fila del sensor está expandida.
-   */
-  isExpanded(sensorId: string): boolean {
-    return this.expandedSensorId() === sensorId;
-  }
-
-  // ── Puentes de plantilla: exponen las funciones de módulo al contexto del template ──
-  /** @see {@link formatBytes} */
-  readonly formatBytes  = formatBytes;
-  /** @see {@link averageRssi} */
-  readonly averageRssi  = averageRssi;
-  /** @see {@link rssiClass} */
-  readonly rssiClass    = rssiClass;
-
-  /** Cancela todas las suscripciones al socket para evitar fugas de memoria. */
   ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+    if (this.temporizador !== null) clearInterval(this.temporizador);
+    this.suscripciones.unsubscribe();
+  }
+
+  /** Texto legible de un nivel de ocupación. */
+  etiquetaNivel(nivel: string): string {
+    return ETIQUETA_NIVEL[nivel] ?? nivel;
+  }
+
+  /**
+   * Clase CSS de un nivel de ocupación.
+   *
+   * El nivel llega como `sin datos`, con espacio, y un atributo `class` se
+   * parte por los espacios: concatenarlo daba dos clases sueltas
+   * (`nivel-sin` y `datos`) y ninguna regla llegaba a aplicarse, así que el
+   * distintivo salía transparente y con el borde en blanco.
+   */
+  claseNivel(nivel: string): string {
+    return 'nivel-' + nivel.replace(/\s+/g, '-');
+  }
+
+  /** Carga los espacios y selecciona el primero. */
+  private cargarZonas(): void {
+    this.publicoService.zonas().subscribe({
+      next: (res) => {
+        this.zonas.set(res.data);
+        if (res.data.length > 0) {
+          this.zonaSeleccionada.set(res.data[0].idZona);
+          this.cargarMapa();
+        } else {
+          this.cargando.set(false);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.error.set(describeHttpError(err, 'No se pudo cargar la información de los espacios.'));
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  /**
+   * Pide el mapa del espacio seleccionado.
+   *
+   * @param silencioso - `true` en los refrescos, para no parpadear.
+   */
+  cargarMapa(silencioso = false): void {
+    const zona = this.zonaSeleccionada();
+    if (!zona) return;
+
+    if (!silencioso) {
+      this.cargando.set(true);
+      this.error.set('');
+    }
+
+    this.publicoService.mapa(zona).subscribe({
+      next: (res) => {
+        this.mapa.set(res.data);
+        this.cargando.set(false);
+        this.error.set('');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.error.set(describeHttpError(err, 'No se pudo cargar el mapa de ocupación.'));
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  /** Cambia de espacio y recarga. */
+  alCambiarZona(idZona: string): void {
+    this.zonaSeleccionada.set(idZona);
+    this.mapa.set(null);
+    this.cargarMapa();
   }
 }

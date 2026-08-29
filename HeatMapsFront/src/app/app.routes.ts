@@ -14,7 +14,9 @@
  * | `/public`             | `PublicSection`  | No        | Mapa/tabla de sensores en tiempo real    |
  * | `/login`              | `Login`          | No        | Formulario de login a pantalla completa  |
  * | `/register`           | `Register`       | No        | Formulario de registro + verificación    |
- * | `/admin/dashboard`    | `Dashboard`      | Sí        | Panel de administración de correos       |
+ * | `/admin/dashboard`    | `Dashboard`      | Sí        | Métricas de ocupación y estado de la red |
+ * | `/admin/users`        | `Users`          | Sí        | Correos permitidos, admins y sesiones    |
+ * | `/admin/reportes`     | `Reportes`       | Sí        | Reportes de ocupación y exportación CSV  |
  * | `/admin`              | —                | Sí        | Redirige a `/admin/dashboard`            |
  * | `/**`                 | —                | No        | Redirige a `/` (catch-all)               |
  *
@@ -53,9 +55,22 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
+        /** Métricas de ocupación, salud de nodos y alertas. */
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/admin/dashboard/dashboard').then(m => m.Dashboard)
+      },
+      {
+        /** Control de acceso: lista blanca, administradores y sesiones. */
+        path: 'users',
+        loadComponent: () =>
+          import('./pages/admin/users/users').then(m => m.Users)
+      },
+      {
+        /** Reportes guardados sobre el histórico de ocupación. */
+        path: 'reportes',
+        loadComponent: () =>
+          import('./pages/admin/reportes/reportes').then(m => m.Reportes)
       },
       {
         path: '',

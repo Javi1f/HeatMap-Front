@@ -15,11 +15,16 @@
   margin-left: 64px;
 }
 
+/* En teléfono la barra lateral pasa a ser un cajón superpuesto, así que el
+   contenido no le reserva sitio: los 64px del carril costaban un 17% del ancho
+   de la pantalla y dejaban el mapa en poco más de 240px. El relleno superior
+   despeja el botón flotante que abre el cajón. */
 @media (max-width: 768px) {
   .main-content,
   .main-content.collapsed {
-    margin-left: 64px;
+    margin-left: 0;
     padding: 1rem;
+    padding-top: 3.75rem;
   }
 }
 

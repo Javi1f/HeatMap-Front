@@ -1,91 +1,114 @@
-<div class="public-container">
+<div class="publico">
 
-  <div class="public-header">
-    <h1 class="public-title">
-      <span class="material-icons" aria-hidden="true">sensors</span>
-      Sensores en tiempo real
-    </h1>
-    <div class="status-bar">
-      <span class="status-dot" [class.connected]="isConnected()" role="status"
-            [attr.aria-label]="isConnected() ? 'Conectado' : 'Desconectado'">
-      </span>
-      <span class="status-text">{{ isConnected() ? 'Conectado' : 'Desconectado' }}</span>
-      @if (lastUpdated()) {
-        <span class="last-updated">· Última lectura: {{ lastUpdated() | date:'HH:mm:ss' }}</span>
-      }
-    </div>
-  </div>
-
-  <section class="sensor-card">
-
-    @if (sensorList().length === 0) {
-      <div class="empty-state">
-        <span class="material-icons" aria-hidden="true">wifi_off</span>
-        @if (isConnected()) {
-          <p>Esperando datos de los sensores…</p>
-          <span class="empty-hint">Los datos aparecerán aquí en cuanto lleguen lecturas</span>
-        } @else {
-          <p>Sin conexión al servidor</p>
-          <span class="empty-hint">Intentando reconectar…</span>
+  <header class="hero">
+    <p class="hero-eyebrow">Ocupación en tiempo real</p>
+    <h1 class="hero-titulo">Mira dónde hay sitio<br>antes de ir</h1>
+    @if (conteoVisible() !== null) {
+      <span class="vivo">
+        @if (enDirecto()) {
+          <i class="vivo-punto"></i>
         }
-      </div>
-    } @else {
-      <div class="table-wrapper">
-        <table class="sensor-table" aria-label="Lecturas de sensores en tiempo real">
-          <thead>
-            <tr>
-              <th class="col-expand" scope="col"></th>
-              <th scope="col">Sensor</th>
-              <th class="col-num" scope="col">Dispositivos</th>
-              <th class="col-num hide-sm" scope="col">RSSI prom.</th>
-              <th class="col-num hide-sm" scope="col">Bytes</th>
-              <th class="col-time" scope="col">Hora</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (sensor of sensorList(); track sensor.sensor_id) {
-              <tr class="sensor-row"
-                  [class.expanded]="isExpanded(sensor.sensor_id)"
-                  (click)="toggleExpand(sensor.sensor_id)"
-                  (keydown.enter)="toggleExpand(sensor.sensor_id)"
-                  (keydown.space)="toggleExpand(sensor.sensor_id)"
-                  tabindex="0"
-                  role="button"
-                  [attr.aria-expanded]="isExpanded(sensor.sensor_id)"
-                  [attr.aria-label]="'Sensor ' + sensor.sensor_id">
-                <td class="cell-expand" aria-hidden="true">
-                  <span class="material-icons expand-icon"
-                        [class.rotated]="isExpanded(sensor.sensor_id)">
-                    chevron_right
-                  </span>
-                </td>
-                <td>
-                  <div class="cell-sensor">
-                    <span class="live-dot" aria-hidden="true"></span>
-                    <span class="sensor-id">{{ sensor.sensor_id }}</span>
-                  </div>
-                </td>
-                <td class="col-num">
-                  <span class="device-count">{{ sensor.total_devices }}</span>
-                </td>
-                <td class="col-num hide-sm">
-                  @if (averageRssi(sensor); as rssi) {
-                    <span class="rssi-badge" [ngClass]="rssiClass(rssi)">{{ rssi }} dBm</span>
-                  } @else {
-                    <span class="text-muted">—</span>
-                  }
-                </td>
-                <td class="col-num hide-sm">{{ formatBytes(sensor.bytes_received) }}</td>
-                <td class="col-time">{{ sensor.timestamp }}</td>
-              </tr>
+        {{ conteoVisible() }} dispositivos {{ conteoLeyenda() }}
+      </span>
+    }
+  </header>
 
-              <tr class="devices-row" appSensorDevicesRow [sensor]="sensor"
-                  [hidden]="!isExpanded(sensor.sensor_id)"></tr>
-            }
-          </tbody>
-        </table>
+  @if (error()) {
+    <div class="aviso aviso-error">
+      <span class="material-icons">error_outline</span>
+      {{ error() }}
+      <button class="reintentar" (click)="cargarMapa()">Reintentar</button>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="cargando">
+      <div class="spinner"></div>
+      <p>Cargando ocupación...</p>
+    </div>
+  } @else if (zonas().length === 0) {
+    <div class="tarjeta">
+      <div class="vacio">
+        <span class="material-icons">location_off</span>
+        <p>Todavía no hay espacios disponibles</p>
+        <span class="vacio-nota">
+          Aparecerán aquí en cuanto se registren con sus medidas y sus nodos de captura.
+        </span>
       </div>
+    </div>
+  } @else {
+
+    @if (zonas().length > 1) {
+      <nav class="selector" aria-label="Espacios disponibles">
+        @for (z of zonas(); track z.idZona) {
+          <button class="pastilla"
+                  [class.pastilla-activa]="z.idZona === zonaSeleccionada()"
+                  [attr.aria-pressed]="z.idZona === zonaSeleccionada()"
+                  (click)="alCambiarZona(z.idZona)">
+            <span class="pastilla-nombre">{{ z.nombre }}</span>
+            <span class="punto-nivel" [class]="claseNivel(z.nivelOcupacion)"></span>
+          </button>
+        }
+      </nav>
     }
 
-  </section>
+    <section class="tarjeta">
+
+      @if (zonaActual(); as z) {
+        <div class="lugar">
+          <div class="lugar-texto">
+            <h2 class="lugar-nombre">{{ z.nombre }}</h2>
+            @if (z.descripcion) {
+              <p class="lugar-desc">{{ z.descripcion }}</p>
+            }
+          </div>
+          @if (mostrarNivel(z.nivelOcupacion)) {
+            <div class="estado" [class]="claseNivel(z.nivelOcupacion)">
+              <span class="estado-punto"></span>
+              {{ etiquetaNivel(z.nivelOcupacion) }}
+            </div>
+          }
+        </div>
+      }
+
+      <div class="lienzo-marco">
+        <app-mapa-lienzo [mapa]="mapa()" />
+      </div>
+
+      <div class="pie-mapa">
+        <div class="leyenda">
+          <span class="leyenda-extremo">menos gente</span>
+          <div class="leyenda-rampa" role="img" aria-label="Escala de concentración, de menor a mayor"></div>
+          <span class="leyenda-extremo">más gente</span>
+        </div>
+        <span class="leyenda-nodo"><i class="punto-nodo"></i> nodo de captura</span>
+      </div>
+
+      @if (mapa(); as m) {
+        @if (m.situados === 0) {
+          <div class="aviso aviso-neutro">
+            <span class="material-icons">sensors_off</span>
+            Sin detecciones en los últimos {{ m.ventanaMinutos }} minutos.
+          </div>
+        }
+      }
+    </section>
+
+    <div class="notas">
+      <p class="nota">
+        El mapa muestra <strong>dispositivos</strong>, no personas: mucha gente lleva más de uno y
+        otra no lleva ninguno. Las posiciones se estiman por la potencia de la señal Wi-Fi, con un
+        margen de varios metros, así que sirve para ver dónde se agrupa la gente y no para saber
+        cuánta hay exactamente.
+      </p>
+
+      <p class="nota nota-privacidad">
+        <span class="material-icons">lock</span>
+        <span>
+          No se registra la identidad de nadie. Esta página nunca recibe identificadores de
+          dispositivo: solo cuántos hay en cada tramo del espacio.
+        </span>
+      </p>
+    </div>
+  }
 </div>

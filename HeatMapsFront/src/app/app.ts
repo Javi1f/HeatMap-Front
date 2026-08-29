@@ -57,12 +57,16 @@ export class AppComponent implements OnInit {
     private themeService:   ThemeService
   ) {}
 
+  /**
+   * Aplica el tema guardado y reconstruye la sesion si hay token.
+   *
+   * El error de `checkSession` se descarta con `noop` a proposito: el propio
+   * servicio ya llama a `clearSession()` cuando el token es invalido, asi que
+   * aqui no queda nada que manejar.
+   */
   ngOnInit(): void {
-    // Aplicar el tema guardado en localStorage al atributo data-theme del body
     this.themeService.init();
 
-    // Si hay token, intentar reconstruir la sesión en memoria.
-    // El error se descarta con noop: checkSession ya llama clearSession() internamente en caso de fallo.
     if (this.authService.getToken()) {
       this.authService.checkSession().subscribe({ error: noop });
     }

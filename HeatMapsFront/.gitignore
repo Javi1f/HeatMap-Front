@@ -47,3 +47,8 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Configuracion generada desde .env por `npm run set-env`.
+# Contiene la clave de cifrado del frontend, asi que no debe versionarse:
+# cada entorno la genera a partir de su propio .env al arrancar o compilar.
+/src/app/core/config.ts

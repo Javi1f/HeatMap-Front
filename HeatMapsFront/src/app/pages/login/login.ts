@@ -44,8 +44,6 @@ export class Login implements OnDestroy {
     public loginState: LoginStateService
   ) {}
 
-  // ── Getters de conveniencia para el template ────────────────────────────────
-
   /** Formulario reactivo con los campos `identifier` y `password`. */
   get loginForm()    { return this.loginState.loginForm;    }
   /** Acceso directo a los controles del formulario. */

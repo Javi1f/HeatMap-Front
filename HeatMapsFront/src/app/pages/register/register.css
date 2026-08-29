@@ -107,3 +107,13 @@ form { display: flex; flex-direction: column; gap: 1.25rem; }
   background-color: var(--bg-surface-hover) !important;
   border-color: var(--color-text-muted) !important;
 }
+
+/* ── Mínimos para teléfono ──────────────────────────────────── */
+
+/* El ojo del icono medía 53x23: el dedo lo falla. Se le da área de 44px sin
+   moverlo de sitio, centrando el icono dentro. */
+.toggle-password {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}

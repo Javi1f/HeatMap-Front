@@ -1,0 +1,174 @@
+/* Estilos propios de Administración de usuarios: cabecera, cards, tablas y
+   estados vacíos.
+   Lo que renderizan los componentes hijos vive en su propia hoja
+   (add-email-form.css, email-row.css, delete-confirm-modal.css), porque la
+   encapsulación emulada impide que estas reglas crucen al DOM del hijo.
+   El spinner es compartido por los tres y está en styles.css. */
+
+.dashboard-container {
+  display: flex; flex-direction: column; gap: 2rem;
+  max-width: 960px; margin: 0 auto; width: 100%;
+}
+
+.dashboard-header  { display: flex; flex-direction: column; gap: 0.25rem; }
+.dashboard-title   { display: flex; align-items: center; gap: 0.6rem; font-size: 1.8rem; font-weight: 700; color: var(--color-text); }
+.dashboard-title .material-icons { font-size: 2rem; color: var(--color-primary); }
+.dashboard-subtitle { font-size: 0.95rem; color: var(--color-text-muted); margin-left: 2.6rem; }
+
+.section-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.75rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: background-color 0.25s ease;
+  min-width: 0;
+}
+
+.section-header      { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+.section-title-group { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.section-icon        { font-size: 2rem; color: var(--color-primary); flex-shrink: 0; }
+.section-title       { font-size: 1.2rem; font-weight: 700; color: var(--color-text); }
+.section-desc        { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.1rem; }
+
+.badge {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-size: 0.8rem; font-weight: 700;
+  padding: 0.2rem 0.6rem; border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.alert { display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; }
+.alert-error { background-color: rgba(232,100,12,0.1); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
+
+.retry-btn {
+  margin-left: auto; background: none;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary); border-radius: 6px;
+  padding: 0.2rem 0.65rem; font-size: 0.8rem; cursor: pointer;
+  transition: background-color 0.2s ease; font-family: Roboto, sans-serif;
+}
+.retry-btn:hover { background-color: rgba(232,100,12,0.1); }
+
+.loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1rem; padding: 2rem; color: var(--color-text-muted); font-size: 0.9rem;
+}
+
+/* ── Tabla ────────────────────────────────────────────────────── */
+
+.table-wrapper  { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+.emails-table   { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+
+.emails-table thead tr { background-color: var(--bg-surface-deep); border-bottom: 1px solid var(--border); }
+.emails-table th {
+  padding: 0.75rem 1rem; text-align: left;
+  font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  overflow: hidden;
+}
+
+/* Los <tr> se declaran en esta plantilla (host de EmailRowComponent), por eso
+   sí reciben estos estilos; las <td> de dentro las estiliza email-row.css. */
+.emails-table tbody tr { border-bottom: 1px solid var(--border); transition: background-color 0.15s ease; }
+.emails-table tbody tr:last-child  { border-bottom: none; }
+.emails-table tbody tr:hover       { background-color: var(--bg-surface-hover); }
+.emails-table tbody tr.row-protected { opacity: 0.7; }
+
+.col-actions   { text-align: center; width: 80px; }
+.col-secondary { width: 130px; }
+
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 2.5rem; color: var(--color-text-muted); font-size: 0.9rem; }
+.empty-state .material-icons { font-size: 2.5rem; color: var(--border); }
+
+/* ── Celdas de las tablas de administradores y sesiones ──────── */
+/* Estas filas se renderizan en esta plantilla (no en un componente hijo), así
+   que sus <td> sí reciben los estilos de este archivo. Las filas de correo
+   permitido son un componente aparte y llevan los suyos en email-row.css. */
+
+.emails-table td { padding: 0.85rem 1rem; color: var(--color-text); vertical-align: middle; }
+
+.col-state       { width: 130px; text-align: center; }
+.cell-state      { text-align: center; }
+.cell-actions-td { text-align: center; width: 80px; }
+
+.cell-flex     { display: flex; align-items: center; gap: 0.5rem; overflow: hidden; }
+.row-icon      { font-size: 1rem; color: var(--color-primary); flex-shrink: 0; }
+.cell-strong   { font-weight: 500; }
+.cell-muted    { color: var(--color-text-muted); font-size: 0.88rem; }
+.cell-truncate { max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Píldoras de estado ──────────────────────────────────────── */
+
+.pill {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.2rem 0.6rem; border-radius: 20px;
+  white-space: nowrap;
+}
+.pill-ok   { background-color: rgba(46,160,67,0.12); color: #3fb950; border: 1px solid #2ea043; }
+.pill-idle { background-color: var(--bg-surface-hover); color: var(--color-text-muted); border: 1px solid var(--border-2); }
+.pill-warn { background-color: rgba(232,100,12,0.12); color: var(--color-secondary); border: 1px solid var(--color-secondary); }
+
+/* Punto pulsante del estado «en línea»: refuerza que es un dato vivo y no
+   una etiqueta estática. */
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background-color: currentColor;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.35; } }
+
+/* Segunda línea que sólo aparece en teléfono. Las columnas secundarias se
+   ocultan ahí por falta de sitio, y sin esto sus datos —el correo del
+   administrador, el origen y la vigencia de la sesión— desaparecían por
+   completo en vez de reubicarse. */
+.sub-movil { display: none; }
+
+@media (max-width: 768px) {
+  .emails-table td { padding: 0.65rem 0.75rem; }
+  .col-state       { width: auto; }
+
+  /* Las <td> se ocultan a la vez que su <th>. Antes sólo se ocultaba el
+     encabezado y la tabla quedaba descuadrada: dos títulos sobre cinco celdas. */
+  .cell-secondary { display: none; }
+
+  .sub-movil {
+    display: block;
+    margin-top: 0.25rem;
+    margin-left: 1.5rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  /* Suelo de legibilidad: por debajo de 12px el texto deja de leerse cómodamente
+     en un teléfono, y estas etiquetas llevan información de estado. */
+  .pill { font-size: 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation: none; }
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .section-card    { padding: 1.25rem; gap: 1.25rem; }
+  .section-desc    { display: none; }
+  .col-secondary   { display: none; }
+  .emails-table th { padding: 0.65rem 0.75rem; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container              { gap: 1rem; }
+  .section-card                     { padding: 1rem; gap: 1rem; }
+  .dashboard-title                  { font-size: 1.4rem; }
+  .dashboard-title .material-icons  { font-size: 1.6rem; }
+  .dashboard-subtitle               { margin-left: 2rem; font-size: 0.85rem; }
+  .section-title                    { font-size: 1rem; }
+  .section-title-group              { gap: 0.6rem; }
+  .section-icon                     { font-size: 1.5rem; }
+}

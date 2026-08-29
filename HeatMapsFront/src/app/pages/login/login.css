@@ -81,3 +81,21 @@ form { display: flex; flex-direction: column; gap: 1.25rem; }
 }
 .register-link a { color: var(--color-primary); font-weight: 600; margin-left: 0.25rem; }
 .register-link a:hover { color: var(--color-primary-hover); }
+
+/* ── Mínimos para teléfono ──────────────────────────────────── */
+
+/* El ojo del icono medía 53x23: el dedo lo falla. Se le da área de 44px sin
+   moverlo de sitio, centrando el icono dentro. */
+.toggle-password {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+
+/* El enlace de registro medía 18px de alto. Se le da altura de dedo con
+   relleno propio, en vez de agrandar la fuente y desequilibrar el bloque. */
+.register-link a {
+  display: inline-block;
+  padding: 0.75rem 0.4rem;
+  font-weight: 600;
+}

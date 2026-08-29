@@ -8,8 +8,6 @@
  * con la documentación de la API cuando el backend evolucione.
  */
 
-// ─── Entidades de dominio ──────────────────────────────────────────────────────
-
 /**
  * Representa un administrador autenticado en el sistema.
  * Esta entidad se recibe del backend tras un login o verificación exitosos,
@@ -39,8 +37,6 @@ export interface AllowedEmail {
   createdAt: string;
 }
 
-// ─── Auth: requests ────────────────────────────────────────────────────────────
-
 /**
  * Payload enviado a `POST /api/auth/login`.
  * El campo `username` acepta tanto el nombre de usuario como el email.
@@ -67,8 +63,6 @@ export interface RegisterRequest {
   /** Contraseña: mínimo 8 caracteres con mayúscula, minúscula, número y símbolo. */
   password: string;
 }
-
-// ─── Auth: responses ───────────────────────────────────────────────────────────
 
 /**
  * Respuesta de `POST /api/auth/login` y `POST /api/auth/verify-code` (éxito).

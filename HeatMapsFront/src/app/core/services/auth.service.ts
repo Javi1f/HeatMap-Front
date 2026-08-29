@@ -40,6 +40,7 @@ import { apiUrl as API_URL } from '../config';
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  /** Cliente HTTP con los interceptores de auth y cifrado ya aplicados. */
   private http = inject(HttpClient);
 
   /**
@@ -179,7 +180,6 @@ export class AuthService {
       .pipe(
         tap(() => this.clearSession()),
         catchError(err => {
-          // Limpiar siempre aunque falle la petición
           this.clearSession();
           return throwError(() => err);
         })

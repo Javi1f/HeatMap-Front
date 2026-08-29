@@ -1,0 +1,47 @@
+/* Estilos del lienzo del mapa de calor.
+
+   Los colores del dibujo se exponen como variables CSS y el componente los lee
+   con getComputedStyle: así el lienzo, que no participa de la cascada, sigue
+   respetando el tema claro u oscuro sin duplicar la paleta en TypeScript. */
+
+/* El anfitrión es un elemento a medida y por defecto seria `inline`, cuyo ancho
+   colapsa dentro de un contenedor de bloque. El componente calcula su tamaño a
+   partir del ancho disponible, asi que sin esto el lienzo se dibuja con ancho
+   cero segun donde se coloque. Se declara aqui para que funcione en cualquier
+   sitio, y no solo dentro de un contenedor flex. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+
+.lienzo-envoltura {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.lienzo {
+  display: block;
+  width: 100%;
+
+  --plano-fondo:    #F0F2F5;
+  --plano-borde:    #C3CAD4;
+  --plano-reticula: rgba(60, 68, 81, 0.08);
+  --plano-texto:    #3C4451;
+  --plano-cota:     #7A828F;
+  --nodo-activo:    var(--color-primary);
+  --nodo-inactivo:  #98A1AE;
+}
+
+/* `:host-context` y no `body[data-theme="dark"] .lienzo`: con encapsulación
+   emulada, Angular le añade el atributo de componente a cada parte del selector,
+   incluido `body`, que nunca lo lleva. Escrito de la forma directa la regla no
+   llega a coincidir y el plano se dibujaba siempre con la paleta clara. */
+:host-context(body[data-theme="dark"]) .lienzo {
+  --plano-fondo:    #141920;
+  --plano-borde:    #333C49;
+  --plano-reticula: rgba(255, 255, 255, 0.05);
+  --plano-texto:    #C8CFD9;
+  --plano-cota:     #7F8894;
+  --nodo-inactivo:  #6B7481;
+}

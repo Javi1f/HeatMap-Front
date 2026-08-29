@@ -1,3 +1,11 @@
+<!-- El control de abrir vive fuera del <aside> porque en teléfono el aside sale
+     de pantalla por completo; su propio botón se iría con él. -->
+@if (!isMobileOpen()) {
+  <button class="abrir-menu" (click)="toggleSidebar()" aria-label="Abrir menú de navegación">
+    <span class="material-icons">menu</span>
+  </button>
+}
+
 @if (isMobileOpen()) {
   <div class="mobile-overlay" (click)="toggleSidebar()"></div>
 }
@@ -43,7 +51,7 @@
 
     <button class="theme-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
       <span class="material-icons">{{ isDark() ? 'light_mode' : 'dark_mode' }}</span>
-      @if (!isCollapsed()) {
+      @if (!isCollapsed() || isMobileOpen()) {
         <span>{{ isDark() ? 'Modo claro' : 'Modo oscuro' }}</span>
       }
     </button>

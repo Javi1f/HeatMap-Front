@@ -46,8 +46,6 @@ export class LoginModalComponent implements OnDestroy {
     private modalService: ModalService
   ) {}
 
-  // ── Getters de conveniencia para el template ────────────────────────────────
-
   /** Formulario reactivo del login. */
   get loginForm()    { return this.loginState.loginForm;    }
   /** Acceso directo a los controles del formulario. */

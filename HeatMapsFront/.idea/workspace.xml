@@ -5,7 +5,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ccc4914-4d39-4a3d-b308-b766e0cff0f8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/angular.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/crypto/crypto.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/crypto/crypto.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/guards/auth-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/guards/auth-guard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/interceptors/auth.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/interceptors/auth.interceptor.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/interceptors/crypto.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/interceptors/crypto.interceptor.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/models/admin.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/models/admin.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/allowed-emails.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/allowed-emails.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/core/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/login-state.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/login-state.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/sidebar.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/sidebar.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/add-email-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/add-email-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/delete-confirm-modal.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/delete-confirm-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/email-row.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/email-row.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/sensor-devices-row.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/sensor-devices-row.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/socket/sensor-data.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/socket/sensor-data.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/socket/socket.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/socket/socket.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,30 +56,29 @@
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="72" />
-    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000144356940723" />
-      <entry key="MS500" value="1.107618648542363" />
-      <entry key="S2" value="1.572759075569556" />
-      <entry key="S5" value="1.8027363121499007" />
-      <entry key="S10" value="1.9655894872166146" />
-      <entry key="S30" value="2.620170892684828" />
-      <entry key="S60" value="3.127393386641803" />
-      <entry key="M2" value="3.5044948306559474" />
-      <entry key="M5" value="3.7853900880328553" />
-      <entry key="M10" value="3.889753246598717" />
-      <entry key="M15" value="3.925832143917982" />
-      <entry key="M30" value="3.9625768943408133" />
-      <entry key="H1" value="3.981202862249726" />
-      <entry key="H2" value="3.990579935272828" />
-      <entry key="H4" value="3.9952845811698596" />
-      <entry key="D1" value="3.99921334767766" />
-      <entry key="W1" value="3.99988760273556" />
+      <entry key="MS100" value="1.2317832646611768" />
+      <entry key="MS500" value="2.451733659749298" />
+      <entry key="S2" value="4.4231411740280535" />
+      <entry key="S5" value="5.296989814043413" />
+      <entry key="S10" value="6.140304645769198" />
+      <entry key="S30" value="10.069812833905004" />
+      <entry key="S60" value="13.22002054133846" />
+      <entry key="M2" value="15.656630701443147" />
+      <entry key="M5" value="17.5313620273208" />
+      <entry key="M10" value="18.24154936821683" />
+      <entry key="M15" value="18.488821085411235" />
+      <entry key="M30" value="18.741590650617262" />
+      <entry key="H1" value="18.870081319253586" />
+      <entry key="H2" value="18.934861014556013" />
+      <entry key="H4" value="18.967385452153074" />
+      <entry key="D1" value="18.994557972116475" />
+      <entry key="W1" value="18.999222413736366" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -59,23 +100,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.7737916328086754" />
-      <entry key="MS500" value="1.0482094474583334" />
-      <entry key="S2" value="1.5470652098359226" />
-      <entry key="S5" value="1.7902680372116162" />
-      <entry key="S10" value="1.9579412347163017" />
-      <entry key="S30" value="2.6145179068598297" />
-      <entry key="S60" value="3.1232595750662764" />
-      <entry key="M2" value="3.501931849991777" />
-      <entry key="M5" value="3.7842155928323953" />
-      <entry key="M10" value="3.8891381299841643" />
-      <entry key="M15" value="3.9254156330348047" />
-      <entry key="M30" value="3.962365360380761" />
-      <entry key="H1" value="3.9810962638378573" />
-      <entry key="H2" value="3.990526426717084" />
-      <entry key="H4" value="3.995257774367009" />
-      <entry key="D1" value="3.9992088725660837" />
-      <entry key="W1" value="3.99988696325465" />
+      <entry key="MS100" value="1.1329636892472665" />
+      <entry key="MS500" value="2.424179599118679" />
+      <entry key="S2" value="4.41316573378703" />
+      <entry key="S5" value="5.292365521877809" />
+      <entry key="S10" value="6.136785360229586" />
+      <entry key="S30" value="10.064854678366208" />
+      <entry key="S60" value="13.215347654410298" />
+      <entry key="M2" value="15.653276113927548" />
+      <entry key="M5" value="17.52967177680907" />
+      <entry key="M10" value="18.24063461217375" />
+      <entry key="M15" value="18.488194787900568" />
+      <entry key="M30" value="18.741269011011816" />
+      <entry key="H1" value="18.86991832645456" />
+      <entry key="H2" value="18.9347789684975" />
+      <entry key="H4" value="18.967344290899923" />
+      <entry key="D1" value="18.994551092640805" />
+      <entry key="W1" value="18.999221430481388" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -87,32 +128,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "fix",
-    "javascript.preferred.runtime.type.id": "node",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/deads_ydg60se/OneDrive/Documentos/GitHub/HeatMap-Front/HeatMapsFront",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "npm.Angular CLI Server.executor": "Run",
-    "npm.build.executor": "Run",
-    "settings.editor.selected.configurable": "settings.javascript.runtime",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "C:\\Users\\deads_ydg60se\\OneDrive\\Documentos\\GitHub\\HeatMap-Front\\HeatMapsFront\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/deads_ydg60se/OneDrive/Documentos/GitHub/HeatMap-Front/HeatMapsFront&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.Angular CLI Server.executor&quot;: &quot;Run&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.runtime&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2026.1.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.Angular CLI Server">
     <configuration name="Angular Application" type="JavascriptDebugType" uri="http://localhost:4200">
       <method v="2" />
@@ -164,6 +206,8 @@
       <workItem from="1779149676935" duration="1477000" />
       <workItem from="1779151523118" duration="7000" />
       <workItem from="1779163073639" duration="2582000" />
+      <workItem from="1787574669797" duration="7605000" />
+      <workItem from="1788012098082" duration="788000" />
     </task>
     <servers />
   </component>

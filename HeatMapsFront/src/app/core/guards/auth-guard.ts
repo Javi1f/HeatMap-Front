@@ -46,20 +46,16 @@ export const authGuard: CanActivateFn = () => {
   /** UrlTree de redirección reutilizado en los tres casos de denegación. */
   const loginTree: UrlTree = router.createUrlTree(['/login']);
 
-  // Caso 1: sesión ya activa en memoria — acceso inmediato sin HTTP
   if (authService.isAuthenticated()) {
     return true;
   }
 
-  // Caso 2: hay token pero sin estado en memoria — validar con el backend
   if (authService.getToken()) {
     return authService.checkSession().pipe(
-      // Devolver UrlTree en lugar de false para que el Router gestione la redirección
       map(response => response.isValid ? true : loginTree),
       catchError(() => of(loginTree))
     );
   }
 
-  // Caso 3: sin token — redirigir directamente con UrlTree
   return loginTree;
 };

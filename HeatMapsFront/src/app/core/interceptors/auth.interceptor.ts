@@ -38,14 +38,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
-  // Clonar la petición añadiendo el header solo si hay token activo
   const authReq = token
     ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${token}`) })
     : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Sesión expirada o token inválido: limpiar estado y redirigir
       if (error.status === 401) {
         authService.clearSession();
         router.navigate(['/login']).catch(() => undefined);

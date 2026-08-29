@@ -1,0 +1,41 @@
+/* Estilos de la fila de correo permitido.
+   Incluye las reglas de `td`: las celdas se renderizan desde este componente,
+   así que `.emails-table td` del padre ya no las alcanzaba. El `<tr>` anfitrión
+   sí vive en dashboard.html y sigue recibiendo los estilos de la tabla. */
+
+td { padding: 0.85rem 1rem; color: var(--color-text); vertical-align: middle; }
+
+.cell-actions   { text-align: center; width: 80px; }
+.cell-secondary { color: var(--color-text-muted); font-size: 0.88rem; }
+
+/* cell-email es un div dentro del td — overflow: hidden funciona correctamente en un div */
+.cell-email  { display: flex; align-items: center; gap: 0.5rem; overflow: hidden; }
+.email-icon  { font-size: 1rem; color: var(--color-primary); flex-shrink: 0; }
+.email-text  { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* .tag* y .btn-delete* viven en styles.css: los comparten esta fila y las
+   tablas de administradores y sesiones de la página de usuarios. */
+
+@media (max-width: 768px) {
+  td              { padding: 0.65rem 0.75rem; }
+  .cell-secondary { display: none; }
+
+  /* En teléfono el correo se parte en varias líneas en lugar de recortarse con
+     puntos suspensivos. `white-space: nowrap` obliga además a la celda a medir
+     el texto entero aunque sobresalga: la tabla se iba a 423px en una pantalla
+     de 375 y la columna de acciones quedaba fuera de vista. */
+  .cell-email {
+    flex-wrap: wrap;
+    overflow: visible;
+    row-gap: 0.3rem;
+  }
+
+  .email-text {
+    flex: 1 1 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+}

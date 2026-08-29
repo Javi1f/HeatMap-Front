@@ -39,7 +39,8 @@ import { AllowedEmail } from '../../../core/models/admin.model';
   selector: '[appEmailRow]',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './email-row.html'
+  templateUrl: './email-row.html',
+  styleUrl: './email-row.css'
 })
 export class EmailRowComponent {
   /** Correo electrónico permitido que representa esta fila. */

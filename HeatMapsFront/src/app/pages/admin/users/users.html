@@ -1,0 +1,240 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      <span class="material-icons">manage_accounts</span>
+      Administración de usuarios
+    </h1>
+    <p class="dashboard-subtitle">Quién puede entrar, quién está registrado y quién está dentro ahora</p>
+  </div>
+
+  <!-- ── Correos permitidos ─────────────────────────────────────────────── -->
+  <section class="section-card">
+
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">mark_email_read</span>
+        <div>
+          <h2 class="section-title">Correos permitidos</h2>
+          <p class="section-desc">Solo estos correos pueden registrarse como administradores</p>
+        </div>
+      </div>
+      @if (!isLoading()) {
+        <span class="badge">{{ emails().length }}</span>
+      }
+    </div>
+
+    <app-add-email-form
+      [addForm]="addForm"
+      [isAdding]="isAdding()"
+      [addError]="addError()"
+      (formSubmit)="onAddEmail()">
+    </app-add-email-form>
+
+    @if (error()) {
+      <div class="alert alert-error">
+        <span class="material-icons">error_outline</span>
+        {{ error() }}
+        <button class="retry-btn" (click)="loadEmails()">Reintentar</button>
+      </div>
+    } @else if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando correos...</p>
+      </div>
+    } @else if (emails().length > 0) {
+      <div class="table-wrapper">
+        <table class="emails-table">
+          <thead>
+          <tr>
+            <th>Correo</th>
+            <th class="col-secondary">Añadido por</th>
+            <th class="col-secondary">Fecha</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (email of emails(); track email.id) {
+              <tr appEmailRow
+                  [class.row-protected]="!canDelete(email)"
+                  [email]="email"
+                  [canDelete]="canDelete(email)"
+                  [tooltip]="getDeleteTooltip(email)"
+                  [deletingId]="deletingId()"
+                  [isCurrentUser]="email.email === currentAdminEmail()"
+                  [isFounder]="email.id === firstEmailId()"
+                  (deleteRequested)="requestDelete($event)">
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-icons">inbox</span>
+        <p>No hay correos permitidos registrados</p>
+      </div>
+    }
+
+  </section>
+
+  <!-- ── Administradores registrados ────────────────────────────────────── -->
+  <section class="section-card">
+
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">admin_panel_settings</span>
+        <div>
+          <h2 class="section-title">Administradores</h2>
+          <p class="section-desc">Cuentas que han completado el registro y la verificación</p>
+        </div>
+      </div>
+      @if (!isLoadingAccounts()) {
+        <span class="badge">{{ admins().length }}</span>
+      }
+    </div>
+
+    @if (accountsError()) {
+      <div class="alert alert-error">
+        <span class="material-icons">error_outline</span>
+        {{ accountsError() }}
+        <button class="retry-btn" (click)="loadAccounts()">Reintentar</button>
+      </div>
+    } @else if (isLoadingAccounts()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando administradores...</p>
+      </div>
+    } @else if (admins().length > 0) {
+      <div class="table-wrapper">
+        <table class="emails-table">
+          <thead>
+          <tr>
+            <th>Usuario</th>
+            <th class="col-secondary">Correo</th>
+            <th class="col-secondary">Registro</th>
+            <th class="col-state">Estado</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (admin of admins(); track admin.id) {
+              <tr>
+                <td>
+                  <div class="cell-flex">
+                    <span class="material-icons row-icon">person</span>
+                    <span class="cell-strong">{{ admin.username }}</span>
+                    @if (admin.email === currentAdminEmail()) {
+                      <span class="tag tag-you">tú</span>
+                    }
+                  </div>
+                  <div class="sub-movil">{{ admin.email }}</div>
+                </td>
+                <td class="cell-muted cell-truncate cell-secondary">{{ admin.email }}</td>
+                <td class="cell-muted cell-secondary">{{ admin.createdAt | date: 'dd/MM/yyyy' }}</td>
+                <td class="cell-state">
+                  @if (admin.conSesionActiva) {
+                    <span class="pill pill-ok">
+                      <span class="dot"></span> En línea
+                    </span>
+                  } @else if (admin.isVerified) {
+                    <span class="pill pill-idle">Verificado</span>
+                  } @else {
+                    <span class="pill pill-warn">Sin verificar</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-icons">person_off</span>
+        <p>Todavía no hay administradores registrados</p>
+      </div>
+    }
+
+  </section>
+
+  <!-- ── Sesiones activas ───────────────────────────────────────────────── -->
+  <section class="section-card">
+
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">devices</span>
+        <div>
+          <h2 class="section-title">Sesiones activas</h2>
+          <p class="section-desc">Cerrar una sesión invalida su token de inmediato</p>
+        </div>
+      </div>
+      @if (!isLoadingAccounts()) {
+        <span class="badge">{{ sessions().length }}</span>
+      }
+    </div>
+
+    @if (sessions().length > 0) {
+      <div class="table-wrapper">
+        <table class="emails-table">
+          <thead>
+          <tr>
+            <th>Administrador</th>
+            <th class="col-secondary">Origen</th>
+            <th class="col-secondary">Inicio</th>
+            <th class="col-secondary">Expira</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (session of sessions(); track session.idSesion) {
+              <tr>
+                <td>
+                  <div class="cell-flex">
+                    <span class="material-icons row-icon">vpn_key</span>
+                    <span class="cell-strong">{{ session.username ?? 'Cuenta eliminada' }}</span>
+                    @if (session.esActual) {
+                      <span class="tag tag-you">esta sesión</span>
+                    }
+                  </div>
+                  <div class="sub-movil">
+                    {{ session.ipOrigen ?? '—' }} · inicio {{ session.fechaInicio | date: 'dd/MM HH:mm' }}
+                    · expira {{ session.fechaExpiracion | date: 'dd/MM HH:mm' }}
+                  </div>
+                </td>
+                <td class="cell-muted cell-secondary">{{ session.ipOrigen ?? '—' }}</td>
+                <td class="cell-muted cell-secondary">{{ session.fechaInicio | date: 'dd/MM HH:mm' }}</td>
+                <td class="cell-muted cell-secondary">{{ session.fechaExpiracion | date: 'dd/MM HH:mm' }}</td>
+                <td class="cell-actions-td">
+                  <button
+                    class="btn-delete"
+                    [disabled]="revokingSessionId() === session.idSesion"
+                    (click)="revokeSession(session)"
+                    [title]="session.esActual ? 'Cerrar tu sesión actual' : 'Cerrar esta sesión'"
+                  >
+                    @if (revokingSessionId() === session.idSesion) {
+                      <div class="spinner spinner-sm"></div>
+                    } @else {
+                      <span class="material-icons">logout</span>
+                    }
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (!isLoadingAccounts()) {
+      <div class="empty-state">
+        <span class="material-icons">no_accounts</span>
+        <p>No hay sesiones abiertas</p>
+      </div>
+    }
+
+  </section>
+</div>
+
+<app-delete-confirm-modal
+  [email]="emailBeingDeleted()"
+  [hidden]="confirmDeleteId() === null"
+  (deleteConfirmed)="confirmDelete()"
+  (deleteCancelled)="cancelDelete()">
+</app-delete-confirm-modal>

@@ -56,7 +56,6 @@ import { CryptoService } from '../crypto/crypto.service';
 export const cryptoInterceptor: HttpInterceptorFn = (req, next) => {
   const crypto = inject(CryptoService);
 
-  // ── Paso 1: cifrar el body saliente (si existe) ──────────────────────────
   const encryptRequest$ = req.body !== null
     ? from(crypto.encrypt(req.body)).pipe(
         map(encrypted => req.clone({ body: { data: encrypted } }))
@@ -64,10 +63,8 @@ export const cryptoInterceptor: HttpInterceptorFn = (req, next) => {
     : of(req);
 
   return encryptRequest$.pipe(
-    // ── Paso 2: enviar la petición (ya cifrada o sin body) ─────────────────
     switchMap(encryptedReq => next(encryptedReq)),
 
-    // ── Paso 3: descifrar la respuesta exitosa ─────────────────────────────
     switchMap(event => {
       if (
         event instanceof HttpResponse &&
@@ -80,11 +77,9 @@ export const cryptoInterceptor: HttpInterceptorFn = (req, next) => {
           map(decrypted => event.clone({ body: decrypted }))
         );
       }
-      // Eventos que no son HttpResponse (p.ej. UploadProgress) pasan sin cambios
       return of(event);
     }),
 
-    // ── Paso 4: descifrar el body de errores HTTP ──────────────────────────
     catchError((error: unknown) => {
       if (
         error instanceof HttpErrorResponse &&
@@ -105,7 +100,6 @@ export const cryptoInterceptor: HttpInterceptorFn = (req, next) => {
           )
         );
       }
-      // Errores de red o no-HTTP se relanzan tal cual
       return throwError(() => error);
     })
   );

@@ -1,306 +1,352 @@
-/* ── Layout ─────────────────────────────────────────────────── */
+/* Estilos de la ocupación pública.
+   El lienzo trae los suyos: lo dibuja su propio componente. */
 
-.public-container {
+.publico {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: 1100px;
+  gap: 1.75rem;
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
+/* ── Portada ─────────────────────────────────────────────────── */
 
-.public-header {
+.hero {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.5rem 0 0.25rem;
 }
 
-.public-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 1.8rem;
+.hero-eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--color-text);
-}
-.public-title .material-icons {
-  font-size: 2rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--color-primary);
 }
 
-.status-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-  margin-left: 2.6rem;
+/* El salto de línea del título está en la plantilla: la frase se lee mejor
+   partida por su cesura natural que dejada al ancho del contenedor. */
+.hero-titulo {
+  margin: 0;
+  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  text-wrap: balance;
 }
 
-.status-dot {
+.vivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-2);
+  border-radius: 24px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* El punto late para señalar que el dato llega solo, sin recargar. */
+.vivo-punto {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-secondary);
+  background-color: #3fb950;
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.18);
+  animation: latido 2.4s ease-in-out infinite;
+}
+@keyframes latido { 50% { opacity: 0.35; } }
+
+/* ── Selector de espacios ────────────────────────────────────── */
+
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 1rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-2);
+  border-radius: 24px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+.pastilla:hover { border-color: var(--color-primary); color: var(--color-text); }
+.pastilla:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.pastilla-activa {
+  border-color: var(--color-primary);
+  background-color: rgba(232, 100, 12, 0.1);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Punto de nivel: el color dice cómo está el espacio sin gastar una etiqueta
+   en cada pastilla, que llenaría la fila de texto repetido. */
+.punto-nivel {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   flex-shrink: 0;
-  transition: background-color 0.3s ease;
-}
-.status-dot.connected {
-  background-color: #4caf50;
-  animation: pulse-green 2s ease-in-out infinite;
 }
 
-@keyframes pulse-green {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
-}
+/* ── Tarjeta principal ───────────────────────────────────────── */
 
-.status-text  { font-weight: 500; }
-.last-updated { font-style: italic; }
-
-/* ── Card ────────────────────────────────────────────────────── */
-
-.sensor-card {
+.tarjeta {
   background-color: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border-radius: 18px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
   transition: background-color 0.25s ease;
   min-width: 0;
 }
 
-/* ── Empty state ─────────────────────────────────────────────── */
-
-.empty-state {
+.lugar {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+.lugar-texto  { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.lugar-nombre { margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text); letter-spacing: -0.01em; }
+.lugar-desc   { margin: 0; font-size: 0.86rem; color: var(--color-text-muted); max-width: 58ch; line-height: 1.5; }
+
+.estado {
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 3rem;
-  text-align: center;
-}
-.empty-state .material-icons {
-  font-size: 3rem;
-  color: var(--border);
-}
-.empty-state p {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  margin: 0;
-}
-.empty-hint {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  opacity: 0.7;
-}
-
-/* ── Sensor table ────────────────────────────────────────────── */
-
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-
-.sensor-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.92rem;
-}
-
-.sensor-table thead tr {
-  background-color: var(--bg-surface-deep);
-  border-bottom: 1px solid var(--border);
-}
-.sensor-table th {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 700;
   white-space: nowrap;
 }
+.estado-punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
-.sensor-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background-color 0.15s ease;
+/* Niveles: del verde tranquilo al rojo de saturación, en la misma dirección
+   que la rampa del mapa, para que ambos se lean igual. */
+.nivel-baja  { color: #3fb950; }
+.nivel-media { color: #c99a1e; }
+.nivel-alta  { color: var(--color-danger); }
+.nivel-sin-datos { color: var(--color-text-muted); }
+
+.punto-nivel.nivel-baja       { background-color: #3fb950; }
+.punto-nivel.nivel-media      { background-color: #c99a1e; }
+.punto-nivel.nivel-alta       { background-color: var(--color-danger); }
+.punto-nivel.nivel-sin-datos { background-color: var(--border-2); }
+
+.estado.nivel-baja       { background-color: rgba(46, 160, 67, 0.13);  border: 1px solid #2ea043; }
+.estado.nivel-media      { background-color: rgba(201, 154, 30, 0.14); border: 1px solid #c99a1e; }
+.estado.nivel-alta       { background-color: rgba(208, 62, 32, 0.13);  border: 1px solid var(--color-danger); }
+.estado.nivel-sin-datos { background-color: var(--bg-surface-hover);  border: 1px solid var(--border-2); }
+
+/* ── Marco del mapa ──────────────────────────────────────────── */
+
+/* El plano se hunde ligeramente respecto a la tarjeta: separa el dibujo de los
+   controles sin necesidad de otra línea divisoria. */
+.lienzo-marco {
+  background-color: var(--bg-surface-deep);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem;
+  min-width: 0;
 }
-.sensor-table tbody tr:last-child { border-bottom: none; }
 
-.sensor-table td {
-  padding: 0.85rem 1rem;
-  color: var(--color-text);
-  vertical-align: middle;
-}
+/* ── Leyenda ─────────────────────────────────────────────────── */
 
-/* Column widths */
-.col-expand { width: 36px; padding-right: 0 !important; }
-.col-num    { text-align: right; width: 120px; white-space: nowrap; }
-.col-time   { width: 90px; white-space: nowrap; color: var(--color-text-muted); font-size: 0.85rem; }
-
-/* ── Sensor row ──────────────────────────────────────────────── */
-
-.sensor-row {
-  cursor: pointer;
-  outline: none;
-}
-.sensor-row:hover    { background-color: var(--bg-surface-hover); }
-.sensor-row.expanded { background-color: rgba(232, 100, 12, 0.06); }
-.sensor-row:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--color-primary);
-}
-
-.cell-expand { text-align: center; }
-.expand-icon {
-  font-size: 1.1rem;
+.pie-mapa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
-  transition: transform 0.2s ease;
-  user-select: none;
-  display: block;
 }
-.expand-icon.rotated { transform: rotate(90deg); }
 
-.cell-sensor {
+.leyenda {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.leyenda-extremo { white-space: nowrap; }
+
+/* La rampa repite las paradas del lienzo, para que la leyenda no describa una
+   escala distinta de la dibujada. */
+.leyenda-rampa {
+  flex: 1 1 6rem;
+  max-width: 14rem;
+  height: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-2);
+  background: linear-gradient(
+    to right,
+    rgba(56, 132, 196, 0.55) 0%,
+    rgba(74, 168, 132, 0.72) 33%,
+    rgba(214, 176, 54, 0.82) 58%,
+    rgba(232, 140, 40, 0.9) 78%,
+    rgba(208, 62, 32, 0.95) 100%
+  );
 }
 
-/* Live pulse dot */
-.live-dot {
+.leyenda-nodo { display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.punto-nodo {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-primary);
-  flex-shrink: 0;
-  animation: live-pulse 1.8s ease-in-out infinite;
-}
-@keyframes live-pulse {
-  0%, 100% { opacity: 1;   transform: scale(1);    }
-  50%       { opacity: 0.4; transform: scale(0.75); }
+  background: var(--color-primary);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-sizing: content-box;
 }
 
-.sensor-id {
-  font-weight: 600;
-  color: var(--color-text);
-}
+/* ── Avisos y estados ────────────────────────────────────────── */
 
-.device-count {
-  font-weight: 700;
-  color: var(--color-primary);
-  font-size: 1rem;
-}
-
-/* ── RSSI badges ─────────────────────────────────────────────── */
-
-.rssi-badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.rssi-excellent { background: rgba(76,  175, 80,  0.15); color: #4caf50; }
-.rssi-good      { background: rgba(139, 195, 74,  0.15); color: #8bc34a; }
-.rssi-fair      { background: rgba(255, 193, 7,   0.15); color: #ffc107; }
-.rssi-poor      { background: rgba(244, 67,  54,  0.15); color: #f44336; }
-
-.text-muted { color: var(--color-text-muted); }
-
-/* ── Devices sub-row ─────────────────────────────────────────── */
-
-.devices-row { background-color: var(--bg-surface-deep) !important; }
-.devices-cell { padding: 0 !important; }
-
-.devices-container {
-  padding: 1rem 1.5rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.devices-title {
+.aviso {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.aviso-error  { background-color: rgba(232, 100, 12, 0.1); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
+.aviso-neutro { background-color: var(--bg-surface-deep); border: 1px solid var(--border-2); color: var(--color-text-muted); }
+
+.reintentar {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  border-radius: 6px;
+  padding: 0.22rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: Roboto, sans-serif;
+}
+.reintentar:hover { background-color: rgba(232, 100, 12, 0.1); }
+
+.cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
   color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 0.9rem;
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+.vacio .material-icons { font-size: 2.5rem; color: var(--border); }
+.vacio-nota { font-size: 0.82rem; max-width: 48ch; line-height: 1.55; }
+
+/* ── Notas al pie ────────────────────────────────────────────── */
+
+.notas { display: flex; flex-direction: column; gap: 0.85rem; }
+
+.nota {
   margin: 0;
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  max-width: 76ch;
+  padding: 0 0.25rem;
 }
-.devices-title .material-icons { font-size: 1rem; }
+.nota strong { color: var(--color-text); font-weight: 600; }
 
-.devices-table-wrapper {
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  overflow-x: auto;
-}
-
-.devices-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-.devices-table thead tr {
+.nota-privacidad {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
   background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
-.devices-table th {
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
+.nota-privacidad .material-icons {
+  font-size: 1.05rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
 }
-.devices-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background-color 0.12s ease;
-}
-.devices-table tbody tr:last-child { border-bottom: none; }
-.devices-table tbody tr:hover { background-color: var(--bg-surface-hover); }
-.devices-table td {
-  padding: 0.5rem 0.75rem;
-  color: var(--color-text);
-  vertical-align: middle;
-}
-
-.cell-mac {
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-.rand-icon           { font-size: 1rem; color: var(--border); }
-.rand-icon.rand-yes  { color: var(--color-primary); }
 
 /* ── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .sensor-card   { padding: 1.25rem; }
-  .public-title  { font-size: 1.4rem; }
-  .public-title .material-icons { font-size: 1.6rem; }
-  .status-bar    { margin-left: 0; }
-
-  .hide-sm { display: none; }
-
-  .sensor-table td,
-  .sensor-table th { padding: 0.65rem 0.75rem; }
+  .publico  { gap: 1.35rem; }
+  .tarjeta  { padding: 1.15rem; gap: 1.1rem; }
+  .lugar-nombre { font-size: 1.2rem; }
 }
 
 @media (max-width: 480px) {
-  .public-container { gap: 1rem; }
-  .sensor-card      { padding: 1rem; }
-  .public-title     { font-size: 1.3rem; }
+  .publico       { gap: 1.15rem; }
+  .tarjeta       { padding: 0.9rem; border-radius: 14px; }
+
+  /* El mapa se sale del relleno de la tarjeta y ocupa todo el ancho: en una
+     pantalla de 375px cada milímetro de plano cuenta, y los bordes laterales
+     del marco no aportan nada cuando ya lo enmarca la propia tarjeta. */
+  .lienzo-marco {
+    margin-left: -0.9rem;
+    margin-right: -0.9rem;
+    padding: 0.35rem 0.2rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .selector      { flex-direction: column; }
+  .pastilla      { justify-content: space-between; }
+  /* En columna, el `flex: 1 1 16rem` de la leyenda deja de referirse al ancho y
+     pasa a fijar el ALTO: el pie crecía hasta 288px y la rampa de color se
+     encogía a 2px, con lo que la escala quedaba invisible. Se repone la base
+     automática y se estira la leyenda a todo el ancho. */
+  .pie-mapa {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .leyenda        { flex: 0 0 auto; width: 100%; }
+  .leyenda-rampa  { max-width: none; }
+  .leyenda-nodo   { align-self: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vivo-punto { animation: none; }
 }

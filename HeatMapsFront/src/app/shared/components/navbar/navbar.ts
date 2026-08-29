@@ -69,22 +69,32 @@ export class NavbarComponent {
   /** Elementos de navegación siempre visibles (rutas públicas). */
   navItems: NavItem[] = [
     { label: 'Inicio',          route: '/',       icon: 'home'   },
-    { label: 'Sección pública', route: '/public', icon: 'public' }
+    { label: 'Sección pública', route: '/public', icon: 'local_fire_department' }
   ];
 
   /** Elementos de navegación exclusivos del área de administración. */
   adminItems: NavItem[] = [
-    { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard' }
+    { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard'        },
+    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts'  },
+    { label: 'Reportes',  route: '/admin/reportes',  icon: 'description'      }
   ];
 
+  /** Decide si se muestran las entradas de administracion y el logout. */
   private authService    = inject(AuthService);
+
+  /** Estado de colapso y del menu movil. */
   private sidebarService = inject(SidebarService);
+
+  /** Abre el modal de login desde el pie del sidebar. */
   private modalService   = inject(ModalService);
+
+  /** Alterna entre modo claro y oscuro. */
   private themeService   = inject(ThemeService);
+
+  /** Navegacion al pulsar una entrada del menu. */
   private router         = inject(Router);
 
   constructor() {
-    // Ajustar estado inicial según el tamaño de pantalla al montar el componente
     this.sidebarService.initResponsive();
   }
 

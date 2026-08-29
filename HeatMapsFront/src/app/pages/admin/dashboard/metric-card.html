@@ -1,0 +1,12 @@
+<div class="metric-card" [class]="'tone-' + tone">
+  <div class="metric-icon-wrap">
+    <span class="material-icons">{{ icon }}</span>
+  </div>
+  <div class="metric-body">
+    <span class="metric-label">{{ label }}</span>
+    <span class="metric-value">{{ value }}</span>
+    @if (hint) {
+      <span class="metric-hint">{{ hint }}</span>
+    }
+  </div>
+</div>

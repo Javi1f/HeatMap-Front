@@ -33,7 +33,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-add-email-form',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './add-email-form.html'
+  templateUrl: './add-email-form.html',
+  styleUrl: './add-email-form.css'
 })
 export class AddEmailFormComponent {
   /**

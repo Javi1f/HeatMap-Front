@@ -28,6 +28,7 @@ const MOBILE_BREAKPOINT = '(max-width: 768px)';
  */
 @Injectable({ providedIn: 'root' })
 export class SidebarService {
+  /** Observador del CDK que decide si la ventana esta en rango movil. */
   private breakpointObserver = inject(BreakpointObserver);
 
   /** Signal privado: `true` cuando el sidebar está colapsado a su ancho mínimo (64px). */

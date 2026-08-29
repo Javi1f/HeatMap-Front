@@ -7,12 +7,12 @@
  * ## Arquitectura de la conexión
  * ```
  * Broker Kafka → Backend (KafkaConsumerService)
- *                       ↓ io.emit('sensor-data', data)
+ *                       ↓ io.emit('sensor-data', { data: cifrado })
  *             Socket.IO server (misma URL que la API, path /socket.io/)
  *                       ↓ WebSocket
  *             SocketService (este archivo)
  *                       ↓ sensorData$ Observable
- *             PublicSection component (tabla en tiempo real)
+ *             PublicSection component (contador en vivo)
  * ```
  *
  * ## Singleton y reconexión
@@ -20,19 +20,37 @@
  * vida de la aplicación. Socket.IO gestiona la reconexión automáticamente
  * con hasta 5 intentos espaciados 2 segundos entre sí.
  *
- * ## Sin cifrado a nivel aplicación
- * A diferencia de los endpoints REST, el canal Socket.IO no usa cifrado AES
- * adicional. La seguridad depende únicamente del TLS del transporte (HTTPS/WSS).
+ * ## Todo llega cifrado
+ * Cada evento viaja como `{ data: "<base64>" }` con AES-256-GCM, el mismo
+ * sobre y la misma clave que las respuestas de la API REST, y se descifra aquí
+ * antes de publicarse en el flujo. Los componentes reciben ya el objeto en
+ * claro y no saben que hubo cifrado de por medio.
+ *
+ * ## Canal abierto: solo viajan agregados
+ * El canal no exige autenticación: cualquiera que abra una conexión recibe lo
+ * que se emita, y la clave de descifrado viaja en el propio bundle del
+ * navegador. El cifrado da integridad y uniformidad con el resto de la API, no
+ * confidencialidad frente a un tercero decidido; de eso responde el TLS del
+ * transporte (HTTPS/WSS). Por eso el servidor difunde únicamente el conteo por
+ * nodo y nunca el detalle de los dispositivos: la garantía de privacidad está
+ * en no publicar el dato, no en cifrarlo.
  *
  * @see {@link PublicSection} — componente que consume `sensorData$`.
- * @see {@link SensorData} — interfaz del payload del evento `sensor-data`.
+ * @see {@link ResumenSensor} — interfaz del payload del evento `sensor-data`.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { SensorData } from './sensor-data.model';
+import { ResumenSensor } from './sensor-data.model';
 import { apiUrl } from '../core/config';
+import { CryptoService } from '../core/crypto/crypto.service';
+
+/** Sobre en el que viaja todo evento del servidor. */
+interface SobreCifrado {
+  /** Carga cifrada en Base64, con el layout `iv | authTag | ciphertext`. */
+  data: string;
+}
 
 /**
  * URL del servidor Socket.IO.
@@ -56,6 +74,13 @@ const SOCKET_URL = apiUrl.replace(/\/api$/, '');
 @Injectable({ providedIn: 'root' })
 export class SocketService implements OnDestroy {
   /**
+   * Descifra los eventos entrantes. Es el mismo servicio que usa el
+   * interceptor con las respuestas HTTP: un solo lugar donde vive la clave y
+   * un solo formato de sobre para los dos canales.
+   */
+  private readonly crypto = inject(CryptoService);
+
+  /**
    * Instancia del cliente Socket.IO.
    * Configurado con transporte WebSocket exclusivo (sin fallback a polling)
    * y reconexión automática limitada a 5 intentos.
@@ -66,7 +91,7 @@ export class SocketService implements OnDestroy {
    * Subject interno para el flujo de datos de sensores.
    * Completado en `ngOnDestroy` para limpiar todas las suscripciones derivadas.
    */
-  private readonly sensorDataSubject = new Subject<SensorData>();
+  private readonly sensorDataSubject = new Subject<ResumenSensor>();
 
   /**
    * Subject interno del estado de conexión.
@@ -76,14 +101,14 @@ export class SocketService implements OnDestroy {
   private readonly connectedSubject = new BehaviorSubject<boolean>(false);
 
   /**
-   * Observable público que emite cada {@link SensorData} recibida del servidor.
+   * Observable público que emite cada {@link ResumenSensor} recibida del servidor.
    *
    * Cada emisión corresponde a un mensaje del evento `sensor-data` de Socket.IO,
    * que a su vez proviene de una lectura procesada del broker Kafka.
    *
    * Los suscriptores reciben el dato tan pronto como llega, sin buffer ni debounce.
    */
-  readonly sensorData$: Observable<SensorData> = this.sensorDataSubject.asObservable();
+  readonly sensorData$: Observable<ResumenSensor> = this.sensorDataSubject.asObservable();
 
   /**
    * Observable público del estado de la conexión WebSocket.
@@ -98,20 +123,39 @@ export class SocketService implements OnDestroy {
 
   constructor() {
     this.socket = io(SOCKET_URL, {
-      transports: ['websocket'],    // Solo WebSocket; sin fallback a long-polling
-      reconnectionAttempts: 5,      // Reintentos máximos antes de darse por vencido
-      reconnectionDelay: 2000,      // Espera inicial entre reintentos (ms)
+      transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
 
-    // Eventos del ciclo de vida de la conexión
     this.socket.on('connect',       () => { this.connectedSubject.next(true);  });
     this.socket.on('disconnect',    () => { this.connectedSubject.next(false); });
     this.socket.on('connect_error', () => { this.connectedSubject.next(false); });
 
-    // Evento de dominio: nueva lectura de sensor procesada por el backend
-    this.socket.on('sensor-data', (data: SensorData) => {
-      this.sensorDataSubject.next(data);
+    this.socket.on('sensor-data', (sobre: SobreCifrado) => {
+      void this.recibirResumen(sobre);
     });
+  }
+
+  /**
+   * Descifra un evento y lo publica en el flujo.
+   *
+   * El descifrado es asíncrono porque la Web Crypto API lo es, así que no puede
+   * hacerse dentro del manejador del socket. Un sobre que no se pueda descifrar
+   * se descarta en silencio: significa que el mensaje no lo emitió este backend
+   * o que las claves no coinciden, y en ninguno de los dos casos hay nada que
+   * mostrar al visitante. Cortar el flujo por un mensaje corrupto dejaría la
+   * pantalla congelada en lugar de saltarse una lectura.
+   */
+  private async recibirResumen(sobre: SobreCifrado): Promise<void> {
+    if (!sobre || typeof sobre.data !== 'string') return;
+
+    try {
+      const resumen = await this.crypto.decrypt<ResumenSensor>(sobre.data);
+      this.sensorDataSubject.next(resumen);
+    } catch {
+      // Sobre ilegible: se ignora esta lectura y se sigue escuchando.
+    }
   }
 
   /**

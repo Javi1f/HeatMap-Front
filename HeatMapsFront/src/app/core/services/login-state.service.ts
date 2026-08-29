@@ -126,7 +126,6 @@ export class LoginStateService {
 
     this.authService.login(request).subscribe({
       next: () => {
-        // saveSession es llamado internamente por AuthService.login via tap()
         this.failedAttempts = 0;
         onSuccess?.();
         this.router.navigate(['/admin/dashboard']).catch(() => undefined);
@@ -134,7 +133,6 @@ export class LoginStateService {
       error: () => {
         this.failedAttempts++;
         this.loginError.set('Credenciales incorrectas.');
-        // Bloqueo temporal cada 3 intentos fallidos
         if (this.failedAttempts % 3 === 0) {
           this.startBlockCountdown();
         }
@@ -194,7 +192,7 @@ export class LoginStateService {
       if (current === 0) {
         this.clearCountdown();
         this.isBlocked.set(false);
-        this.countdown.set(10); // Restaurar para el próximo bloqueo
+        this.countdown.set(10);
       }
     }, 1000);
   }

@@ -30,7 +30,8 @@ import { AllowedEmail } from '../../../core/models/admin.model';
   selector: 'app-delete-confirm-modal',
   standalone: true,
   imports: [],
-  templateUrl: './delete-confirm-modal.html'
+  templateUrl: './delete-confirm-modal.html',
+  styleUrl: './delete-confirm-modal.css'
 })
 export class DeleteConfirmModalComponent {
   /**

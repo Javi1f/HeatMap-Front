@@ -21,8 +21,6 @@ import { Observable } from 'rxjs';
 import { AllowedEmail } from '../models/admin.model';
 import { apiUrl as API_URL } from '../config';
 
-// ─── Response shapes ───────────────────────────────────────────────────────────
-
 /**
  * Respuesta de `GET /api/allowed-emails`.
  * Devuelve la lista completa de correos autorizados, ordenada por fecha de creación.
@@ -55,8 +53,6 @@ export interface DeleteEmailResponse {
   message: string;
 }
 
-// ─── Servicio ──────────────────────────────────────────────────────────────────
-
 /**
  * Servicio singleton para gestionar la lista blanca de correos permitidos.
  *
@@ -66,6 +62,7 @@ export interface DeleteEmailResponse {
  */
 @Injectable({ providedIn: 'root' })
 export class AllowedEmailsService {
+  /** Cliente HTTP con los interceptores de auth y cifrado ya aplicados. */
   private http = inject(HttpClient);
 
   /**

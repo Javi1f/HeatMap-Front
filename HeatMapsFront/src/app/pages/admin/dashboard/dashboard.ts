@@ -1,253 +1,230 @@
 /**
  * @file dashboard.ts
- * @description Panel de administración principal (`/admin/dashboard`).
+ * @description Panel de métricas de ocupación (`/admin/dashboard`).
  *
- * Permite a los administradores autenticados gestionar la lista blanca de
- * correos electrónicos autorizados a registrarse en el sistema.
+ * Sustituye al antiguo dashboard, que gestionaba la lista blanca de correos y
+ * ahora vive en `/admin/users`. Aquí se muestra lo que el sistema realmente
+ * produce: ocupación por zona, salud de la red de nodos y alertas de
+ * aglomeración.
  *
- * ## Funcionalidades
- * - **Listar** los correos permitidos con información de quién los añadió y cuándo.
- * - **Añadir** nuevos correos con validación de formato en el cliente.
- * - **Eliminar** correos con confirmación mediante un modal para evitar borrados accidentales.
+ * ## De dónde sale cada dato
  *
- * ## Protecciones de UI
- * - El correo del administrador autenticado no puede eliminarse a sí mismo.
- * - El correo con el ID más bajo (correo fundador) no puede eliminarse.
- * - Ambas restricciones se calculan mediante `computed` reactivos para mantenerse
- *   sincronizados con el estado actual de la lista y la sesión.
+ * | Bloque                | Origen                                  |
+ * |-----------------------|-----------------------------------------|
+ * | Tarjetas de cabecera  | `captura` en la ventana reciente        |
+ * | Ocupación por zona    | `ocupacion_agregada` (última ventana)   |
+ * | Salud de nodos        | `sensor.ultimaConexion`                 |
+ * | Alertas               | `alerta` sin resolver                   |
+ *
+ * Las tarjetas y la tabla de zonas **no miden lo mismo**: las primeras
+ * describen los últimos minutos leyendo detecciones crudas, la segunda la
+ * última ventana ya consolidada. Pueden diferir, y por eso cada bloque indica
+ * su propia marca temporal.
+ *
+ * ## Refresco
+ * Sondeo cada {@link REFRESH_INTERVAL_MS}. No se usa el WebSocket de sensores
+ * porque estas cifras son agregados sobre la base de datos, no el flujo crudo
+ * que consume la sección pública.
  *
  * ## Acceso
  * Requiere autenticación; protegido por {@link authGuard} en las rutas.
  */
 
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthService } from '../../../core/services/auth.service';
-import { AllowedEmailsService } from '../../../core/services/allowed-emails.service';
-import { AllowedEmail } from '../../../core/models/admin.model';
-import { EmailRowComponent } from './email-row';
-import { AddEmailFormComponent } from './add-email-form';
-import { DeleteConfirmModalComponent } from './delete-confirm-modal';
+import {
+  Alerta,
+  MetricsOverview,
+  MetricsService,
+  SensingParameters,
+  SensorHealth,
+  ZoneOccupancy,
+} from '../../../core/services/metrics.service';
+import { MetricCardComponent, MetricTone } from './metric-card';
+import { describeHttpError } from '../../../core/http-error';
 
 /**
- * Componente del dashboard de administración.
- * Gestiona el estado y las operaciones CRUD de la lista blanca de correos.
+ * Periodo de refresco de las métricas, en milisegundos.
+ *
+ * Un minuto es holgado a propósito: la ocupación por zona procede de ventanas
+ * que el backend consolida cada cinco minutos, así que pedirla más a menudo
+ * devuelve exactamente los mismos números y solo gasta cuota del limitador.
+ * Los indicadores de «ahora» sí cambian de forma continua, y con este periodo
+ * siguen siendo suficientemente frescos.
+ */
+const REFRESH_INTERVAL_MS = 60_000;
+
+/**
+ * Componente del dashboard de métricas.
  */
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent],
+  imports: [CommonModule, MetricCardComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard implements OnInit {
-  private authService         = inject(AuthService);
-  private allowedEmailsService = inject(AllowedEmailsService);
-  private fb                  = inject(FormBuilder);
+export class Dashboard implements OnInit, OnDestroy {
+  /** Origen de todos los bloques de esta pantalla. */
+  private metricsService = inject(MetricsService);
 
-  /** Lista actual de correos permitidos, cargada desde el backend. */
-  emails = signal<AllowedEmail[]>([]);
+  /** Identificador del temporizador de refresco. */
+  private refreshTimer: ReturnType<typeof setInterval> | null = null;
 
-  /** `true` mientras se realiza la carga inicial de la lista. */
-  isLoading = signal<boolean>(false);
+  /** Indicadores de cabecera. `null` mientras no haya llegado la primera carga. */
+  overview = signal<MetricsOverview | null>(null);
 
-  /** `true` mientras se procesa la petición de añadir un correo. */
-  isAdding = signal<boolean>(false);
+  /** Ocupación actual de cada zona activa. */
+  zones = signal<ZoneOccupancy[]>([]);
 
-  /** Mensaje de error general (carga o eliminación), vacío si no hay error. */
+  /** Estado de cada nodo de captura. */
+  sensors = signal<SensorHealth[]>([]);
+
+  /** Alertas de aglomeración abiertas. */
+  alerts = signal<Alerta[]>([]);
+
+  /** Parámetros de sensado con los que se calcularon las métricas. */
+  parameters = signal<SensingParameters | null>(null);
+
+  /** `true` durante la primera carga; los refrescos posteriores son silenciosos. */
+  isLoading = signal<boolean>(true);
+
+  /** Mensaje de error de la carga, vacío si todo fue bien. */
   error = signal<string>('');
 
-  /** Mensaje de error específico del formulario de añadir correo. */
-  addError = signal<string>('');
+  /** Id de la alerta que se está resolviendo, para el spinner de su fila. */
+  resolvingAlertId = signal<string | null>(null);
+
+  /** Momento de la última actualización correcta. */
+  lastUpdated = signal<Date | null>(null);
 
   /**
-   * ID del correo que está siendo eliminado actualmente.
-   * Se usa para mostrar el spinner en la fila correspondiente durante la petición.
-   * `null` cuando no hay eliminación en curso.
+   * `true` cuando no hay ningún nodo emitiendo.
+   *
+   * Se destaca en la UI porque cambia cómo hay que leer el resto: con la red
+   * caída, los ceros de ocupación significan «no se sabe», no «vacío».
    */
-  deletingId = signal<number | null>(null);
-
-  /**
-   * ID del correo pendiente de confirmación en el modal de borrado.
-   * `null` cuando el modal de confirmación no está visible.
-   */
-  confirmDeleteId = signal<number | null>(null);
-
-  /** Formulario reactivo para el campo de email del formulario de añadir. */
-  addForm: FormGroup = this.fb.group({
-    email: ['', [
-      Validators.required,
-      Validators.email,
-      Validators.pattern('^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$')
-    ]]
+  redCaida = computed(() => {
+    const o = this.overview();
+    return o !== null && o.sensoresTotal > 0 && o.sensoresEnLinea === 0;
   });
 
-  /**
-   * Email del administrador autenticado actualmente.
-   * Se usa para la restricción que impide eliminar el propio correo.
-   * Cadena vacía si no hay sesión activa.
-   */
-  currentAdminEmail = computed(() => this.authService.currentAdmin()?.email ?? '');
+  /** `true` si no hay ningún nodo registrado todavía. */
+  sinNodos = computed(() => this.overview()?.sensoresTotal === 0);
 
-  /**
-   * ID numérico más pequeño de la lista (el "correo fundador").
-   * Se protege de eliminación independientemente de quién lo añadió.
-   * `null` si la lista está vacía.
-   */
-  firstEmailId = computed(() => {
-    const list = this.emails();
-    if (!list.length) return null;
-    return list.reduce((minId, e) => (e.id < minId ? e.id : minId), list[0].id);
-  });
-
-  /**
-   * Entidad `AllowedEmail` que está esperando confirmación para ser eliminada.
-   * Derivado reactivamente de `confirmDeleteId` y la lista `emails`.
-   * `null` cuando no hay ningún correo pendiente de confirmación.
-   */
-  emailBeingDeleted = computed(() => {
-    const id = this.confirmDeleteId();
-    return this.emails().find(e => e.id === id) ?? null;
-  });
-
-  /**
-   * Acceso directo a los controles del formulario de añadir correo.
-   * Conveniente para verificar el estado de validación en la plantilla.
-   */
-  /** Acceso directo a los controles del formulario de añadir correo. */
-  get f() { return this.addForm.controls; }
-
-  /**
-   * Carga la lista de correos permitidos al inicializar el componente.
-   * @see {@link loadEmails}
-   */
+  /** Carga inicial y arranque del sondeo periodico. */
   ngOnInit(): void {
-    this.loadEmails();
+    this.loadAll();
+    this.refreshTimer = setInterval(() => this.loadAll(true), REFRESH_INTERVAL_MS);
   }
 
   /**
-   * Carga la lista completa de correos permitidos desde el backend.
-   * Activa el estado de carga y limpia errores previos antes de la petición.
-   * Se puede llamar manualmente para reintentar en caso de error.
+   * Detiene el sondeo al salir de la pantalla; sin esto el intervalo seguiria
+   * pidiendo metricas de un componente ya destruido.
    */
-  loadEmails(): void {
-    this.isLoading.set(true);
-    this.error.set('');
-
-    this.allowedEmailsService.getAll().subscribe({
-      next: (response) => {
-        this.emails.set(response.data);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.error.set('No se pudo cargar la lista de correos.');
-        this.isLoading.set(false);
-      }
-    });
+  ngOnDestroy(): void {
+    if (this.refreshTimer !== null) clearInterval(this.refreshTimer);
   }
 
   /**
-   * Procesa el envío del formulario para añadir un correo a la lista blanca.
+   * Carga todos los bloques del dashboard.
    *
-   * Valida el formulario localmente antes de hacer la petición.
-   * En caso de éxito, añade el nuevo correo a la lista sin recargar todos.
-   *
-   * @fires addError — se actualiza con el mensaje de error del backend si falla.
+   * @param silent - `true` en los refrescos automáticos, para no mostrar el
+   *   spinner ni borrar los datos ya visibles mientras llega la respuesta.
    */
-  onAddEmail(): void {
-    if (this.addForm.invalid) {
-      this.addForm.markAllAsTouched();
-      return;
+  loadAll(silent = false): void {
+    if (!silent) {
+      this.isLoading.set(true);
+      this.error.set('');
     }
 
-    this.isAdding.set(true);
-    this.addError.set('');
-
-    this.allowedEmailsService.add(this.addForm.value.email.trim()).subscribe({
-      next: (response) => {
-        // Añadir el nuevo correo al final de la lista sin recargar todo
-        this.emails.update(list => [...list, response.data]);
-        this.addForm.reset();
-        this.isAdding.set(false);
+    this.metricsService.overview().subscribe({
+      next: (res) => {
+        this.overview.set(res.data);
+        this.lastUpdated.set(new Date());
+        this.isLoading.set(false);
+        this.error.set('');
       },
       error: (err: HttpErrorResponse) => {
-        this.addError.set(err.error?.message ?? 'Error al añadir el correo.');
-        this.isAdding.set(false);
+        this.error.set(describeHttpError(err, 'No se pudieron cargar las métricas.'));
+        this.isLoading.set(false);
       }
     });
+
+    this.metricsService.zones().subscribe({ next: (res) => this.zones.set(res.data) });
+    this.metricsService.sensors().subscribe({ next: (res) => this.sensors.set(res.data) });
+    this.metricsService.alerts().subscribe({ next: (res) => this.alerts.set(res.data) });
+
+    if (this.parameters() === null) {
+      this.metricsService.parameters().subscribe({ next: (res) => this.parameters.set(res.data) });
+    }
   }
 
-  /**
-   * Determina si un correo puede ser eliminado.
-   *
-   * Un correo **no puede** eliminarse si:
-   * - Es el correo del administrador que está actualmente autenticado.
-   * - Es el correo fundador (el de menor ID en la lista).
-   *
-   * @param email - Correo a evaluar.
-   * @returns `true` si el correo puede ser eliminado por el admin actual.
-   */
-  canDelete(email: AllowedEmail): boolean {
-    return (
-      email.email !== this.currentAdminEmail() &&
-      email.id !== this.firstEmailId()
-    );
-  }
+  /** Marca una alerta como resuelta y la retira de la lista. */
+  resolveAlert(alerta: Alerta): void {
+    this.resolvingAlertId.set(alerta.idAlerta);
 
-  /**
-   * Devuelve el texto del tooltip del botón de eliminar según el estado del correo.
-   *
-   * @param email - Correo para el que se quiere el tooltip.
-   * @returns Texto descriptivo del estado o la acción disponible.
-   */
-  getDeleteTooltip(email: AllowedEmail): string {
-    if (email.id === this.firstEmailId())        return 'No puedes eliminar el correo fundador';
-    if (email.email === this.currentAdminEmail()) return 'No puedes eliminar tu propio correo';
-    return 'Eliminar correo';
-  }
-
-  /**
-   * Inicia el flujo de confirmación de borrado mostrando el modal.
-   *
-   * @param id - ID del correo a eliminar.
-   */
-  requestDelete(id: number): void {
-    this.confirmDeleteId.set(id);
-  }
-
-  /**
-   * Cancela el flujo de confirmación y cierra el modal sin eliminar nada.
-   */
-  cancelDelete(): void {
-    this.confirmDeleteId.set(null);
-  }
-
-  /**
-   * Ejecuta la eliminación del correo tras la confirmación en el modal.
-   *
-   * Guarda el ID, cierra el modal y realiza la petición DELETE.
-   * En éxito, filtra el correo de la lista local sin recargar.
-   * En error, muestra el mensaje del backend en el área de error general.
-   */
-  confirmDelete(): void {
-    const id = this.confirmDeleteId();
-    if (id === null) return;
-
-    this.deletingId.set(id);
-    this.confirmDeleteId.set(null); // Cerrar modal antes de la petición
-
-    this.allowedEmailsService.delete(id).subscribe({
+    this.metricsService.resolveAlert(alerta.idAlerta).subscribe({
       next: () => {
-        // Eliminar de la lista local sin recargar del backend
-        this.emails.update(list => list.filter(e => e.id !== id));
-        this.deletingId.set(null);
+        this.alerts.update(list => list.filter(a => a.idAlerta !== alerta.idAlerta));
+        this.resolvingAlertId.set(null);
+        this.loadAll(true);
       },
       error: (err: HttpErrorResponse) => {
-        this.error.set(err.error?.message ?? 'Error al eliminar el correo.');
-        this.deletingId.set(null);
+        this.error.set(describeHttpError(err, 'No se pudo resolver la alerta.'));
+        this.resolvingAlertId.set(null);
       }
     });
+  }
+
+  /**
+   * Tono de la tarjeta de nodos en línea.
+   *
+   * Ninguno en línea es un fallo (rojo); alguno caído, un aviso; todos
+   * emitiendo, correcto.
+   */
+  sensorTone(): MetricTone {
+    const o = this.overview();
+    if (!o || o.sensoresTotal === 0) return 'neutral';
+    if (o.sensoresEnLinea === 0) return 'danger';
+    return o.sensoresEnLinea < o.sensoresTotal ? 'warn' : 'ok';
+  }
+
+  /** Tono de la tarjeta de alertas: cualquier alerta abierta es un aviso. */
+  alertTone(): MetricTone {
+    return (this.overview()?.alertasAbiertas ?? 0) > 0 ? 'warn' : 'ok';
+  }
+
+  /**
+   * Tono de la tarjeta de MAC aleatorizadas.
+   *
+   * Un porcentaje muy alto degrada la fiabilidad del conteo: cada MAC rotada
+   * puede contarse como un dispositivo distinto, así que el número de
+   * dispositivos únicos se infla.
+   */
+  randomTone(): MetricTone {
+    const pct = this.overview()?.porcentajeRandomizadas ?? 0;
+    if (pct >= 80) return 'warn';
+    return 'neutral';
+  }
+
+  /** Clase CSS de la barra de aforo según el nivel de ocupación. */
+  levelClass(nivel: string): string {
+    return `level-${nivel}`;
+  }
+
+  /**
+   * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
+   * ocupación no desborde la celda.
+   */
+  aforoWidth(zone: ZoneOccupancy): number {
+    return Math.min(zone.porcentajeAforo ?? 0, 100);
+  }
+
+  /** Formatea un valor que puede no existir todavía. */
+  fmt(value: number | null | undefined, suffix = ''): string {
+    if (value === null || value === undefined) return '—';
+    return `${value}${suffix}`;
   }
 }
