@@ -14,9 +14,13 @@
  *    página o navegó directamente a una ruta protegida. Se hace una llamada a
  *    `GET /api/auth/session` para validar el token con el backend.
  *    - Si la sesión es válida, concede acceso y actualiza el estado en memoria.
- *    - Si la sesión es inválida o la petición falla, redirige a `/login`.
+ *    - Si la sesión es inválida o la petición falla, redirige al inicio.
  *
- * 3. **Sin token**: redirige directamente a `/login` sin petición HTTP.
+ * 3. **Sin token**: redirige directamente al inicio sin petición HTTP.
+ *
+ * La redirección va a `/` y no a `/login` a propósito: quien llega sin sesión
+ * a una URL de administración suele ser un visitante cualquiera, y el inicio
+ * le da algo que mirar en vez de un formulario que no puede rellenar.
  */
 
 import { inject } from '@angular/core';
@@ -36,7 +40,7 @@ import { map, catchError, of } from 'rxjs';
  * guards: evita Promises flotantes y permite al Router gestionar la navegación
  * de forma declarativa.
  *
- * @returns `true` si está autenticado, `UrlTree` de `/login` si no lo está,
+ * @returns `true` si está autenticado, `UrlTree` del inicio si no lo está,
  *          u `Observable<boolean | UrlTree>` cuando se valida el token con el backend.
  */
 export const authGuard: CanActivateFn = () => {
@@ -44,7 +48,7 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   /** UrlTree de redirección reutilizado en los tres casos de denegación. */
-  const loginTree: UrlTree = router.createUrlTree(['/login']);
+  const inicio: UrlTree = router.createUrlTree(['/']);
 
   if (authService.isAuthenticated()) {
     return true;
@@ -52,10 +56,10 @@ export const authGuard: CanActivateFn = () => {
 
   if (authService.getToken()) {
     return authService.checkSession().pipe(
-      map(response => response.isValid ? true : loginTree),
-      catchError(() => of(loginTree))
+      map(response => response.isValid ? true : inicio),
+      catchError(() => of(inicio))
     );
   }
 
-  return loginTree;
+  return inicio;
 };

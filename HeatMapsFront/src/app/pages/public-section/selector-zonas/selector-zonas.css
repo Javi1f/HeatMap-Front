@@ -1,0 +1,51 @@
+/** Pastillas para elegir espacio. */
+
+:host { display: block; }
+
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 1rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-2);
+  border-radius: 24px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+.pastilla:hover { border-color: var(--color-primary); color: var(--color-text); }
+.pastilla:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.pastilla-activa {
+  border-color: var(--color-primary);
+  background-color: rgba(232, 100, 12, 0.1);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* El color dice cómo está el espacio sin gastar una etiqueta por pastilla. */
+.punto-nivel {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.nivel-baja       { background-color: #3fb950; }
+.nivel-media      { background-color: #c99a1e; }
+.nivel-alta       { background-color: var(--color-danger); }
+.nivel-sin-datos  { background-color: var(--border-2); }
+
+@media (max-width: 480px) {
+  .selector { flex-direction: column; }
+  .pastilla { justify-content: space-between; }
+}

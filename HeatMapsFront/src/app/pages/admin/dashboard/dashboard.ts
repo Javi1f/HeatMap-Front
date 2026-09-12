@@ -4,7 +4,7 @@
  *
  * Sustituye al antiguo dashboard, que gestionaba la lista blanca de correos y
  * ahora vive en `/admin/users`. Aquí se muestra lo que el sistema realmente
- * produce: ocupación por zona, salud de la red de nodos y alertas de
+ * produce: ocupación por zona, salud de la red de nodos y
  * aglomeración.
  *
  * ## De dónde sale cada dato
@@ -14,7 +14,6 @@
  * | Tarjetas de cabecera  | `captura` en la ventana reciente        |
  * | Ocupación por zona    | `ocupacion_agregada` (última ventana)   |
  * | Salud de nodos        | `sensor.ultimaConexion`                 |
- * | Alertas               | `alerta` sin resolver                   |
  *
  * Las tarjetas y la tabla de zonas **no miden lo mismo**: las primeras
  * describen los últimos minutos leyendo detecciones crudas, la segunda la
@@ -34,14 +33,16 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  Alerta,
   MetricsOverview,
   MetricsService,
   SensingParameters,
   SensorHealth,
   ZoneOccupancy,
 } from '../../../core/services/metrics.service';
-import { MetricCardComponent, MetricTone } from './metric-card';
+import { AvisosDashboardComponent } from '../avisos-dashboard/avisos-dashboard';
+import { IndicadoresDashboardComponent } from '../indicadores-dashboard/indicadores-dashboard';
+import { TablaZonasComponent } from '../tabla-zonas/tabla-zonas';
+import { TablaNodosComponent } from '../tabla-nodos/tabla-nodos';
 import { describeHttpError } from '../../../core/http-error';
 
 /**
@@ -58,27 +59,16 @@ const REFRESH_INTERVAL_MS = 60_000;
 /**
  * Componente del dashboard de métricas.
  */
-/* ── Ayudantes de presentación ────────────────────────────────────
-   Funciones puras: reciben lo que necesitan y no tocan estado alguno. Se
-   definen antes del componente porque con `const` no hay izado. */
-
-/** Clase CSS de la barra de aforo según el nivel de ocupación. */
-const levelClass = (nivel: string): string => `level-${nivel}`;
-
-/**
- * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
- * ocupación no desborde la celda.
- */
-const aforoWidth = (zone: ZoneOccupancy): number => Math.min(zone.porcentajeAforo ?? 0, 100);
-
-/** Formatea un valor que puede no existir todavía. */
-const fmt = (value: number | null | undefined, suffix = ''): string =>
-  value === null || value === undefined ? '—' : `${value}${suffix}`;
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MetricCardComponent],
+  imports: [
+    CommonModule,
+    AvisosDashboardComponent,
+    IndicadoresDashboardComponent,
+    TablaZonasComponent,
+    TablaNodosComponent,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -98,9 +88,6 @@ export class Dashboard implements OnInit, OnDestroy {
   /** Estado de cada nodo de captura. */
   sensors = signal<SensorHealth[]>([]);
 
-  /** Alertas de aglomeración abiertas. */
-  alerts = signal<Alerta[]>([]);
-
   /** Parámetros de sensado con los que se calcularon las métricas. */
   parameters = signal<SensingParameters | null>(null);
 
@@ -109,9 +96,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   /** Mensaje de error de la carga, vacío si todo fue bien. */
   error = signal<string>('');
-
-  /** Id de la alerta que se está resolviendo, para el spinner de su fila. */
-  resolvingAlertId = signal<string | null>(null);
 
   /** Momento de la última actualización correcta. */
   lastUpdated = signal<Date | null>(null);
@@ -171,74 +155,31 @@ export class Dashboard implements OnInit, OnDestroy {
 
     this.metricsService.zones().subscribe({ next: (res) => this.zones.set(res.data) });
     this.metricsService.sensors().subscribe({ next: (res) => this.sensors.set(res.data) });
-    this.metricsService.alerts().subscribe({ next: (res) => this.alerts.set(res.data) });
 
     if (this.parameters() === null) {
       this.metricsService.parameters().subscribe({ next: (res) => this.parameters.set(res.data) });
     }
   }
 
-  /** Marca una alerta como resuelta y la retira de la lista. */
-  resolveAlert(alerta: Alerta): void {
-    this.resolvingAlertId.set(alerta.idAlerta);
-
-    this.metricsService.resolveAlert(alerta.idAlerta).subscribe({
-      next: () => {
-        this.alerts.update(list => list.filter(a => a.idAlerta !== alerta.idAlerta));
-        this.resolvingAlertId.set(null);
-        this.loadAll(true);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.error.set(describeHttpError(err, 'No se pudo resolver la alerta.'));
-        this.resolvingAlertId.set(null);
-      }
-    });
-  }
+  /** Texto de la ventana de agregación para la cabecera de la sección. */
+  ventanaTexto = computed(() => {
+    const parametros = this.parameters();
+    return parametros ? `${parametros.ventanaAgregacionMinutos} min` : '—';
+  });
 
   /**
-   * Tono de la tarjeta de nodos en línea.
+   * Pie con los parámetros de sensado.
    *
-   * Ninguno en línea es un fallo (rojo); alguno caído, un aviso; todos
-   * emitiendo, correcto.
+   * Se compone aquí y no en la plantilla para que el texto quede en un solo
+   * sitio, con su advertencia incluida.
    */
-  sensorTone(): MetricTone {
-    const resumen = this.overview();
-    if (!resumen || resumen.sensoresTotal === 0) return 'neutral';
-    if (resumen.sensoresEnLinea === 0) return 'danger';
-    return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
-  }
-
-  /** Tono de la tarjeta de alertas: cualquier alerta abierta es un aviso. */
-  alertTone(): MetricTone {
-    return (this.overview()?.alertasAbiertas ?? 0) > 0 ? 'warn' : 'ok';
-  }
-
-  /**
-   * Tono de la tarjeta de MAC aleatorizadas.
-   *
-   * Un porcentaje muy alto degrada la fiabilidad del conteo: cada MAC rotada
-   * puede contarse como un dispositivo distinto, así que el número de
-   * dispositivos únicos se infla.
-   */
-  randomTone(): MetricTone {
-    const pct = this.overview()?.porcentajeRandomizadas ?? 0;
-    if (pct >= 80) return 'warn';
-    return 'neutral';
-  }
-
-  /*
-   * Los tres ayudantes que siguen viven en el módulo, no en la clase: no
-   * dependen de su estado. La clase se limita a exponerlos, porque una
-   * plantilla de Angular solo resuelve miembros de la instancia y por eso no
-   * pueden declararse estáticos.
-   */
-
-  /** Clase CSS de la barra de aforo según el nivel de ocupación. */
-  readonly levelClass = levelClass;
-
-  /** Anchura de la barra de aforo, acotada al 100 %. */
-  readonly aforoWidth = aforoWidth;
-
-  /** Formatea un valor que puede no existir todavía. */
-  readonly fmt = fmt;
+  pieParametros = computed(() => {
+    const parametros = this.parameters();
+    if (!parametros) return '';
+    return `Distancia estimada con RSSI₀ = ${parametros.rssiReferencia} dBm`
+         + ` y n = ${parametros.exponenteAtenuacion}.`
+         + ' Estos valores requieren calibración por espacio; hasta entonces las distancias'
+         + ' son orientativas.';
+  });
 }
+

@@ -86,11 +86,6 @@ const margenPara = (anchoCss: number): number =>
 /** Densidad de la pantalla, con respaldo para entornos que no la exponen. */
 const densidadPantalla = (): number => window.devicePixelRatio || 1;
 
-/* ── Ayudantes de dibujo ──────────────────────────────────────────
-   Viven en el modulo y no en la clase porque no tocan su estado: reciben
-   todo lo que necesitan por parametro. Van antes del componente para que
-   esten definidos donde se usan; con `const` no hay izado que valga. */
-
 /** Tabla precalculada de 256 colores, uno por nivel de opacidad. */
 const tablaDeColor = (): [number, number, number, number][] => {
   const aux = document.createElement('canvas');
@@ -324,6 +319,11 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
    *
    * @returns El contexto y las medidas del plano, o `null` si todavía no se
    *          puede dibujar.
+   *
+   * El plano manda en la proporción: el alto se deduce del ancho disponible
+   * para que un espacio de 17,64 x 9,10 m no salga deformado. Y el lienzo se
+   * dibuja a la resolución real de la pantalla aunque se muestre al tamaño
+   * CSS; sin eso, en pantallas de alta densidad se ve borroso.
    */
   private prepararLienzo(): {
     ctx: CanvasRenderingContext2D;
@@ -334,16 +334,12 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     const contenedor = canvas?.parentElement;
     if (!canvas || !contenedor) return null;
 
-    // El plano manda en la proporción: el alto se deduce del ancho disponible
-    // para que un espacio de 17,64 x 9,10 m no salga deformado.
     const anchoCss = contenedor.clientWidth;
     this.margen = margenPara(anchoCss);
     this.anchoDibujado = anchoCss;
     const altoCss =
       Math.round((anchoCss - this.margen * 2) * proporcionDe(this.mapa)) + this.margen * 2;
 
-    // El lienzo se dibuja a la resolución real de la pantalla y se muestra al
-    // tamaño CSS; sin esto, en pantallas de alta densidad se ve borroso.
     const dpr = densidadPantalla();
     canvas.width = Math.round(anchoCss * dpr);
     canvas.height = Math.round(altoCss * dpr);
@@ -426,6 +422,10 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
 
   /**
    * Pinta la intensidad en un lienzo auxiliar y la vuelca ya coloreada.
+   *
+   * El eje Y se invierte al pasar de la rejilla al lienzo: la fila 0 es la
+   * parte inferior del espacio, mientras que en un lienzo la Y crece hacia
+   * abajo.
    */
   private dibujarCalor(
     ctx: CanvasRenderingContext2D,
@@ -447,8 +447,6 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
         const valor = mapa.rejilla[fila][col];
         if (valor === 0) continue;
 
-        // Centro de la celda en metros y su equivalente en el lienzo. El eje Y
-        // se invierte: la fila 0 es la parte inferior del espacio.
         const cx = (col + 0.5) * mapa.ladoCelda * escala;
         const cy = alto - (fila + 0.5) * mapa.ladoCelda * escala;
 

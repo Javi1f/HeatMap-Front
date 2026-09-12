@@ -6,23 +6,22 @@
         <span class="material-icons">dashboard</span>
         Dashboard
       </h1>
-      <p class="dashboard-subtitle">Ocupación, estado de la red de nodos y alertas</p>
+      <p class="dashboard-subtitle">Ocupación y estado de la red de nodos</p>
     </div>
-    @if (lastUpdated()) {
+    @if (lastUpdated(); as momento) {
       <span class="last-updated">
         <span class="material-icons">update</span>
-        Actualizado {{ lastUpdated() | date: 'HH:mm:ss' }}
+        Actualizado {{ momento | date: 'HH:mm:ss' }}
       </span>
     }
   </div>
 
-  @if (error()) {
-    <div class="alert alert-error">
-      <span class="material-icons">error_outline</span>
-      {{ error() }}
-      <button class="retry-btn" (click)="loadAll()">Reintentar</button>
-    </div>
-  }
+  <app-avisos-dashboard
+    [error]="error()"
+    [sinNodos]="sinNodos()"
+    [redCaida]="redCaida()"
+    (reintentar)="loadAll()"
+  />
 
   @if (isLoading()) {
     <div class="loading-state">
@@ -31,108 +30,10 @@
     </div>
   } @else {
 
-    @if (sinNodos()) {
-      <div class="alert alert-info">
-        <span class="material-icons">sensors_off</span>
-        Todavía no hay nodos de captura registrados. Los nodos aparecen solos en cuanto
-        publican su primera lectura en el bróker.
-      </div>
-    } @else if (redCaida()) {
-      <div class="alert alert-error">
-        <span class="material-icons">wifi_off</span>
-        Ningún nodo está emitiendo. Los conteos de abajo son los últimos conocidos:
-        un cero significa «sin datos», no «espacio vacío».
-      </div>
+    @if (overview(); as resumen) {
+      <app-indicadores-dashboard [resumen]="resumen" />
     }
 
-    <!-- ── Indicadores ──────────────────────────────────────────────────── -->
-    @if (overview(); as o) {
-      <div class="metric-grid">
-        <app-metric-card
-          label="Dispositivos ahora"
-          [value]="o.dispositivosAhora.toString()"
-          icon="smartphone"
-          [hint]="'MAC distintas en los últimos ' + o.ventanaMinutos + ' min. No equivale a personas.'"
-        />
-        <app-metric-card
-          label="Detecciones"
-          [value]="o.detecciones.toString()"
-          icon="graphic_eq"
-          [hint]="'Tramas capturadas en la misma ventana'"
-        />
-        <app-metric-card
-          label="MAC aleatorizadas"
-          [value]="o.porcentajeRandomizadas + ' %'"
-          icon="shuffle"
-          [tone]="randomTone()"
-          hint="Cuanto más alto, más se infla el conteo de únicos"
-        />
-        <app-metric-card
-          label="RSSI medio"
-          [value]="fmt(o.rssiPromedio, ' dBm')"
-          icon="network_check"
-          hint="Potencia media de las detecciones"
-        />
-        <app-metric-card
-          label="Nodos en línea"
-          [value]="o.sensoresEnLinea + ' / ' + o.sensoresTotal"
-          icon="router"
-          [tone]="sensorTone()"
-          hint="Nodos que han emitido en los últimos minutos"
-        />
-        <app-metric-card
-          label="Alertas abiertas"
-          [value]="o.alertasAbiertas.toString()"
-          icon="notification_important"
-          [tone]="alertTone()"
-          hint="Aglomeraciones sin resolver"
-        />
-      </div>
-    }
-
-    <!-- ── Alertas ──────────────────────────────────────────────────────── -->
-    @if (alerts().length > 0) {
-      <section class="section-card">
-        <div class="section-header">
-          <div class="section-title-group">
-            <span class="material-icons section-icon">warning_amber</span>
-            <div>
-              <h2 class="section-title">Alertas de aglomeración</h2>
-              <p class="section-desc">Se levantan solas cuando una zona entra en nivel alto</p>
-            </div>
-          </div>
-          <span class="badge">{{ alerts().length }}</span>
-        </div>
-
-        <div class="alert-list">
-          @for (alerta of alerts(); track alerta.idAlerta) {
-            <div class="alert-item" [class.alert-item-critica]="alerta.nivel === 'critica'">
-              <span class="material-icons alert-item-icon">
-                {{ alerta.nivel === 'critica' ? 'report' : 'warning_amber' }}
-              </span>
-              <div class="alert-item-body">
-                <p class="alert-item-msg">{{ alerta.mensaje }}</p>
-                <span class="alert-item-time">{{ alerta.timestampAlerta | date: 'dd/MM HH:mm' }}</span>
-              </div>
-              <button
-                class="btn-resolve"
-                [disabled]="resolvingAlertId() === alerta.idAlerta"
-                (click)="resolveAlert(alerta)"
-                title="Marcar como resuelta"
-              >
-                @if (resolvingAlertId() === alerta.idAlerta) {
-                  <div class="spinner spinner-sm"></div>
-                } @else {
-                  <span class="material-icons">check</span>
-                }
-              </button>
-            </div>
-          }
-        </div>
-      </section>
-    }
-
-    <!-- ── Ocupación por zona ───────────────────────────────────────────── -->
     <section class="section-card">
       <div class="section-header">
         <div class="section-title-group">
@@ -142,70 +43,14 @@
             <p class="section-desc">Última ventana consolidada de cada espacio</p>
           </div>
         </div>
-        @if (parameters(); as p) {
-          <span class="param-chip" title="Duración de la ventana de agregación">
-            ventana {{ p.ventanaAgregacionMinutos }} min
-          </span>
-        }
+        <span class="param-chip" title="Duración de la ventana de agregación">
+          ventana {{ ventanaTexto() }}
+        </span>
       </div>
 
-      @if (zones().length > 0) {
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-            <tr>
-              <th>Zona</th>
-              <th class="col-num">Únicos</th>
-              <th class="col-num col-secondary">Estables</th>
-              <th class="col-aforo">Aforo</th>
-              <th class="col-secondary">Actualizado</th>
-            </tr>
-            </thead>
-            <tbody>
-              @for (zone of zones(); track zone.idZona) {
-                <tr>
-                  <td>
-                    <div class="cell-flex">
-                      <span class="level-dot" [class]="levelClass(zone.nivelOcupacion)"></span>
-                      <span class="cell-strong">{{ zone.nombre }}</span>
-                    </div>
-                  </td>
-                  <td class="col-num cell-num">{{ zone.dispositivosUnicos }}</td>
-                  <td class="col-num cell-num cell-muted col-secondary">{{ zone.dispositivosEstables }}</td>
-                  <td class="col-aforo">
-                    @if (zone.capacidadMax) {
-                      <div class="aforo-bar" [title]="zone.porcentajeAforo + ' % de ' + zone.capacidadMax">
-                        <div
-                          class="aforo-fill"
-                          [class]="levelClass(zone.nivelOcupacion)"
-                          [style.width.%]="aforoWidth(zone)"
-                        ></div>
-                      </div>
-                      <span class="aforo-text">{{ zone.porcentajeAforo }} % de {{ zone.capacidadMax }}</span>
-                    } @else {
-                      <span class="cell-muted">Sin aforo definido</span>
-                    }
-                  </td>
-                  <td class="cell-muted col-secondary">
-                    {{ zone.actualizadoEn ? (zone.actualizadoEn | date: 'HH:mm') : '—' }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <div class="empty-state">
-          <span class="material-icons">location_off</span>
-          <p>Aún no hay ocupación consolidada</p>
-          <span class="empty-hint">
-            La primera ventana aparece cuando los nodos llevan emitiendo el tiempo de un intervalo completo.
-          </span>
-        </div>
-      }
+      <app-tabla-zonas [zonas]="zones()" />
     </section>
 
-    <!-- ── Nodos de captura ─────────────────────────────────────────────── -->
     <section class="section-card">
       <div class="section-header">
         <div class="section-title-group">
@@ -215,68 +60,13 @@
             <p class="section-desc">Un nodo se marca caído si deja de emitir unos minutos</p>
           </div>
         </div>
-        @if (overview(); as o) {
-          <span class="badge">{{ o.sensoresTotal }}</span>
-        }
+        <span class="badge">{{ sensors().length }}</span>
       </div>
 
-      @if (sensors().length > 0) {
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-            <tr>
-              <th>Nodo</th>
-              <th class="col-secondary">Zona</th>
-              <th class="col-secondary">Última lectura</th>
-              <th class="col-state">Estado</th>
-            </tr>
-            </thead>
-            <tbody>
-              @for (sensor of sensors(); track sensor.idSensor) {
-                <tr>
-                  <td>
-                    <div class="cell-flex">
-                      <span class="material-icons row-icon">memory</span>
-                      <span class="cell-strong">{{ sensor.nombre }}</span>
-                    </div>
-                  </td>
-                  <td class="cell-muted col-secondary">{{ sensor.zona ?? '—' }}</td>
-                  <td class="cell-muted col-secondary">
-                    @if (sensor.minutosDesdeUltimaLectura === null) {
-                      Nunca
-                    } @else if (sensor.minutosDesdeUltimaLectura < 1) {
-                      Hace menos de 1 min
-                    } @else {
-                      Hace {{ sensor.minutosDesdeUltimaLectura }} min
-                    }
-                  </td>
-                  <td class="cell-state">
-                    @if (sensor.enLinea) {
-                      <span class="pill pill-ok"><span class="dot"></span> En línea</span>
-                    } @else {
-                      <span class="pill pill-warn">Sin señal</span>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <div class="empty-state">
-          <span class="material-icons">sensors_off</span>
-          <p>No hay nodos registrados</p>
-        </div>
-      }
+      <app-tabla-nodos [nodos]="sensors()" />
     </section>
 
-    <!-- ── Parámetros de sensado ────────────────────────────────────────── -->
-    @if (parameters(); as p) {
-      <p class="params-footer">
-        Distancia estimada con RSSI₀ = {{ p.rssiReferencia }} dBm y n = {{ p.exponenteAtenuacion }}.
-        Estos valores requieren calibración por espacio; hasta entonces las distancias son orientativas.
-      </p>
-    }
+    <p class="params-footer">{{ pieParametros() }}</p>
   }
 
 </div>

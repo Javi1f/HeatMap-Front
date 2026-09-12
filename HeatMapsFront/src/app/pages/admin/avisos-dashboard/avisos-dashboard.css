@@ -1,0 +1,20 @@
+/** Estilos de los avisos del panel. */
+
+:host { display: contents; }
+
+.alert {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.85rem 1rem; border-radius: 8px;
+  font-size: 0.9rem; font-weight: 500;
+}
+.alert-error { background-color: rgba(232,100,12,0.1); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
+.alert-info  { background-color: var(--bg-surface); border: 1px solid var(--border-2); color: var(--color-text-muted); }
+
+.retry-btn {
+  margin-left: auto; background: none;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary); border-radius: 6px;
+  padding: 0.2rem 0.65rem; font-size: 0.8rem; cursor: pointer;
+  transition: background-color 0.2s ease; font-family: Roboto, sans-serif;
+}
+.retry-btn:hover { background-color: rgba(232,100,12,0.1); }

@@ -1,0 +1,41 @@
+@if (filas().length > 0) {
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nodo</th>
+          <th class="col-secondary">Zona</th>
+          <th class="col-secondary">Última lectura</th>
+          <th class="col-state">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of filas(); track fila.idSensor) {
+          <tr>
+            <td>
+              <div class="cell-flex">
+                <span class="material-icons row-icon">memory</span>
+                <span class="cell-strong">{{ fila.nombre }}</span>
+              </div>
+            </td>
+            <td class="cell-muted col-secondary">{{ fila.zona }}</td>
+            <td class="cell-muted col-secondary">{{ fila.ultimaLectura }}</td>
+            <td class="cell-state">
+              <span class="pill" [class]="fila.clasePildora">
+                @if (fila.enLinea) {
+                  <span class="dot"></span>
+                }
+                {{ fila.estado }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="empty-state">
+    <span class="material-icons">sensors_off</span>
+    <p>No hay nodos registrados</p>
+  </div>
+}

@@ -1,0 +1,9 @@
+<p class="hero-eyebrow">Ocupación en tiempo real</p>
+<h1 class="hero-titulo">Mira dónde hay sitio antes de ir</h1>
+
+@if (contador(); as c) {
+  <span class="vivo">
+    <i class="vivo-punto" [class.vivo-punto-quieto]="!c.enDirecto"></i>
+    {{ c.texto }}
+  </span>
+}

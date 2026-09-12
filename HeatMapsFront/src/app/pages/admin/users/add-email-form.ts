@@ -12,7 +12,7 @@
  * @see {@link Dashboard} — componente padre que provee el FormGroup y captura `formSubmit`.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -53,7 +53,7 @@ export class AddEmailFormComponent {
    * Emite cuando el usuario envía el formulario (`ngSubmit`).
    * El componente padre es responsable de validar y realizar la petición HTTP.
    */
-  @Output() readonly formSubmit = new EventEmitter<void>();
+  readonly formSubmit = output();
 
   /**
    * Acceso directo a los controles del `FormGroup` para verificar

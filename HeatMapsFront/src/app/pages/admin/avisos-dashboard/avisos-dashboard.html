@@ -1,0 +1,14 @@
+@if (error()) {
+  <div class="alert alert-error">
+    <span class="material-icons">error_outline</span>
+    {{ error() }}
+    <button class="retry-btn" (click)="reintentar.emit()">Reintentar</button>
+  </div>
+}
+
+@if (estadoRed(); as aviso) {
+  <div class="alert" [class]="aviso.clase">
+    <span class="material-icons">{{ aviso.icono }}</span>
+    {{ aviso.texto }}
+  </div>
+}

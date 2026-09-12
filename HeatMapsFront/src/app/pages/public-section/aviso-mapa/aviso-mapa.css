@@ -1,0 +1,30 @@
+/** Aviso bajo el mapa: error de carga o motivo por el que no hay manchas. */
+
+:host { display: contents; }
+
+.aviso {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.aviso-error  { background-color: rgba(232, 100, 12, 0.1); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
+.aviso-neutro { background-color: var(--bg-surface-deep); border: 1px solid var(--border-2); color: var(--color-text-muted); }
+
+.reintentar {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  border-radius: 6px;
+  padding: 0.22rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: Roboto, sans-serif;
+}
+.reintentar:hover { background-color: rgba(232, 100, 12, 0.1); }

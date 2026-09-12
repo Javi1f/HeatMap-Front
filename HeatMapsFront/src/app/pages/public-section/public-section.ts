@@ -24,40 +24,64 @@ import { Subscription } from 'rxjs';
 import { describeHttpError } from '../../core/http-error';
 import { MapaPublico, PublicoService, ZonaPublica } from '../../core/services/publico.service';
 import { MapaLienzoComponent } from '../../shared/components/mapa-lienzo/mapa-lienzo';
+import { CabeceraVivoComponent } from './cabecera-vivo/cabecera-vivo';
+import { SelectorZonasComponent } from './selector-zonas/selector-zonas';
+import { CabeceraLugarComponent } from './cabecera-lugar/cabecera-lugar';
+import { AvisoMapaComponent, AvisoMapa } from './aviso-mapa/aviso-mapa';
 import { SocketService } from '../../socket/socket.service';
 
 /** Periodo de refresco del mapa, en milisegundos. */
 const REFRESCO_MS = 30_000;
 
-/** Etiquetas de cada nivel de ocupación. */
-const ETIQUETA_NIVEL: Record<string, string> = {
-  baja: 'Poca gente',
-  media: 'Moderado',
-  alta: 'Muy concurrido',
-  'sin datos': 'Sin datos',
-};
-
-/* ── Ayudantes de presentación ────────────────────────────────────
-   Funciones puras, definidas antes del componente porque con `const` no hay
-   izado que las adelante. */
-
-/** Texto legible de un nivel de ocupación. */
-const etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
+/** Aviso por fallo de carga, o `null` si la carga fue bien. */
+const avisoDeError = (error: string): AvisoMapa | null =>
+  error
+    ? { clase: 'aviso-error', icono: 'error_outline', texto: error, reintentable: true }
+    : null;
 
 /**
- * Clase CSS de un nivel de ocupación.
+ * Aviso sobre lo que el mapa trae, o `null` si ya muestra manchas.
  *
- * El nivel llega como `sin datos`, con espacio, y un atributo `class` se parte
- * por los espacios: componerlo tal cual daba dos clases sueltas (`nivel-sin` y
- * `datos`) y ninguna regla llegaba a aplicarse, así que el distintivo salía
- * transparente y con el borde en blanco.
+ * Situar un dispositivo exige que al menos dos nodos lo vean a la vez: con uno
+ * solo emitiendo los hay, pero no se sabe dónde, que no es lo mismo que no
+ * haber nadie. Un backend anterior a `sinPosicion` no envía el campo y se
+ * trata como cero, de modo que cae en el aviso genérico en lugar de anunciar
+ * «undefined dispositivos».
  */
-const claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
+const avisoDelMapa = (mapa: MapaPublico | null): AvisoMapa | null => {
+  if (!mapa || mapa.situados > 0) return null;
+
+  const sinUbicar = mapa.sinPosicion ?? 0;
+  if (sinUbicar === 0) {
+    return {
+      clase: 'aviso-neutro',
+      icono: 'sensors_off',
+      texto: `Sin detecciones en los últimos ${mapa.ventanaMinutos} minutos.`,
+      reintentable: false,
+    };
+  }
+
+  return {
+    clase: 'aviso-neutro',
+    icono: 'location_searching',
+    texto: `Se están detectando ${sinUbicar} dispositivos, pero hace falta más de un`
+         + ' nodo activo para situarlos en el plano.',
+    reintentable: false,
+  };
+};
 
 @Component({
   selector: 'app-public-section',
   standalone: true,
-  imports: [CommonModule, FormsModule, MapaLienzoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MapaLienzoComponent,
+    CabeceraVivoComponent,
+    SelectorZonasComponent,
+    CabeceraLugarComponent,
+    AvisoMapaComponent,
+  ],
   templateUrl: './public-section.html',
   styleUrl: './public-section.css'
 })
@@ -134,45 +158,12 @@ export class PublicSection implements OnInit, OnDestroy {
   });
 
   /**
-   * `true` si hay mapa cargado y la ventana salió vacía.
+   * Aviso a mostrar bajo el plano, o `null` si no hay nada que advertir.
    *
-   * Va aquí y no como dos `@if` anidados en la plantilla porque «no ha llegado
-   * el mapa» y «el mapa llegó vacío» son estados distintos que sólo en
-   * combinación justifican el aviso.
+   * Un fallo de carga manda sobre cualquier otra cosa; si no lo hay, el aviso
+   * depende de lo que traiga el mapa.
    */
-  sinDetecciones = computed(() => {
-    const mapa = this.mapa();
-    return mapa !== null && mapa.situados === 0;
-  });
-
-  /** Aclara a qué momento se refiere la cifra de arriba. */
-  conteoLeyenda = computed<string>(() => {
-    if (this.enDirecto()) return 'ahora';
-    const minutos = this.mapa()?.ventanaMinutos;
-    return minutos ? `en los últimos ${minutos} min` : '';
-  });
-
-  /**
-   * Datos del distintivo de nivel, o `null` si no procede mostrarlo.
-   *
-   * Reúne las tres decisiones que antes estaban sueltas en la plantilla —si se
-   * muestra, con qué clase y con qué texto—, que en realidad son la misma cosa
-   * mirada por tres lados.
-   *
-   * Se calla cuando diría «Sin datos» habiendo mapa con detecciones: el nivel
-   * sale de las ventanas ya consolidadas y el mapa de lo captado hace un rato,
-   * así que al arrancar puede haber manchas y todavía ningún nivel, y el
-   * distintivo contradiría al mapa que tiene al lado.
-   */
-  nivelVista = computed<{ clase: string; etiqueta: string } | null>(() => {
-    const zona = this.zonaActual();
-    if (!zona) return null;
-
-    const nivel = zona.nivelOcupacion;
-    if (nivel === 'sin datos' && (this.mapa()?.situados ?? 0) > 0) return null;
-
-    return { clase: claseNivel(nivel), etiqueta: etiquetaNivel(nivel) };
-  });
+  aviso = computed<AvisoMapa | null>(() => avisoDeError(this.error()) ?? avisoDelMapa(this.mapa()));
 
   /**
    * Arranca la carga inicial, el refresco periódico y la escucha del socket.
@@ -208,18 +199,6 @@ export class PublicSection implements OnInit, OnDestroy {
     if (this.temporizador !== null) clearInterval(this.temporizador);
     this.suscripciones.unsubscribe();
   }
-
-  /*
-   * Los dos ayudantes que siguen viven en el módulo, no en la clase: no
-   * dependen de su estado. La clase se limita a exponerlos, porque una
-   * plantilla de Angular solo resuelve miembros de la instancia.
-   */
-
-  /** Texto legible de un nivel de ocupación. */
-  readonly etiquetaNivel = etiquetaNivel;
-
-  /** Clase CSS de un nivel de ocupación. */
-  readonly claseNivel = claseNivel;
 
   /** Carga los espacios y selecciona el primero. */
   private cargarZonas(): void {

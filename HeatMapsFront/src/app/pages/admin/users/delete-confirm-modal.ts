@@ -10,7 +10,7 @@
  * @see {@link Dashboard} — componente padre que gestiona el flujo de confirmación.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { AllowedEmail } from '../../../core/models/admin.model';
 
 /**
@@ -41,8 +41,8 @@ export class DeleteConfirmModalComponent {
   @Input() email: AllowedEmail | null = null;
 
   /** Emite cuando el usuario confirma la eliminación del correo. */
-  @Output() readonly deleteConfirmed = new EventEmitter<void>();
+  readonly deleteConfirmed = output();
 
   /** Emite cuando el usuario cancela o cierra el modal sin eliminar. */
-  @Output() readonly deleteCancelled = new EventEmitter<void>();
+  readonly deleteCancelled = output();
 }

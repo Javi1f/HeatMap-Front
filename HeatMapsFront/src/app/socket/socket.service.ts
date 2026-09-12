@@ -121,6 +121,15 @@ export class SocketService implements OnDestroy {
    */
   readonly connected$: Observable<boolean> = this.connectedSubject.asObservable();
 
+  /**
+   * Abre la conexión y registra los manejadores.
+   *
+   * El de `sensor-data` es síncrono y el descifrado no lo es, así que la
+   * promesa queda suelta. Se le engancha un `catch` en lugar de descartarla
+   * con `void`: hoy no puede rechazar porque atrapa sus propios errores, pero
+   * si algún día dejara de hacerlo, la escucha seguiría viva en vez de morir
+   * con un rechazo sin atender.
+   */
   constructor() {
     this.socket = io(SOCKET_URL, {
       transports: ['websocket'],
@@ -132,11 +141,6 @@ export class SocketService implements OnDestroy {
     this.socket.on('disconnect',    () => { this.connectedSubject.next(false); });
     this.socket.on('connect_error', () => { this.connectedSubject.next(false); });
 
-    // El manejador del socket es síncrono y `recibirResumen` no lo es, así que
-    // la promesa queda suelta. Se le engancha un `catch` en lugar de
-    // descartarla con `void`: hoy no puede rechazar porque atrapa sus propios
-    // errores, pero si algún día dejara de hacerlo, la escucha seguiría viva en
-    // vez de morir con un rechazo sin atender.
     this.socket.on('sensor-data', (sobre: SobreCifrado) => {
       this.recibirResumen(sobre).catch(() => undefined);
     });
@@ -159,7 +163,7 @@ export class SocketService implements OnDestroy {
       const resumen = await this.crypto.decrypt<ResumenSensor>(sobre.data);
       this.sensorDataSubject.next(resumen);
     } catch {
-      // Sobre ilegible: se ignora esta lectura y se sigue escuchando.
+      return;
     }
   }
 
