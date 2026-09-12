@@ -1,0 +1,15 @@
+<div class="lugar">
+  <div class="lugar-texto">
+    <h2 class="lugar-nombre">{{ zona().nombre }}</h2>
+    @if (zona().descripcion; as descripcion) {
+      <p class="lugar-desc">{{ descripcion }}</p>
+    }
+  </div>
+
+  @if (nivel(); as vista) {
+    <div class="estado" [class]="vista.clase">
+      <span class="estado-punto"></span>
+      {{ vista.etiqueta }}
+    </div>
+  }
+</div>

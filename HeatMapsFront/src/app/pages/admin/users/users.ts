@@ -206,6 +206,11 @@ export class Users implements OnInit {
    * Si el administrador cierra la suya propia, el token deja de ser válido de
    * inmediato: se limpia la sesión local y se redirige al inicio, en lugar de
    * dejar la pantalla en un estado donde cada petición devolvería 401.
+   *
+   * Al cerrar la sesión propia se navega al inicio. Esa navegación puede
+   * rechazar si un guard la bloquea; como la sesión ya está cerrada, lo peor
+   * que ocurre es quedarse en la misma pantalla, y el rechazo se atiende para
+   * no dejarlo suelto.
    */
   revokeSession(session: SessionSummary): void {
     this.revokingSessionId.set(session.idSesion);
@@ -216,10 +221,6 @@ export class Users implements OnInit {
 
         if (session.esActual) {
           this.authService.clearSession();
-          // La navegación puede rechazar si un guard la bloquea. La sesión ya
-          // está cerrada en ese punto, así que lo peor que puede pasar es
-          // quedarse en la misma pantalla; se atiende el rechazo para no
-          // dejarlo sin manejar.
           this.router.navigate(['/']).catch(() => undefined);
           return;
         }

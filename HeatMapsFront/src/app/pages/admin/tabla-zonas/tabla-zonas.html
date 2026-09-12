@@ -1,0 +1,48 @@
+@if (filas().length > 0) {
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Zona</th>
+          <th class="col-num">Únicos</th>
+          <th class="col-num col-secondary">Estables</th>
+          <th class="col-aforo">Aforo</th>
+          <th class="col-secondary">Actualizado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of filas(); track fila.idZona) {
+          <tr>
+            <td>
+              <div class="cell-flex">
+                <span class="level-dot" [class]="fila.claseNivel"></span>
+                <span class="cell-strong">{{ fila.nombre }}</span>
+              </div>
+            </td>
+            <td class="col-num cell-num">{{ fila.unicos }}</td>
+            <td class="col-num cell-num cell-muted col-secondary">{{ fila.estables }}</td>
+            <td class="col-aforo">
+              @if (fila.aforo; as aforo) {
+                <div class="aforo-bar" [title]="aforo.texto">
+                  <div class="aforo-fill" [class]="fila.claseNivel" [style.width.%]="aforo.ancho"></div>
+                </div>
+                <span class="aforo-text">{{ aforo.texto }}</span>
+              } @else {
+                <span class="cell-muted">Sin aforo definido</span>
+              }
+            </td>
+            <td class="cell-muted col-secondary">{{ fila.actualizado }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="empty-state">
+    <span class="material-icons">location_off</span>
+    <p>Aún no hay ocupación consolidada</p>
+    <span class="empty-hint">
+      La primera ventana aparece cuando los nodos llevan emitiendo el tiempo de un intervalo completo.
+    </span>
+  </div>
+}

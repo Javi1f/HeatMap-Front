@@ -39,7 +39,10 @@ import {
   SensorHealth,
   ZoneOccupancy,
 } from '../../../core/services/metrics.service';
-import { MetricCardComponent, MetricTone } from './metric-card';
+import { AvisosDashboardComponent } from '../avisos-dashboard/avisos-dashboard';
+import { IndicadoresDashboardComponent } from '../indicadores-dashboard/indicadores-dashboard';
+import { TablaZonasComponent } from '../tabla-zonas/tabla-zonas';
+import { TablaNodosComponent } from '../tabla-nodos/tabla-nodos';
 import { describeHttpError } from '../../../core/http-error';
 
 /**
@@ -56,27 +59,16 @@ const REFRESH_INTERVAL_MS = 60_000;
 /**
  * Componente del dashboard de métricas.
  */
-/* ── Ayudantes de presentación ────────────────────────────────────
-   Funciones puras: reciben lo que necesitan y no tocan estado alguno. Se
-   definen antes del componente porque con `const` no hay izado. */
-
-/** Clase CSS de la barra de aforo según el nivel de ocupación. */
-const levelClass = (nivel: string): string => `level-${nivel}`;
-
-/**
- * Anchura de la barra de aforo, acotada al 100 % para que un exceso de
- * ocupación no desborde la celda.
- */
-const aforoWidth = (zone: ZoneOccupancy): number => Math.min(zone.porcentajeAforo ?? 0, 100);
-
-/** Formatea un valor que puede no existir todavía. */
-const fmt = (value: number | null | undefined, suffix = ''): string =>
-  value === null || value === undefined ? '—' : `${value}${suffix}`;
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MetricCardComponent],
+  imports: [
+    CommonModule,
+    AvisosDashboardComponent,
+    IndicadoresDashboardComponent,
+    TablaZonasComponent,
+    TablaNodosComponent,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -169,45 +161,24 @@ export class Dashboard implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Tono de la tarjeta de nodos en línea.
-   *
-   * Ninguno en línea es un fallo (rojo); alguno caído, un aviso; todos
-   * emitiendo, correcto.
-   */
-  sensorTone(): MetricTone {
-    const resumen = this.overview();
-    if (!resumen || resumen.sensoresTotal === 0) return 'neutral';
-    if (resumen.sensoresEnLinea === 0) return 'danger';
-    return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
-  }
+  /** Texto de la ventana de agregación para la cabecera de la sección. */
+  ventanaTexto = computed(() => {
+    const p = this.parameters();
+    return p ? `${p.ventanaAgregacionMinutos} min` : '—';
+  });
 
   /**
-   * Tono de la tarjeta de MAC aleatorizadas.
+   * Pie con los parámetros de sensado.
    *
-   * Un porcentaje muy alto degrada la fiabilidad del conteo: cada MAC rotada
-   * puede contarse como un dispositivo distinto, así que el número de
-   * dispositivos únicos se infla.
+   * Se compone aquí y no en la plantilla para que el texto quede en un solo
+   * sitio, con su advertencia incluida.
    */
-  randomTone(): MetricTone {
-    const pct = this.overview()?.porcentajeRandomizadas ?? 0;
-    if (pct >= 80) return 'warn';
-    return 'neutral';
-  }
-
-  /*
-   * Los tres ayudantes que siguen viven en el módulo, no en la clase: no
-   * dependen de su estado. La clase se limita a exponerlos, porque una
-   * plantilla de Angular solo resuelve miembros de la instancia y por eso no
-   * pueden declararse estáticos.
-   */
-
-  /** Clase CSS de la barra de aforo según el nivel de ocupación. */
-  readonly levelClass = levelClass;
-
-  /** Anchura de la barra de aforo, acotada al 100 %. */
-  readonly aforoWidth = aforoWidth;
-
-  /** Formatea un valor que puede no existir todavía. */
-  readonly fmt = fmt;
+  pieParametros = computed(() => {
+    const p = this.parameters();
+    if (!p) return '';
+    return `Distancia estimada con RSSI₀ = ${p.rssiReferencia} dBm y n = ${p.exponenteAtenuacion}.`
+         + ' Estos valores requieren calibración por espacio; hasta entonces las distancias'
+         + ' son orientativas.';
+  });
 }
+

@@ -1,0 +1,11 @@
+<div class="metric-grid">
+  @for (tarjeta of tarjetas(); track tarjeta.label) {
+    <app-metric-card
+      [label]="tarjeta.label"
+      [value]="tarjeta.value"
+      [icon]="tarjeta.icon"
+      [tone]="tarjeta.tone"
+      [hint]="tarjeta.hint"
+    />
+  }
+</div>

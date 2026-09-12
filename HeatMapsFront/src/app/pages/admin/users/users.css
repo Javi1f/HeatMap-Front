@@ -101,25 +101,6 @@
 
 /* ── Píldoras de estado ──────────────────────────────────────── */
 
-.pill {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.72rem; font-weight: 600;
-  padding: 0.2rem 0.6rem; border-radius: 20px;
-  white-space: nowrap;
-}
-.pill-ok   { background-color: rgba(46,160,67,0.12); color: #3fb950; border: 1px solid #2ea043; }
-.pill-idle { background-color: var(--bg-surface-hover); color: var(--color-text-muted); border: 1px solid var(--border-2); }
-.pill-warn { background-color: rgba(232,100,12,0.12); color: var(--color-secondary); border: 1px solid var(--color-secondary); }
-
-/* Punto pulsante del estado «en línea»: refuerza que es un dato vivo y no
-   una etiqueta estática. */
-.dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background-color: currentColor;
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse { 50% { opacity: 0.35; } }
-
 /* Segunda línea que sólo aparece en teléfono. Las columnas secundarias se
    ocultan ahí por falta de sitio, y sin esto sus datos —el correo del
    administrador, el origen y la vigencia de la sesión— desaparecían por

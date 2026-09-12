@@ -1,25 +1,10 @@
 <div class="publico">
 
-  <header class="hero">
-    <p class="hero-eyebrow">Ocupación en tiempo real</p>
-    <h1 class="hero-titulo">Mira dónde hay sitio antes de ir</h1>
-    @if (conteoVisible() !== null) {
-      <span class="vivo">
-        @if (enDirecto()) {
-          <i class="vivo-punto"></i>
-        }
-        {{ conteoVisible() }} dispositivos {{ conteoLeyenda() }}
-      </span>
-    }
-  </header>
-
-  @if (error()) {
-    <div class="aviso aviso-error">
-      <span class="material-icons">error_outline</span>
-      {{ error() }}
-      <button class="reintentar" (click)="cargarMapa()">Reintentar</button>
-    </div>
-  }
+  <app-cabecera-vivo
+    [valor]="conteoVisible()"
+    [enDirecto]="enDirecto()"
+    [ventanaMinutos]="mapa()?.ventanaMinutos ?? null"
+  />
 
   @if (cargando()) {
     <div class="cargando">
@@ -38,37 +23,16 @@
     </div>
   } @else {
 
-    @if (zonas().length > 1) {
-      <nav class="selector" aria-label="Espacios disponibles">
-        @for (z of zonas(); track z.idZona) {
-          <button class="pastilla"
-                  [class.pastilla-activa]="z.idZona === zonaSeleccionada()"
-                  [attr.aria-pressed]="z.idZona === zonaSeleccionada()"
-                  (click)="alCambiarZona(z.idZona)">
-            <span class="pastilla-nombre">{{ z.nombre }}</span>
-            <span class="punto-nivel" [class]="claseNivel(z.nivelOcupacion)"></span>
-          </button>
-        }
-      </nav>
-    }
+    <app-selector-zonas
+      [zonas]="zonas()"
+      [seleccionada]="zonaSeleccionada()"
+      (seleccionar)="alCambiarZona($event)"
+    />
 
     <section class="tarjeta">
 
-      @if (zonaActual(); as z) {
-        <div class="lugar">
-          <div class="lugar-texto">
-            <h2 class="lugar-nombre">{{ z.nombre }}</h2>
-            @if (z.descripcion) {
-              <p class="lugar-desc">{{ z.descripcion }}</p>
-            }
-          </div>
-          @if (nivelVista(); as nivel) {
-            <div class="estado" [class]="nivel.clase">
-              <span class="estado-punto"></span>
-              {{ nivel.etiqueta }}
-            </div>
-          }
-        </div>
+      @if (zonaActual(); as zona) {
+        <app-cabecera-lugar [zona]="zona" [situados]="mapa()?.situados ?? 0" />
       }
 
       <div class="lienzo-marco">
@@ -84,18 +48,7 @@
         <span class="leyenda-nodo"><i class="punto-nodo"></i> nodo de captura</span>
       </div>
 
-      @if (sinDetecciones()) {
-        <div class="aviso aviso-neutro">
-          <span class="material-icons">sensors_off</span>
-          Sin detecciones en los últimos {{ mapa()?.ventanaMinutos }} minutos.
-        </div>
-      } @else if (detectadosSinUbicar(); as pendientes) {
-        <div class="aviso aviso-neutro">
-          <span class="material-icons">location_searching</span>
-          Se están detectando {{ pendientes }} dispositivos, pero hace falta más de un
-          nodo activo para situarlos en el plano.
-        </div>
-      }
+      <app-aviso-mapa [aviso]="aviso()" (reintentar)="cargarMapa()" />
     </section>
 
     <div class="notas">

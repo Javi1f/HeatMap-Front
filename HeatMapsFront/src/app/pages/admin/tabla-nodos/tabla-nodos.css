@@ -1,0 +1,8 @@
+/**
+ * Estilos propios de la tabla de nodos.
+ *
+ * Lo común con la tabla de zonas vive en `tablas-comunes.css`, que este
+ * componente también incluye.
+ */
+
+:host { display: block; }

@@ -1,0 +1,9 @@
+@if (aviso(); as a) {
+  <div class="aviso" [class]="a.clase">
+    <span class="material-icons">{{ a.icono }}</span>
+    {{ a.texto }}
+    @if (a.reintentable) {
+      <button class="reintentar" (click)="reintentar.emit()">Reintentar</button>
+    }
+  </div>
+}

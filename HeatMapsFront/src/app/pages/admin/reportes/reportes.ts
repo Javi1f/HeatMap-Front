@@ -156,7 +156,11 @@ export class Reportes implements OnInit {
     });
   }
 
-  /** Genera un reporte con los valores del formulario y lo abre. */
+  /** Genera un reporte con los valores del formulario y lo abre.
+   *
+   * El campo de fecha solo aporta el día, así que el rango se extiende a la
+   * jornada completa: de otro modo el último día quedaría fuera del reporte.
+   */
   generar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -170,8 +174,6 @@ export class Reportes implements OnInit {
     this.reportesService
       .crear({
         tipoReporte: valores.tipoReporte,
-        // El input de tipo date da solo la fecha; se extiende al día completo
-        // para que el rango incluya lo ocurrido durante la jornada final.
         rangoInicio: new Date(`${valores.rangoInicio}T00:00:00`).toISOString(),
         rangoFin: new Date(`${valores.rangoFin}T23:59:59`).toISOString(),
         idZona: valores.idZona || undefined,

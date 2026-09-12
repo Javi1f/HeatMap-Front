@@ -1,0 +1,11 @@
+<nav class="selector" aria-label="Espacios disponibles">
+  @for (opcion of opciones(); track opcion.idZona) {
+    <button class="pastilla"
+            [class.pastilla-activa]="opcion.activa"
+            [attr.aria-pressed]="opcion.activa"
+            (click)="seleccionar.emit(opcion.idZona)">
+      <span class="pastilla-nombre">{{ opcion.nombre }}</span>
+      <span class="punto-nivel" [class]="opcion.claseNivel"></span>
+    </button>
+  }
+</nav>

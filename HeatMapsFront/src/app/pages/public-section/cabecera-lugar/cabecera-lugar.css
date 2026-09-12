@@ -1,0 +1,42 @@
+/** Cabecera de la tarjeta: nombre del espacio y su nivel de ocupación. */
+
+:host { display: block; }
+
+.lugar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+.lugar-texto  { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.lugar-nombre { margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text); letter-spacing: -0.01em; }
+.lugar-desc   { margin: 0; font-size: 0.86rem; color: var(--color-text-muted); max-width: 58ch; line-height: 1.5; }
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.estado-punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+/* Del verde tranquilo al rojo de saturación, en la misma dirección que la
+   rampa del mapa, para que ambos se lean igual. */
+.nivel-baja      { color: #3fb950; }
+.nivel-media     { color: #c99a1e; }
+.nivel-alta      { color: var(--color-danger); }
+.nivel-sin-datos { color: var(--color-text-muted); }
+
+.estado.nivel-baja      { background-color: rgba(46, 160, 67, 0.13);  border: 1px solid #2ea043; }
+.estado.nivel-media     { background-color: rgba(201, 154, 30, 0.14); border: 1px solid #c99a1e; }
+.estado.nivel-alta      { background-color: rgba(208, 62, 32, 0.13);  border: 1px solid var(--color-danger); }
+.estado.nivel-sin-datos { background-color: var(--bg-surface-hover);  border: 1px solid var(--border-2); }
+
+@media (max-width: 768px) {
+  .lugar-nombre { font-size: 1.2rem; }
+}

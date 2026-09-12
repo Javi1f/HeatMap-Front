@@ -66,8 +66,10 @@ export interface MapaDibujable {
    * Situar uno exige que al menos dos nodos lo vean a la vez. Con un solo
    * nodo emitiendo, todas las detecciones caen aquí: hay gente, pero no se
    * sabe dónde. Sirve para no anunciar que no hay nadie, que es otra cosa.
+   *
+   * Opcional: un backend anterior a este campo no lo envía.
    */
-  sinPosicion: number;
+  sinPosicion?: number;
 
   /** Nodos con su posición. */
   nodos: NodoDibujable[];

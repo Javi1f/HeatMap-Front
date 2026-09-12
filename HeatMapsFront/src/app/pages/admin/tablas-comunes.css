@@ -1,0 +1,50 @@
+/**
+ * Estilos de tabla compartidos por las tablas del panel.
+ *
+ * Se incluye desde el `styleUrls` de cada componente en lugar de vivir en la
+ * hoja global: así sigue encapsulado —no se filtra a otras páginas que usan
+ * los mismos nombres de clase con medidas propias— y aun así se escribe una
+ * sola vez.
+ */
+
+.table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+.data-table    { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+
+.data-table thead tr { background-color: var(--bg-surface-deep); border-bottom: 1px solid var(--border); }
+.data-table th {
+  padding: 0.7rem 1rem; text-align: left;
+  font-size: 0.78rem; font-weight: 600; color: var(--color-text-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+.data-table tbody tr { border-bottom: 1px solid var(--border); transition: background-color 0.15s ease; }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover      { background-color: var(--bg-surface-hover); }
+
+.data-table td { padding: 0.8rem 1rem; color: var(--color-text); vertical-align: middle; }
+
+.col-num   { text-align: right; width: 90px; }
+.col-aforo { width: 220px; }
+.col-state { width: 120px; text-align: center; }
+
+.cell-flex   { display: flex; align-items: center; gap: 0.5rem; overflow: hidden; }
+.cell-strong { font-weight: 500; }
+.cell-muted  { color: var(--color-text-muted); font-size: 0.88rem; }
+.cell-num    { font-variant-numeric: tabular-nums; text-align: right; }
+.cell-state  { text-align: center; }
+.row-icon    { font-size: 1rem; color: var(--color-primary); flex-shrink: 0; }
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.6rem; padding: 2.5rem 1.5rem;
+  color: var(--color-text-muted); font-size: 0.9rem; text-align: center;
+}
+.empty-state .material-icons { font-size: 2.5rem; color: var(--border); }
+.empty-hint { font-size: 0.8rem; max-width: 52ch; line-height: 1.5; }
+
+@media (max-width: 768px) {
+  .col-secondary { display: none; }
+  .data-table th,
+  .data-table td { padding: 0.6rem 0.7rem; }
+  .col-aforo     { width: auto; }
+}

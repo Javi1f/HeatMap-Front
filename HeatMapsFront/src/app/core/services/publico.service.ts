@@ -26,6 +26,33 @@ export interface RespuestaPublica<T> {
   data: T;
 }
 
+/**
+ * Etiquetas de cada nivel de ocupación.
+ *
+ * Hablan de dispositivos y no de personas porque es lo único que el sistema
+ * mide. Decir «poca gente» daría por contado un salto —de aparato a persona—
+ * que aquí nadie ha dado.
+ */
+const ETIQUETA_NIVEL: Record<string, string> = {
+  baja: 'Pocos dispositivos',
+  media: 'Bastantes dispositivos',
+  alta: 'Muchos dispositivos',
+  'sin datos': 'Sin datos',
+};
+
+/** Texto legible de un nivel de ocupación. */
+export const etiquetaNivel = (nivel: string): string => ETIQUETA_NIVEL[nivel] ?? nivel;
+
+/**
+ * Clase CSS de un nivel de ocupación.
+ *
+ * El nivel llega como `sin datos`, con espacio, y un atributo `class` se parte
+ * por los espacios: componerlo tal cual daba dos clases sueltas (`nivel-sin` y
+ * `datos`) y ninguna regla llegaba a aplicarse, así que el distintivo salía
+ * transparente y con el borde en blanco.
+ */
+export const claseNivel = (nivel: string): string => `nivel-${nivel.replace(/\s+/g, '-')}`;
+
 /** Espacio consultable desde la vista pública. */
 export interface ZonaPublica {
   /** Identificador de la zona, necesario para pedir su mapa. */
