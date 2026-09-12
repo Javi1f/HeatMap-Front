@@ -33,6 +33,43 @@ import { SocketService } from '../../socket/socket.service';
 /** Periodo de refresco del mapa, en milisegundos. */
 const REFRESCO_MS = 30_000;
 
+/** Aviso por fallo de carga, o `null` si la carga fue bien. */
+const avisoDeError = (error: string): AvisoMapa | null =>
+  error
+    ? { clase: 'aviso-error', icono: 'error_outline', texto: error, reintentable: true }
+    : null;
+
+/**
+ * Aviso sobre lo que el mapa trae, o `null` si ya muestra manchas.
+ *
+ * Situar un dispositivo exige que al menos dos nodos lo vean a la vez: con uno
+ * solo emitiendo los hay, pero no se sabe dónde, que no es lo mismo que no
+ * haber nadie. Un backend anterior a `sinPosicion` no envía el campo y se
+ * trata como cero, de modo que cae en el aviso genérico en lugar de anunciar
+ * «undefined dispositivos».
+ */
+const avisoDelMapa = (mapa: MapaPublico | null): AvisoMapa | null => {
+  if (!mapa || mapa.situados > 0) return null;
+
+  const sinUbicar = mapa.sinPosicion ?? 0;
+  if (sinUbicar === 0) {
+    return {
+      clase: 'aviso-neutro',
+      icono: 'sensors_off',
+      texto: `Sin detecciones en los últimos ${mapa.ventanaMinutos} minutos.`,
+      reintentable: false,
+    };
+  }
+
+  return {
+    clase: 'aviso-neutro',
+    icono: 'location_searching',
+    texto: `Se están detectando ${sinUbicar} dispositivos, pero hace falta más de un`
+         + ' nodo activo para situarlos en el plano.',
+    reintentable: false,
+  };
+};
+
 @Component({
   selector: 'app-public-section',
   standalone: true,
@@ -123,45 +160,10 @@ export class PublicSection implements OnInit, OnDestroy {
   /**
    * Aviso a mostrar bajo el plano, o `null` si no hay nada que advertir.
    *
-   * Reúne los tres casos que antes se encadenaban en la plantilla: el fallo de
-   * carga, la ventana sin una sola detección, y el caso de haberlas pero no
-   * poder situarlas. Son excluyentes y se deciden mejor juntos que repartidos
-   * en ramas.
-   *
-   * Situar un dispositivo exige que al menos dos nodos lo vean a la vez: con
-   * uno solo emitiendo los hay, pero no se sabe dónde, que no es lo mismo que
-   * no haber nadie. Un backend anterior a `sinPosicion` no envía el campo y se
-   * trata como cero, de modo que cae en el aviso genérico en lugar de anunciar
-   * «undefined dispositivos».
+   * Un fallo de carga manda sobre cualquier otra cosa; si no lo hay, el aviso
+   * depende de lo que traiga el mapa.
    */
-  aviso = computed<AvisoMapa | null>(() => {
-    const error = this.error();
-    if (error) {
-      return { clase: 'aviso-error', icono: 'error_outline', texto: error, reintentable: true };
-    }
-
-    const mapa = this.mapa();
-    if (!mapa || mapa.situados > 0) return null;
-
-    const sinUbicar = mapa.sinPosicion ?? 0;
-
-    if (sinUbicar === 0) {
-      return {
-        clase: 'aviso-neutro',
-        icono: 'sensors_off',
-        texto: `Sin detecciones en los últimos ${mapa.ventanaMinutos} minutos.`,
-        reintentable: false,
-      };
-    }
-
-    return {
-      clase: 'aviso-neutro',
-      icono: 'location_searching',
-      texto: `Se están detectando ${sinUbicar} dispositivos, pero hace falta más de un`
-           + ' nodo activo para situarlos en el plano.',
-      reintentable: false,
-    };
-  });
+  aviso = computed<AvisoMapa | null>(() => avisoDeError(this.error()) ?? avisoDelMapa(this.mapa()));
 
   /**
    * Arranca la carga inicial, el refresco periódico y la escucha del socket.

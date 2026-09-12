@@ -55,41 +55,41 @@ export class IndicadoresDashboardComponent {
    * rotada puede contarse como un dispositivo distinto.
    */
   readonly tarjetas = computed<Tarjeta[]>(() => {
-    const o = this.resumen();
+    const metricas = this.resumen();
     return [
       {
         label: 'Dispositivos ahora',
-        value: o.dispositivosAhora.toString(),
+        value: metricas.dispositivosAhora.toString(),
         icon: 'smartphone',
         tone: 'neutral',
-        hint: `MAC distintas en los últimos ${o.ventanaMinutos} min. No equivale a personas.`,
+        hint: `MAC distintas en los últimos ${metricas.ventanaMinutos} min. No equivale a personas.`,
       },
       {
         label: 'Detecciones',
-        value: o.detecciones.toString(),
+        value: metricas.detecciones.toString(),
         icon: 'graphic_eq',
         tone: 'neutral',
         hint: 'Tramas capturadas en la misma ventana',
       },
       {
         label: 'MAC aleatorizadas',
-        value: `${o.porcentajeRandomizadas} %`,
+        value: `${metricas.porcentajeRandomizadas} %`,
         icon: 'shuffle',
-        tone: o.porcentajeRandomizadas >= 80 ? 'warn' : 'neutral',
+        tone: metricas.porcentajeRandomizadas >= 80 ? 'warn' : 'neutral',
         hint: 'Cuanto más alto, más se infla el conteo de únicos',
       },
       {
         label: 'RSSI medio',
-        value: fmt(o.rssiPromedio, ' dBm'),
+        value: fmt(metricas.rssiPromedio, ' dBm'),
         icon: 'network_check',
         tone: 'neutral',
         hint: 'Potencia media de las detecciones',
       },
       {
         label: 'Nodos en línea',
-        value: `${o.sensoresEnLinea} / ${o.sensoresTotal}`,
+        value: `${metricas.sensoresEnLinea} / ${metricas.sensoresTotal}`,
         icon: 'router',
-        tone: tonoNodos(o),
+        tone: tonoNodos(metricas),
         hint: 'Nodos que han emitido en los últimos minutos',
       },
     ];

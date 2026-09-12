@@ -30,9 +30,20 @@ import { AuthService } from '../services/auth.service';
  * - Si hay token disponible, clona la petición y añade el header
  *   `Authorization: Bearer <token>` antes de pasarla al siguiente handler.
  * - Si la respuesta es un error 401, invoca {@link AuthService.clearSession}
- *   para limpiar el estado local y redirige a `/login`.
+ *   para limpiar el estado local y devuelve al inicio.
  *   El error se relanza igualmente para que los suscriptores puedan reaccionar.
+ *
+ * Se exceptúan los intentos de autenticación: un 401 de `/auth/login` significa
+ * «contraseña incorrecta», no «sesión caducada». Sacar al usuario de la pantalla
+ * de acceso al fallar el primer intento le impediría corregirlo.
  */
+/** Endpoints donde un 401 lo produce la credencial enviada, no una sesión caducada. */
+const RUTAS_DE_ACCESO = ['/auth/login', '/auth/register', '/auth/verify-code'];
+
+/** Indica si la URL corresponde a un intento de autenticación. */
+const esIntentoDeAcceso = (url: string): boolean =>
+  RUTAS_DE_ACCESO.some(ruta => url.includes(ruta));
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -44,9 +55,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !esIntentoDeAcceso(req.url)) {
         authService.clearSession();
-        router.navigate(['/login']).catch(() => undefined);
+        router.navigate(['/']).catch(() => undefined);
       }
       return throwError(() => error);
     })

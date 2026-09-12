@@ -26,5 +26,5 @@ export class AvisoMapaComponent {
   readonly aviso = input<AvisoMapa | null>(null);
 
   /** Se emite al pulsar «Reintentar». */
-  readonly reintentar = output<void>();
+  readonly reintentar = output();
 }

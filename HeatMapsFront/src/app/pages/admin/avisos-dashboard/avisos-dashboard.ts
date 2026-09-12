@@ -31,7 +31,7 @@ export class AvisosDashboardComponent {
   readonly redCaida = input<boolean>(false);
 
   /** Se emite al pulsar «Reintentar». */
-  readonly reintentar = output<void>();
+  readonly reintentar = output();
 
   /**
    * Aviso sobre la red, o `null` si no hay nada que advertir.

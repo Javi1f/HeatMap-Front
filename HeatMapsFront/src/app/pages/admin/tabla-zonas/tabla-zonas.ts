@@ -35,9 +35,11 @@ interface FilaZona {
  */
 const horaLocal = (iso: string | null): string => {
     if (!iso) return '—';
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '—';
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const fecha = new Date(iso);
+    if (Number.isNaN(fecha.getTime())) return '—';
+    const hora = String(fecha.getHours()).padStart(2, '0');
+    const minuto = String(fecha.getMinutes()).padStart(2, '0');
+    return `${hora}:${minuto}`;
 };
 
 @Component({

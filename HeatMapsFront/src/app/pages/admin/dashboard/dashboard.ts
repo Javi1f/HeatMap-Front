@@ -163,8 +163,8 @@ export class Dashboard implements OnInit, OnDestroy {
 
   /** Texto de la ventana de agregación para la cabecera de la sección. */
   ventanaTexto = computed(() => {
-    const p = this.parameters();
-    return p ? `${p.ventanaAgregacionMinutos} min` : '—';
+    const parametros = this.parameters();
+    return parametros ? `${parametros.ventanaAgregacionMinutos} min` : '—';
   });
 
   /**
@@ -174,9 +174,10 @@ export class Dashboard implements OnInit, OnDestroy {
    * sitio, con su advertencia incluida.
    */
   pieParametros = computed(() => {
-    const p = this.parameters();
-    if (!p) return '';
-    return `Distancia estimada con RSSI₀ = ${p.rssiReferencia} dBm y n = ${p.exponenteAtenuacion}.`
+    const parametros = this.parameters();
+    if (!parametros) return '';
+    return `Distancia estimada con RSSI₀ = ${parametros.rssiReferencia} dBm`
+         + ` y n = ${parametros.exponenteAtenuacion}.`
          + ' Estos valores requieren calibración por espacio; hasta entonces las distancias'
          + ' son orientativas.';
   });
