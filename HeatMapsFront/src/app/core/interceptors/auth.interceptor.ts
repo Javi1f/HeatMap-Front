@@ -7,7 +7,7 @@
  * 1. **Inyección del token**: adjunta el header `Authorization: Bearer <token>`
  *    en cada petición si existe un token activo en `localStorage`.
  * 2. **Manejo de 401**: cuando el backend responde con 401 (token expirado,
- *    inválido o ausente), limpia la sesión local y redirige al login,
+ *    inválido o ausente), limpia la sesión local y devuelve al inicio,
  *    sin requerir lógica adicional en cada componente o servicio.
  *
  * ## Orden con cryptoInterceptor
@@ -24,6 +24,13 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
+/** Endpoints donde un 401 lo produce la credencial enviada, no una sesión caducada. */
+const RUTAS_DE_ACCESO = ['/auth/login', '/auth/register', '/auth/verify-code'];
+
+/** Indica si la URL corresponde a un intento de autenticación. */
+const esIntentoDeAcceso = (url: string): boolean =>
+  RUTAS_DE_ACCESO.some(ruta => url.includes(ruta));
+
 /**
  * Interceptor funcional de Angular para autenticación basada en JWT.
  *
@@ -37,13 +44,6 @@ import { AuthService } from '../services/auth.service';
  * «contraseña incorrecta», no «sesión caducada». Sacar al usuario de la pantalla
  * de acceso al fallar el primer intento le impediría corregirlo.
  */
-/** Endpoints donde un 401 lo produce la credencial enviada, no una sesión caducada. */
-const RUTAS_DE_ACCESO = ['/auth/login', '/auth/register', '/auth/verify-code'];
-
-/** Indica si la URL corresponde a un intento de autenticación. */
-const esIntentoDeAcceso = (url: string): boolean =>
-  RUTAS_DE_ACCESO.some(ruta => url.includes(ruta));
-
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
