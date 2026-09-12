@@ -32,5 +32,10 @@
   .main-content,
   .main-content.collapsed {
     padding: 0.75rem;
+    /* El atajo de arriba reinicia el relleno superior heredado de la consulta
+       de 768px, así que hay que repetirlo: sin esto el contenido se desliza
+       bajo el botón flotante del menú en cualquier teléfono, que siempre
+       entra por esta consulta. */
+    padding-top: 3.75rem;
   }
 }

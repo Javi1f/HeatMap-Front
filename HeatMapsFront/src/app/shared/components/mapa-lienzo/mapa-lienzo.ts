@@ -66,6 +66,18 @@ const MARGEN_ESTRECHO = 16;
 /** Ancho de lienzo por debajo del cual se usa el margen estrecho. */
 const ANCHO_ESTRECHO = 420;
 
+/** Altura de la fuente de las cotas, en píxeles. */
+const ALTO_COTA = 11;
+
+/**
+ * Separación entre el plano y su cota, acotada por el margen disponible.
+ *
+ * La cota tiene que caber entera dentro del margen: con el margen estrecho de
+ * teléfono sólo quedan 16 px, y una separación fija de 8 px dejaba los 11 px de
+ * texto rotado sobresaliendo por la izquierda del lienzo, donde se recortaba.
+ */
+const separacionCota = (margen: number): number => Math.min(7, margen - ALTO_COTA);
+
 /**
  * Lee un token CSS del lienzo, con valor de respaldo.
  *
@@ -499,12 +511,18 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     ctx.fillStyle = tokenCss(estilo, '--plano-cota', '#8a929e');
     ctx.font = '500 11px "Roboto", system-ui, sans-serif';
 
+    const separacion = separacionCota(this.margen);
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(`${mapa.ancho} m`, this.margen + (mapa.ancho * escala) / 2, this.margen + alto + 7);
+    ctx.fillText(
+      `${mapa.ancho} m`,
+      this.margen + (mapa.ancho * escala) / 2,
+      this.margen + alto + separacion,
+    );
 
     ctx.save();
-    ctx.translate(this.margen - 8, this.margen + alto / 2);
+    ctx.translate(this.margen - separacion, this.margen + alto / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textBaseline = 'bottom';
     ctx.fillText(`${mapa.alto} m`, 0, 0);
