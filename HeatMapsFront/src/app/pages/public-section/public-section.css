@@ -2,6 +2,9 @@
    El lienzo trae los suyos: lo dibuja su propio componente. */
 
 .publico {
+  /* Referencia para dimensionar el titular: lo que importa no es el ancho de
+     la ventana sino el que queda tras la barra lateral y los márgenes. */
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
@@ -29,11 +32,20 @@
   color: var(--color-primary);
 }
 
-/* El salto de línea del título está en la plantilla: la frase se lee mejor
-   partida por su cesura natural que dejada al ancho del contenedor. */
+/* Sin salto forzado ni ancho máximo.
+   El <br> fijo peleaba con `text-wrap: balance`, y el `max-width` en `ch`
+   partía la frase aunque cupiera entera: en escritorio ocupa unos 800px de los
+   1000 disponibles, así que cabe en una línea y el corte solo dejaba un hueco
+   a la derecha. Suelto, se lee de una y únicamente parte cuando la pantalla lo
+   obliga; ahí `balance` reparte las líneas en largos parecidos. */
 .hero-titulo {
   margin: 0;
-  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  /* 7.2cqw: la frase ocupa unas 13,3 veces el tamaño de letra, así que por
+     debajo de 1/13,3 del contenedor (7,5%) entra en una línea. Con 7,2% queda
+     margen y el titular llena su hueco sin partirse ni dejar el vacío a la
+     derecha que dejaba el corte anterior. En pantallas estrechas manda el
+     mínimo y sí parte, que es lo que toca ahí. */
+  font-size: clamp(2.1rem, 7.2cqw, 4.25rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -279,14 +291,22 @@
 
 /* ── Notas al pie ────────────────────────────────────────────── */
 
-.notas { display: flex; flex-direction: column; gap: 0.85rem; }
+/* Dos columnas cuando hay sitio, una cuando no.
+   En una sola columna el texto dejaba casi la mitad del ancho vacío, y quitarle
+   el tope habría dado líneas de unos 125 caracteres, que no se leen. Repartido
+   en dos, se llena la fila y además cada línea se acorta. */
+.notas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-items: start;
+  gap: 0.85rem 1.25rem;
+}
 
 .nota {
   margin: 0;
   font-size: 0.83rem;
   color: var(--color-text-muted);
   line-height: 1.65;
-  max-width: 76ch;
   padding: 0 0.25rem;
 }
 .nota strong { color: var(--color-text); font-weight: 600; }

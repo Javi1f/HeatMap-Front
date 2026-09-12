@@ -6,7 +6,7 @@
         <span class="material-icons">dashboard</span>
         Dashboard
       </h1>
-      <p class="dashboard-subtitle">Ocupación, estado de la red de nodos y alertas</p>
+      <p class="dashboard-subtitle">Ocupación y estado de la red de nodos</p>
     </div>
     @if (lastUpdated()) {
       <span class="last-updated">
@@ -80,56 +80,7 @@
           [tone]="sensorTone()"
           hint="Nodos que han emitido en los últimos minutos"
         />
-        <app-metric-card
-          label="Alertas abiertas"
-          [value]="o.alertasAbiertas.toString()"
-          icon="notification_important"
-          [tone]="alertTone()"
-          hint="Aglomeraciones sin resolver"
-        />
       </div>
-    }
-
-    <!-- ── Alertas ──────────────────────────────────────────────────────── -->
-    @if (alerts().length > 0) {
-      <section class="section-card">
-        <div class="section-header">
-          <div class="section-title-group">
-            <span class="material-icons section-icon">warning_amber</span>
-            <div>
-              <h2 class="section-title">Alertas de aglomeración</h2>
-              <p class="section-desc">Se levantan solas cuando una zona entra en nivel alto</p>
-            </div>
-          </div>
-          <span class="badge">{{ alerts().length }}</span>
-        </div>
-
-        <div class="alert-list">
-          @for (alerta of alerts(); track alerta.idAlerta) {
-            <div class="alert-item" [class.alert-item-critica]="alerta.nivel === 'critica'">
-              <span class="material-icons alert-item-icon">
-                {{ alerta.nivel === 'critica' ? 'report' : 'warning_amber' }}
-              </span>
-              <div class="alert-item-body">
-                <p class="alert-item-msg">{{ alerta.mensaje }}</p>
-                <span class="alert-item-time">{{ alerta.timestampAlerta | date: 'dd/MM HH:mm' }}</span>
-              </div>
-              <button
-                class="btn-resolve"
-                [disabled]="resolvingAlertId() === alerta.idAlerta"
-                (click)="resolveAlert(alerta)"
-                title="Marcar como resuelta"
-              >
-                @if (resolvingAlertId() === alerta.idAlerta) {
-                  <div class="spinner spinner-sm"></div>
-                } @else {
-                  <span class="material-icons">check</span>
-                }
-              </button>
-            </div>
-          }
-        </div>
-      </section>
     }
 
     <!-- ── Ocupación por zona ───────────────────────────────────────────── -->

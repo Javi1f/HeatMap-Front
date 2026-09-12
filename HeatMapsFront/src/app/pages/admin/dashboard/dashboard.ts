@@ -4,7 +4,7 @@
  *
  * Sustituye al antiguo dashboard, que gestionaba la lista blanca de correos y
  * ahora vive en `/admin/users`. Aquí se muestra lo que el sistema realmente
- * produce: ocupación por zona, salud de la red de nodos y alertas de
+ * produce: ocupación por zona, salud de la red de nodos y
  * aglomeración.
  *
  * ## De dónde sale cada dato
@@ -14,7 +14,6 @@
  * | Tarjetas de cabecera  | `captura` en la ventana reciente        |
  * | Ocupación por zona    | `ocupacion_agregada` (última ventana)   |
  * | Salud de nodos        | `sensor.ultimaConexion`                 |
- * | Alertas               | `alerta` sin resolver                   |
  *
  * Las tarjetas y la tabla de zonas **no miden lo mismo**: las primeras
  * describen los últimos minutos leyendo detecciones crudas, la segunda la
@@ -34,7 +33,6 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  Alerta,
   MetricsOverview,
   MetricsService,
   SensingParameters,
@@ -98,9 +96,6 @@ export class Dashboard implements OnInit, OnDestroy {
   /** Estado de cada nodo de captura. */
   sensors = signal<SensorHealth[]>([]);
 
-  /** Alertas de aglomeración abiertas. */
-  alerts = signal<Alerta[]>([]);
-
   /** Parámetros de sensado con los que se calcularon las métricas. */
   parameters = signal<SensingParameters | null>(null);
 
@@ -109,9 +104,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   /** Mensaje de error de la carga, vacío si todo fue bien. */
   error = signal<string>('');
-
-  /** Id de la alerta que se está resolviendo, para el spinner de su fila. */
-  resolvingAlertId = signal<string | null>(null);
 
   /** Momento de la última actualización correcta. */
   lastUpdated = signal<Date | null>(null);
@@ -171,28 +163,10 @@ export class Dashboard implements OnInit, OnDestroy {
 
     this.metricsService.zones().subscribe({ next: (res) => this.zones.set(res.data) });
     this.metricsService.sensors().subscribe({ next: (res) => this.sensors.set(res.data) });
-    this.metricsService.alerts().subscribe({ next: (res) => this.alerts.set(res.data) });
 
     if (this.parameters() === null) {
       this.metricsService.parameters().subscribe({ next: (res) => this.parameters.set(res.data) });
     }
-  }
-
-  /** Marca una alerta como resuelta y la retira de la lista. */
-  resolveAlert(alerta: Alerta): void {
-    this.resolvingAlertId.set(alerta.idAlerta);
-
-    this.metricsService.resolveAlert(alerta.idAlerta).subscribe({
-      next: () => {
-        this.alerts.update(list => list.filter(a => a.idAlerta !== alerta.idAlerta));
-        this.resolvingAlertId.set(null);
-        this.loadAll(true);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.error.set(describeHttpError(err, 'No se pudo resolver la alerta.'));
-        this.resolvingAlertId.set(null);
-      }
-    });
   }
 
   /**
@@ -206,11 +180,6 @@ export class Dashboard implements OnInit, OnDestroy {
     if (!resumen || resumen.sensoresTotal === 0) return 'neutral';
     if (resumen.sensoresEnLinea === 0) return 'danger';
     return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
-  }
-
-  /** Tono de la tarjeta de alertas: cualquier alerta abierta es un aviso. */
-  alertTone(): MetricTone {
-    return (this.overview()?.alertasAbiertas ?? 0) > 0 ? 'warn' : 'ok';
   }
 
   /**

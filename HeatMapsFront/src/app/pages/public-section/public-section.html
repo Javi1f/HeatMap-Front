@@ -2,7 +2,7 @@
 
   <header class="hero">
     <p class="hero-eyebrow">Ocupación en tiempo real</p>
-    <h1 class="hero-titulo">Mira dónde hay sitio<br>antes de ir</h1>
+    <h1 class="hero-titulo">Mira dónde hay sitio antes de ir</h1>
     @if (conteoVisible() !== null) {
       <span class="vivo">
         @if (enDirecto()) {
@@ -77,9 +77,9 @@
 
       <div class="pie-mapa">
         <div class="leyenda">
-          <span class="leyenda-extremo">menos gente</span>
-          <div class="leyenda-rampa" role="img" aria-label="Escala de concentración, de menor a mayor"></div>
-          <span class="leyenda-extremo">más gente</span>
+          <span class="leyenda-extremo">menos dispositivos</span>
+          <div class="leyenda-rampa" role="img" aria-label="Escala de concentración de dispositivos, de menor a mayor"></div>
+          <span class="leyenda-extremo">más dispositivos</span>
         </div>
         <span class="leyenda-nodo"><i class="punto-nodo"></i> nodo de captura</span>
       </div>
@@ -89,15 +89,21 @@
           <span class="material-icons">sensors_off</span>
           Sin detecciones en los últimos {{ mapa()?.ventanaMinutos }} minutos.
         </div>
+      } @else if (detectadosSinUbicar(); as pendientes) {
+        <div class="aviso aviso-neutro">
+          <span class="material-icons">location_searching</span>
+          Se están detectando {{ pendientes }} dispositivos, pero hace falta más de un
+          nodo activo para situarlos en el plano.
+        </div>
       }
     </section>
 
     <div class="notas">
       <p class="nota">
-        El mapa muestra <strong>dispositivos</strong>, no personas: mucha gente lleva más de uno y
-        otra no lleva ninguno. Las posiciones se estiman por la potencia de la señal Wi-Fi, con un
-        margen de varios metros, así que sirve para ver dónde se agrupa la gente y no para saber
-        cuánta hay exactamente.
+        El mapa muestra <strong>dispositivos</strong>, no personas: una misma persona puede llevar
+        varios y otra ninguno, así que el conteo no dice cuánta gente hay. Las posiciones se
+        estiman por la potencia de la señal Wi-Fi, con un margen de varios metros, de modo que
+        sirve para ver dónde se concentran los dispositivos, no para ubicarlos con precisión.
       </p>
 
       <p class="nota nota-privacidad">

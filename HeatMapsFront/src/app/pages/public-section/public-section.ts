@@ -29,11 +29,17 @@ import { SocketService } from '../../socket/socket.service';
 /** Periodo de refresco del mapa, en milisegundos. */
 const REFRESCO_MS = 30_000;
 
-/** Etiquetas de cada nivel de ocupación. */
+/**
+ * Etiquetas de cada nivel de ocupación.
+ *
+ * Hablan de dispositivos y no de personas porque es lo único que el sistema
+ * mide. Decir «poca gente» daría por contado un salto —de aparato a persona—
+ * que aquí nadie ha dado.
+ */
 const ETIQUETA_NIVEL: Record<string, string> = {
-  baja: 'Poca gente',
-  media: 'Moderado',
-  alta: 'Muy concurrido',
+  baja: 'Pocos dispositivos',
+  media: 'Bastantes dispositivos',
+  alta: 'Muchos dispositivos',
   'sin datos': 'Sin datos',
 };
 
@@ -142,7 +148,23 @@ export class PublicSection implements OnInit, OnDestroy {
    */
   sinDetecciones = computed(() => {
     const mapa = this.mapa();
-    return mapa !== null && mapa.situados === 0;
+    return mapa !== null && mapa.situados === 0 && mapa.sinPosicion === 0;
+  });
+
+  /**
+   * Dispositivos detectados que no se han podido situar en el plano.
+   *
+   * Es el caso de tener un solo nodo emitiendo: hacen falta dos viéndolo a la
+   * vez para cruzar las distancias. Decir «sin detecciones» ahí sería falso,
+   * porque los hay; lo que falta es saber dónde están.
+   *
+   * @returns El número de detecciones sin ubicar, o `null` si no procede
+   *          mencionarlo porque el mapa ya muestra algo.
+   */
+  detectadosSinUbicar = computed<number | null>(() => {
+    const mapa = this.mapa();
+    if (!mapa || mapa.situados > 0 || mapa.sinPosicion === 0) return null;
+    return mapa.sinPosicion;
   });
 
   /** Aclara a qué momento se refiere la cifra de arriba. */
