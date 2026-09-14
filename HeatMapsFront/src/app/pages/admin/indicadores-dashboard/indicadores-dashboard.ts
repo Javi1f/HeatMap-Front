@@ -62,14 +62,14 @@ export class IndicadoresDashboardComponent {
         value: metricas.dispositivosAhora.toString(),
         icon: 'smartphone',
         tone: 'neutral',
-        hint: `MAC distintas en los últimos ${metricas.ventanaMinutos} min. No equivale a personas.`,
+        hint: `Presentes en los últimos ${metricas.ventanaMinutos} min, sin puntos de acceso ni señales de fuera. No equivale a personas.`,
       },
       {
         label: 'Detecciones',
         value: metricas.detecciones.toString(),
         icon: 'graphic_eq',
         tone: 'neutral',
-        hint: 'Tramas capturadas en la misma ventana',
+        hint: 'Todas las tramas capturadas en la ventana, sin filtrar',
       },
       {
         label: 'MAC aleatorizadas',
@@ -83,7 +83,7 @@ export class IndicadoresDashboardComponent {
         value: fmt(metricas.rssiPromedio, ' dBm'),
         icon: 'network_check',
         tone: 'neutral',
-        hint: 'Potencia media de las detecciones',
+        hint: 'Potencia media de los dispositivos presentes',
       },
       {
         label: 'Nodos en línea',

@@ -6,6 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="5ccc4914-4d39-4a3d-b308-b766e0cff0f8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/metrics.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/metrics.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,6 +173,7 @@
       <workItem from="1788057285808" duration="607000" />
       <workItem from="1789232437952" duration="693000" />
       <workItem from="1789238887061" duration="1074000" />
+      <workItem from="1789253001142" duration="3635000" />
     </task>
     <servers />
   </component>

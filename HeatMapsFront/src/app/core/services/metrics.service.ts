@@ -28,21 +28,22 @@ export interface ApiResponse<T> {
 /** Tarjetas de cabecera del dashboard. */
 export interface MetricsOverview {
   /**
-   * MAC distintas vistas en la ventana reciente. No equivale al número de
+   * Dispositivos presentes en alguna zona durante la ventana reciente, sin
+   * puntos de acceso ni lo que llega de otros pisos. No equivale al número de
    * personas: un mismo teléfono con MAC rotada puede contarse varias veces.
    */
   dispositivosAhora: number;
 
-  /** Tramas capturadas en esa misma ventana, sumando todos los nodos. */
+  /** Tramas capturadas en esa misma ventana, sumando todos los nodos y sin filtrar. */
   detecciones: number;
 
   /**
-   * Porcentaje de las MAC distintas que estaban aleatorizadas. Cuanto más
+   * Porcentaje de los dispositivos presentes con MAC aleatorizada. Cuanto más
    * alto, menos fiable es `dispositivosAhora` como conteo.
    */
   porcentajeRandomizadas: number;
 
-  /** Potencia media de las detecciones en dBm, o `null` si no hubo ninguna. */
+  /** Potencia media de los dispositivos presentes en dBm, o `null` si no hay ninguno. */
   rssiPromedio: number | null;
 
   /** Número de zonas marcadas como activas. */
@@ -72,7 +73,7 @@ export interface ZoneOccupancy {
   /** Aforo declarado, o `null` si la institución no lo ha fijado. */
   capacidadMax: number | null;
 
-  /** MAC distintas en la última ventana consolidada. Techo del conteo. */
+  /** Dispositivos presentes en la última ventana consolidada. Techo del conteo. */
   dispositivosUnicos: number;
 
   /** Subconjunto con MAC de fabricante. Suelo fiable del conteo. */
@@ -99,7 +100,7 @@ export interface OccupancyPoint {
   /** Zona a la que pertenece el punto. */
   idZona: string;
 
-  /** MAC distintas contadas en la ventana. */
+  /** Dispositivos presentes en la ventana. */
   dispositivosUnicos: number;
 
   /** MAC de fabricante contadas en la ventana. */
