@@ -116,19 +116,8 @@ export class PublicSection implements OnInit, OnDestroy {
   /** `true` mientras el WebSocket está conectado. */
   enVivo = signal<boolean>(false);
 
-  /**
-   * Último conteo comunicado por cada nodo.
-   *
-   * Se guarda por nodo y no como total acumulado porque cada uno emite a su
-   * ritmo: sumar lecturas de instantes distintos daría una cifra que nunca
-   * existió.
-   */
-  private conteoPorNodo = signal<Record<string, number>>({});
-
-  /** Dispositivos vistos ahora mismo, sumando la última lectura de cada nodo. */
-  enVivoTotal = computed(() =>
-    Object.values(this.conteoPorNodo()).reduce((a, b) => a + b, 0),
-  );
+  /** `true` en cuanto llega por el socket la primera lectura de un nodo. */
+  private recibiendoLecturas = signal<boolean>(false);
 
   /** Zona seleccionada, resuelta a su objeto. */
   zonaActual = computed(() =>
@@ -139,22 +128,24 @@ export class PublicSection implements OnInit, OnDestroy {
    * `true` sólo si están llegando lecturas ahora mismo.
    *
    * No basta con que el WebSocket esté conectado: se conecta al abrir la
-   * página, y hasta que un nodo emite el conteo es cero. Anunciar «0
-   * dispositivos ahora» sobre un mapa lleno de manchas hacía dudar de las dos
-   * cifras a la vez.
+   * página, antes de que ningún nodo haya emitido.
    */
-  enDirecto = computed(() => this.enVivo() && this.enVivoTotal() > 0);
+  enDirecto = computed(() => this.enVivo() && this.recibiendoLecturas());
 
   /**
-   * Cifra que encabeza la página.
+   * Cifra que encabeza la página: los dispositivos presentes en el espacio.
    *
-   * Prefiere el directo cuando lo hay y, si no, cae en el conteo que el
-   * backend ya calculó para dibujar el mapa. Así el número y las manchas
-   * salen siempre del mismo hecho.
+   * Sale siempre del mapa, que ya descarta los puntos de acceso y lo que llega
+   * de otros pisos, y no del total que emite cada nodo por el socket. Ese total
+   * lo cuenta todo, y además sumarlo entre nodos contaba tres veces a quien
+   * oyen los tres: la cabecera anunciaba cientos de dispositivos sobre un mapa
+   * casi vacío.
+   *
+   * Incluye a los presentes que no se pudieron situar, porque también están.
    */
   conteoVisible = computed<number | null>(() => {
-    if (this.enDirecto()) return this.enVivoTotal();
-    return this.mapa()?.situados ?? null;
+    const mapa = this.mapa();
+    return mapa ? mapa.situados + (mapa.sinPosicion ?? 0) : null;
   });
 
   /**
@@ -169,8 +160,8 @@ export class PublicSection implements OnInit, OnDestroy {
    * Arranca la carga inicial, el refresco periódico y la escucha del socket.
    *
    * El sondeo convive con el socket porque cubren cosas distintas: el socket
-   * trae el pulso de cada nodo, mientras que el mapa entero lo recalcula el
-   * backend y solo llega al pedirlo.
+   * sólo indica que los nodos están emitiendo, mientras que quién está presente
+   * lo decide el backend al recalcular el mapa, y sólo llega al pedirlo.
    */
   ngOnInit(): void {
     this.cargarZonas();
@@ -180,12 +171,7 @@ export class PublicSection implements OnInit, OnDestroy {
       this.socketService.connected$.subscribe((conectado) => this.enVivo.set(conectado)),
     );
     this.suscripciones.add(
-      this.socketService.sensorData$.subscribe((resumen) =>
-        this.conteoPorNodo.update((previo) => ({
-          ...previo,
-          [resumen.sensor_id]: resumen.total_devices,
-        })),
-      ),
+      this.socketService.sensorData$.subscribe(() => this.recibiendoLecturas.set(true)),
     );
   }
 

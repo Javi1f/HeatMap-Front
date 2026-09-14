@@ -57,7 +57,7 @@ const RADIO_EN_CELDAS = 3.2;
  *
  * En un teléfono el lienzo ronda los 300px de ancho: con el margen de
  * escritorio, los dos bordes se llevaban una quinta parte del espacio y el
- * plano quedaba en poco más de 190px para 17,64 m reales. El margen estrecho
+ * plano quedaba en poco más de 190px para 21 m reales. El margen estrecho
  * sigue dejando sitio a las cotas de los dos ejes.
  */
 const MARGEN_AMPLIO = 26;
@@ -333,7 +333,7 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
    *          puede dibujar.
    *
    * El plano manda en la proporción: el alto se deduce del ancho disponible
-   * para que un espacio de 17,64 x 9,10 m no salga deformado. Y el lienzo se
+   * para que un espacio de 21 x 11,84 m no salga deformado. Y el lienzo se
    * dibuja a la resolución real de la pantalla aunque se muestre al tamaño
    * CSS; sin eso, en pantallas de alta densidad se ve borroso.
    */
