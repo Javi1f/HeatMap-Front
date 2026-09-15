@@ -15,15 +15,9 @@
           type="text"
           formControlName="username"
           placeholder="Nombre de usuario"
-          [class.input-error]="f['username'].invalid && f['username'].touched"
+          [class.input-error]="controles['username'].invalid && controles['username'].touched"
         />
-        @if (f['username'].invalid && f['username'].touched) {
-          @if (f['username'].errors?.['required']) {
-            <span class="error">El usuario es obligatorio.</span>
-          } @else if (f['username'].errors?.['minlength']) {
-            <span class="error">Mínimo 3 caracteres.</span>
-          }
-        }
+        <app-error-campo [control]="controles['username']" [mensajes]="mensajes.username" />
       </div>
 
       <div class="form-group">
@@ -33,15 +27,9 @@
           type="email"
           formControlName="email"
           placeholder="correo@ejemplo.com"
-          [class.input-error]="f['email'].invalid && f['email'].touched"
+          [class.input-error]="controles['email'].invalid && controles['email'].touched"
         />
-        @if (f['email'].invalid && f['email'].touched) {
-          @if (f['email'].errors?.['required']) {
-            <span class="error">El correo es obligatorio.</span>
-          } @else if (f['email'].errors?.['email'] || f['email'].errors?.['pattern']) {
-            <span class="error">Ingresa un correo válido.</span>
-          }
-        }
+        <app-error-campo [control]="controles['email']" [mensajes]="mensajes.email" />
       </div>
 
       <div class="form-group">
@@ -52,21 +40,13 @@
             [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
             placeholder="Contraseña"
-            [class.input-error]="f['password'].invalid && f['password'].touched"
+            [class.input-error]="controles['password'].invalid && controles['password'].touched"
           />
           <button type="button" class="toggle-password" (click)="togglePassword()">
             {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>
-        @if (f['password'].invalid && f['password'].touched) {
-          @if (f['password'].errors?.['required']) {
-            <span class="error">La contraseña es obligatoria.</span>
-          } @else if (f['password'].errors?.['minlength']) {
-            <span class="error">Mínimo 8 caracteres.</span>
-          } @else if (f['password'].errors?.['pattern']) {
-            <span class="error">Debe incluir mayúscula, minúscula, número y carácter especial (&#64;$!%*?&).</span>
-          }
-        }
+        <app-error-campo [control]="controles['password']" [mensajes]="mensajes.password" />
       </div>
 
       <div class="form-group">
@@ -77,13 +57,13 @@
             [type]="showConfirmPassword() ? 'text' : 'password'"
             formControlName="confirmPassword"
             placeholder="Repite la contraseña"
-            [class.input-error]="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched"
+            [class.input-error]="registerForm.errors?.['passwordMismatch'] && controles['confirmPassword'].touched"
           />
           <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
             {{ showConfirmPassword() ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>
-        @if (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched) {
+        @if (registerForm.errors?.['passwordMismatch'] && controles['confirmPassword'].touched) {
           <span class="error">Las contraseñas no coinciden.</span>
         }
       </div>

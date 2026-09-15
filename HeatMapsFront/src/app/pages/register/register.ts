@@ -40,7 +40,23 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { VerificationService } from '../../core/services/verification.service';
 import { VerifyCodeErrorResponse } from '../../core/models/admin.model';
+
+import { noop } from 'rxjs';
+import { ErrorCampoComponent } from './error-campo/error-campo';
 
+/**
+ * Mensaje por error de validación de cada campo, en orden de prioridad: se
+ * muestra el primero que aplique.
+ */
+const MENSAJES_ERROR = {
+  username: { required: 'El usuario es obligatorio.', minlength: 'Mínimo 3 caracteres.' },
+  email: { required: 'El correo es obligatorio.', email: 'Ingresa un correo válido.', pattern: 'Ingresa un correo válido.' },
+  password: {
+    required: 'La contraseña es obligatoria.',
+    minlength: 'Mínimo 8 caracteres.',
+    pattern: 'Debe incluir mayúscula, minúscula, número y carácter especial (@$!%*?&).',
+  },
+} as const;
 /**
  * Componente de la página de registro.
  * Gestiona el formulario, el modal de verificación y la comunicación con el backend.
@@ -48,11 +64,14 @@ import { VerifyCodeErrorResponse } from '../../core/models/admin.model';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, ErrorCampoComponent],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
 export class Register {
+  /** Mensajes de validación de cada campo, para la plantilla. */
+  readonly mensajes = MENSAJES_ERROR;
+
   /** Formulario reactivo con los cuatro campos de registro y el validador de grupo. */
   registerForm: FormGroup;
 
@@ -135,7 +154,7 @@ export class Register {
    * Acceso directo a los controles del formulario reactivo.
    * Útil en la plantilla para verificar estados de validación por campo.
    */
-  get f() { return this.registerForm.controls; }
+  get controles() { return this.registerForm.controls; }
 
   /**
    * Procesa el envío del formulario de registro (Paso 1).
@@ -191,22 +210,32 @@ export class Register {
     this.authService.verifyCode(this.pendingEmail, this.verificationCodeValue).subscribe({
       next: () => {
         this.showModal.set(false);
-        this.router.navigate(['/admin/dashboard']).catch(() => undefined);
+        this.router.navigate(['/admin/dashboard']).catch(noop);
       },
-      error: (err: HttpErrorResponse) => {
-        const body = err.error as VerifyCodeErrorResponse;
-
-        if (body?.details?.attemptsLeft === 0) {
-          this.showModal.set(false);
-          this.registerForm.reset();
-          this.verificationCodeValue = '';
-          this.verificationService.reset();
-          this.formError.set('Verificación errónea. Solicita un nuevo código.');
-        } else {
-          this.verificationService.handleServerError(body?.details?.attemptsLeft ?? 0);
-        }
-      }
+      error: (err: HttpErrorResponse) => this.alFallarVerificacion(err),
     });
+  }
+
+  /**
+   * Reacciona a un código rechazado: descuenta un intento o, si ya no quedan,
+   * cierra la verificación y pide volver a registrarse.
+   */
+  private alFallarVerificacion(err: HttpErrorResponse): void {
+    const restantes = (err.error as VerifyCodeErrorResponse | null)?.details?.attemptsLeft;
+    if (restantes === 0) {
+      this.agotarIntentos();
+      return;
+    }
+    this.verificationService.handleServerError(restantes ?? 0);
+  }
+
+  /** Cierra la verificación agotada y deja el formulario listo para empezar de nuevo. */
+  private agotarIntentos(): void {
+    this.showModal.set(false);
+    this.registerForm.reset();
+    this.verificationCodeValue = '';
+    this.verificationService.reset();
+    this.formError.set('Verificación errónea. Solicita un nuevo código.');
   }
 
   /**

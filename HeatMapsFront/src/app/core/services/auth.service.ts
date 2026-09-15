@@ -68,6 +68,9 @@ export class AuthService {
    */
   currentAdmin = computed(() => this._currentAdmin());
 
+  /** `true` si el administrador autenticado tiene el rol `root`. */
+  esRoot = computed(() => this._currentAdmin()?.rol === 'root');
+
   /**
    * Autentica al administrador con usuario y contraseña.
    *

@@ -153,3 +153,34 @@
   .section-title-group              { gap: 0.6rem; }
   .section-icon                     { font-size: 1.5rem; }
 }
+
+/* Controles de rol y activación de cuentas. */
+.selector-rol {
+  background: var(--bg-surface-deep);
+  color: var(--color-text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  min-height: 36px;
+}
+
+.btn-cuenta {
+  display: block;
+  margin-top: 0.4rem;
+  background: none;
+  color: var(--color-text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.25rem 0.6rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.btn-cuenta:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}

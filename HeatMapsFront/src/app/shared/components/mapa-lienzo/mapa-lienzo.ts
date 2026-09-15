@@ -201,6 +201,7 @@ const dibujarEtiquetaNodo = (
   ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
 };
 
+/** Lienzo que dibuja el plano de una zona, su mapa de calor y sus nodos. */
 @Component({
   selector: 'app-mapa-lienzo',
   standalone: true,
@@ -276,18 +277,22 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
    * aparezca la barra de desplazamiento.
    */
   private vigilarTamano(): void {
-    const contenedor = this.lienzoRef?.nativeElement?.parentElement;
+    const contenedor = this.contenedor;
     if (!contenedor || typeof ResizeObserver === 'undefined') return;
 
     this.observador = new ResizeObserver(() => this.redibujarSiCambio());
     this.observador.observe(contenedor);
   }
 
+  /** Elemento que contiene al lienzo y fija su ancho, o `null` antes de que exista la vista. */
+  private get contenedor(): HTMLElement | null {
+    return this.lienzoRef?.nativeElement?.parentElement ?? null;
+  }
+
   /** Redibuja sólo si el ancho disponible cambió de verdad. */
   private redibujarSiCambio(): void {
-    if (!this.listo) return;
-    const contenedor = this.lienzoRef?.nativeElement?.parentElement;
-    if (!contenedor) return;
+    const contenedor = this.contenedor;
+    if (!this.listo || !contenedor) return;
 
     const ancho = contenedor.clientWidth;
     if (ancho === 0 || ancho === this.anchoDibujado) return;
@@ -342,9 +347,9 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
     anchoPlano: number;
     altoPlano: number;
   } | null {
-    const canvas = this.lienzoRef?.nativeElement;
-    const contenedor = canvas?.parentElement;
-    if (!canvas || !contenedor) return null;
+    const contenedor = this.contenedor;
+    if (!contenedor) return null;
+    const canvas = this.lienzoRef.nativeElement;
 
     const anchoCss = contenedor.clientWidth;
     this.margen = margenPara(anchoCss);

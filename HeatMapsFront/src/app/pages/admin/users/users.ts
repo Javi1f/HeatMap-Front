@@ -32,11 +32,13 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, noop } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AllowedEmailsService } from '../../../core/services/allowed-emails.service';
 import {
   AdminSummary,
+  EventoAuditoria,
   SessionSummary,
   UsersService,
 } from '../../../core/services/users.service';
@@ -45,6 +47,9 @@ import { describeHttpError } from '../../../core/http-error';
 import { EmailRowComponent } from './email-row';
 import { AddEmailFormComponent } from './add-email-form';
 import { DeleteConfirmModalComponent } from './delete-confirm-modal';
+import { TablaAuditoriaComponent } from './tabla-auditoria/tabla-auditoria';
+import { TablaAdministradoresComponent } from './tabla-administradores/tabla-administradores';
+import { TablaSesionesComponent } from './tabla-sesiones/tabla-sesiones';
 
 /**
  * Componente de administración de usuarios.
@@ -54,7 +59,7 @@ import { DeleteConfirmModalComponent } from './delete-confirm-modal';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent, TablaAuditoriaComponent, TablaAdministradoresComponent, TablaSesionesComponent],
   templateUrl: './users.html',
   styleUrl: './users.css'
 })
@@ -126,7 +131,7 @@ export class Users implements OnInit {
   firstEmailId = computed(() => {
     const list = this.emails();
     if (!list.length) return null;
-    return list.reduce((minId, e) => (e.id < minId ? e.id : minId), list[0].id);
+    return list.reduce((minId, correo) => (correo.id < minId ? correo.id : minId), list[0].id);
   });
 
   /**
@@ -136,20 +141,14 @@ export class Users implements OnInit {
    */
   emailBeingDeleted = computed(() => {
     const id = this.confirmDeleteId();
-    return this.emails().find(e => e.id === id) ?? null;
+    return this.emails().find(correo => correo.id === id) ?? null;
   });
 
   /**
    * Acceso directo a los controles del formulario de añadir correo.
    * Conveniente para verificar el estado de validación en la plantilla.
    */
-  /** Acceso directo a los controles del formulario de añadir correo. */
-  get f() { return this.addForm.controls; }
-
-  /**
-   * Carga la lista de correos permitidos al inicializar el componente.
-   * @see {@link loadEmails}
-   */
+  get controles() { return this.addForm.controls; }
 
   /** Administradores registrados en el sistema. */
   admins = signal<AdminSummary[]>([]);
@@ -166,10 +165,60 @@ export class Users implements OnInit {
   /** Id de la sesión que se está revocando, para el spinner de su fila. */
   revokingSessionId = signal<string | null>(null);
 
+  /** Id de la cuenta cuyo rol o activación se está cambiando. */
+  cambiandoCuentaId = signal<number | null>(null);
+
+  /** Últimos eventos de auditoría. */
+  auditoria = signal<EventoAuditoria[]>([]);
+
   /** Carga los tres bloques de la pantalla al montar el componente. */
   ngOnInit(): void {
     this.loadEmails();
     this.loadAccounts();
+  }
+
+  /** Carga los últimos eventos de auditoría. */
+  loadAuditoria(): void {
+    this.usersService.listarAuditoria().subscribe({
+      next: (res) => this.auditoria.set(res.data),
+      error: (err: HttpErrorResponse) =>
+        this.accountsError.set(describeHttpError(err, 'No se pudo cargar la auditoría.')),
+    });
+  }
+
+  /**
+   * Cambia el rol de una cuenta.
+   *
+   * El backend rechaza dejar el sistema sin un `root` activo; ese mensaje se
+   * muestra tal cual y la tabla se recarga para deshacer el cambio visual.
+   */
+  cambiarRol(admin: AdminSummary, rol: string): void {
+    if (rol !== 'root' && rol !== 'admin') return;
+    this.aplicarCambioCuenta(admin.id, this.usersService.cambiarRol(admin.id, rol));
+  }
+
+  /** Activa o desactiva una cuenta. Desactivarla cierra sus sesiones. */
+  alternarActivo(admin: AdminSummary): void {
+    this.aplicarCambioCuenta(admin.id, this.usersService.cambiarActivo(admin.id, !admin.activo));
+  }
+
+  /** Ejecuta un cambio sobre una cuenta y recarga la pantalla. */
+  private aplicarCambioCuenta(idAdmin: number, peticion: Observable<unknown>): void {
+    this.cambiandoCuentaId.set(idAdmin);
+    this.accountsError.set('');
+    peticion.subscribe({
+      next: () => {
+        this.cambiandoCuentaId.set(null);
+        this.loadAccounts();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.cambiandoCuentaId.set(null);
+        // Recargar antes de mostrar el error: `loadAccounts` limpia el aviso al
+        // empezar, y al revés borraba el motivo del rechazo nada más escribirlo.
+        this.loadAccounts();
+        this.accountsError.set(err.error?.message ?? 'No se pudo actualizar la cuenta.');
+      },
+    });
   }
 
   /**
@@ -192,6 +241,8 @@ export class Users implements OnInit {
         this.isLoadingAccounts.set(false);
       }
     });
+
+    this.loadAuditoria();
 
     this.usersService.listSessions().subscribe({
       next: (res) => this.sessions.set(res.data),
@@ -221,11 +272,11 @@ export class Users implements OnInit {
 
         if (session.esActual) {
           this.authService.clearSession();
-          this.router.navigate(['/']).catch(() => undefined);
+          this.router.navigate(['/']).catch(noop);
           return;
         }
 
-        this.sessions.update(list => list.filter(s => s.idSesion !== session.idSesion));
+        this.sessions.update(list => list.filter(sesion => sesion.idSesion !== session.idSesion));
         this.loadAccounts();
       },
       error: (err: HttpErrorResponse) => {
@@ -347,7 +398,7 @@ export class Users implements OnInit {
 
     this.allowedEmailsService.delete(id).subscribe({
       next: () => {
-        this.emails.update(list => list.filter(e => e.id !== id));
+        this.emails.update(list => list.filter(correo => correo.id !== id));
         this.deletingId.set(null);
       },
       error: (err: HttpErrorResponse) => {

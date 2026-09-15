@@ -23,7 +23,8 @@ import { AuthService }    from '../../../core/services/auth.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { ModalService }   from '../../../core/services/modal.service';
 import { ThemeService }   from '../../../core/services/theme.service';
-
+
+import { noop } from 'rxjs';
 /**
  * Descriptor de un elemento de navegación en el sidebar.
  */
@@ -36,6 +37,9 @@ export interface NavItem {
   icon: string;
   /** `true` si la entrada pertenece al área de administración. */
   esAdmin?: boolean;
+
+  /** `true` si solo la ve un administrador `root`. */
+  soloRoot?: boolean;
 }
 
 /**
@@ -87,7 +91,7 @@ export class NavbarComponent {
   /** Elementos de navegación exclusivos del área de administración. */
   adminItems: NavItem[] = [
     { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard',       esAdmin: true },
-    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts', esAdmin: true },
+    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts', esAdmin: true, soloRoot: true },
     { label: 'Reportes',  route: '/admin/reportes',  icon: 'description',     esAdmin: true }
   ];
 
@@ -99,9 +103,11 @@ export class NavbarComponent {
    * riesgo de tocar uno y olvidar el otro; la distinción viaja ahora en el
    * propio elemento.
    */
-  entradas = computed<NavItem[]>(() =>
-    this.isLoggedIn() ? [...this.navItems, ...this.adminItems] : this.navItems,
-  );
+  entradas = computed<NavItem[]>(() => {
+    if (!this.isLoggedIn()) return this.navItems;
+    const esRoot = this.authService.esRoot();
+    return [...this.navItems, ...this.adminItems.filter((item) => esRoot || !item.soloRoot)];
+  });
 
   /** Icono y rótulo del cambio de tema, que son una misma decisión. */
   tema = computed(() =>
@@ -185,8 +191,8 @@ export class NavbarComponent {
   logout(): void {
     this.sidebarService.closeMobile();
     this.authService.logout().subscribe({
-      next:  () => { this.router.navigate(['/']).catch(() => undefined); },
-      error: () => { this.router.navigate(['/']).catch(() => undefined); }
+      next:  () => { this.router.navigate(['/']).catch(noop); },
+      error: () => { this.router.navigate(['/']).catch(noop); }
     });
   }
 
@@ -196,7 +202,7 @@ export class NavbarComponent {
    * @param route - Ruta Angular destino (ej. `"/admin/dashboard"`).
    */
   navigate(route: string): void {
-    this.router.navigate([route]).catch(() => undefined);
+    this.router.navigate([route]).catch(noop);
     this.sidebarService.closeMobile();
   }
 }

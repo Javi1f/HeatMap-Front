@@ -11,6 +11,10 @@ interface Contador {
   readonly enDirecto: boolean;
 }
 
+/** Periodo que abarca el conteo cuando no llega en directo; vacío si se desconoce. */
+const textoVentana = (minutos: number | null): string => (minutos ? `en los últimos ${minutos} min` : '');
+
+/** Titular de la vista pública con el contador de dispositivos en vivo. */
 @Component({
   selector: 'app-cabecera-vivo',
   standalone: true,
@@ -40,8 +44,7 @@ export class CabeceraVivoComponent {
     if (valor === null) return null;
 
     const enDirecto = this.enDirecto();
-    const minutos = this.ventanaMinutos();
-    const cuando = enDirecto ? 'ahora' : minutos ? `en los últimos ${minutos} min` : '';
+    const cuando = enDirecto ? 'ahora' : textoVentana(this.ventanaMinutos());
     return { texto: `${valor} dispositivos ${cuando}`.trim(), enDirecto };
   });
 }

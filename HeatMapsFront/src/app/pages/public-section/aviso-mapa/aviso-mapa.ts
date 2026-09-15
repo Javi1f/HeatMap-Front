@@ -13,6 +13,7 @@ export interface AvisoMapa {
   readonly reintentable: boolean;
 }
 
+/** Aviso bajo el mapa público: error con reintento o explicación de un mapa vacío. */
 @Component({
   selector: 'app-aviso-mapa',
   standalone: true,

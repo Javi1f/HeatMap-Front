@@ -19,9 +19,7 @@
           <p class="section-desc">Solo estos correos pueden registrarse como administradores</p>
         </div>
       </div>
-      @if (!isLoading()) {
-        <span class="badge">{{ emails().length }}</span>
-      }
+      <span class="badge" [style.display]="isLoading() ? 'none' : null">{{ emails().length }}</span>
     </div>
 
     <app-add-email-form
@@ -89,9 +87,7 @@
           <p class="section-desc">Cuentas que han completado el registro y la verificación</p>
         </div>
       </div>
-      @if (!isLoadingAccounts()) {
-        <span class="badge">{{ admins().length }}</span>
-      }
+      <span class="badge" [style.display]="isLoadingAccounts() ? 'none' : null">{{ admins().length }}</span>
     </div>
 
     @if (accountsError()) {
@@ -106,47 +102,13 @@
         <p>Cargando administradores...</p>
       </div>
     } @else if (admins().length > 0) {
-      <div class="table-wrapper">
-        <table class="emails-table">
-          <thead>
-          <tr>
-            <th>Usuario</th>
-            <th class="col-secondary">Correo</th>
-            <th class="col-secondary">Registro</th>
-            <th class="col-state">Estado</th>
-          </tr>
-          </thead>
-          <tbody>
-            @for (admin of admins(); track admin.id) {
-              <tr>
-                <td>
-                  <div class="cell-flex">
-                    <span class="material-icons row-icon">person</span>
-                    <span class="cell-strong">{{ admin.username }}</span>
-                    @if (admin.email === currentAdminEmail()) {
-                      <span class="tag tag-you">tú</span>
-                    }
-                  </div>
-                  <div class="sub-movil">{{ admin.email }}</div>
-                </td>
-                <td class="cell-muted cell-truncate cell-secondary">{{ admin.email }}</td>
-                <td class="cell-muted cell-secondary">{{ admin.createdAt | date: 'dd/MM/yyyy' }}</td>
-                <td class="cell-state">
-                  @if (admin.conSesionActiva) {
-                    <span class="pill pill-ok">
-                      <span class="dot"></span> En línea
-                    </span>
-                  } @else if (admin.isVerified) {
-                    <span class="pill pill-idle">Verificado</span>
-                  } @else {
-                    <span class="pill pill-warn">Sin verificar</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-tabla-administradores
+        [admins]="admins()"
+        [correoPropio]="currentAdminEmail()"
+        [cambiandoId]="cambiandoCuentaId()"
+        (cambiarRol)="cambiarRol($event.admin, $event.rol)"
+        (alternarActivo)="alternarActivo($event)"
+      />
     } @else {
       <div class="empty-state">
         <span class="material-icons">person_off</span>
@@ -167,68 +129,30 @@
           <p class="section-desc">Cerrar una sesión invalida su token de inmediato</p>
         </div>
       </div>
-      @if (!isLoadingAccounts()) {
-        <span class="badge">{{ sessions().length }}</span>
-      }
+      <span class="badge" [style.display]="isLoadingAccounts() ? 'none' : null">{{ sessions().length }}</span>
     </div>
 
-    @if (sessions().length > 0) {
-      <div class="table-wrapper">
-        <table class="emails-table">
-          <thead>
-          <tr>
-            <th>Administrador</th>
-            <th class="col-secondary">Origen</th>
-            <th class="col-secondary">Inicio</th>
-            <th class="col-secondary">Expira</th>
-            <th class="col-actions">Acciones</th>
-          </tr>
-          </thead>
-          <tbody>
-            @for (session of sessions(); track session.idSesion) {
-              <tr>
-                <td>
-                  <div class="cell-flex">
-                    <span class="material-icons row-icon">vpn_key</span>
-                    <span class="cell-strong">{{ session.username ?? 'Cuenta eliminada' }}</span>
-                    @if (session.esActual) {
-                      <span class="tag tag-you">esta sesión</span>
-                    }
-                  </div>
-                  <div class="sub-movil">
-                    {{ session.ipOrigen ?? '—' }} · inicio {{ session.fechaInicio | date: 'dd/MM HH:mm' }}
-                    · expira {{ session.fechaExpiracion | date: 'dd/MM HH:mm' }}
-                  </div>
-                </td>
-                <td class="cell-muted cell-secondary">{{ session.ipOrigen ?? '—' }}</td>
-                <td class="cell-muted cell-secondary">{{ session.fechaInicio | date: 'dd/MM HH:mm' }}</td>
-                <td class="cell-muted cell-secondary">{{ session.fechaExpiracion | date: 'dd/MM HH:mm' }}</td>
-                <td class="cell-actions-td">
-                  <button
-                    class="btn-delete"
-                    [disabled]="revokingSessionId() === session.idSesion"
-                    (click)="revokeSession(session)"
-                    [title]="session.esActual ? 'Cerrar tu sesión actual' : 'Cerrar esta sesión'"
-                  >
-                    @if (revokingSessionId() === session.idSesion) {
-                      <div class="spinner spinner-sm"></div>
-                    } @else {
-                      <span class="material-icons">logout</span>
-                    }
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    } @else if (!isLoadingAccounts()) {
-      <div class="empty-state">
-        <span class="material-icons">no_accounts</span>
-        <p>No hay sesiones abiertas</p>
-      </div>
-    }
+    <app-tabla-sesiones
+      [sesiones]="sessions()"
+      [revocandoId]="revokingSessionId()"
+      [cargando]="isLoadingAccounts()"
+      (revocar)="revokeSession($event)"
+    />
 
+  </section>
+
+  <!-- ── Auditoría ──────────────────────────────────────────────────────── -->
+  <section class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">history</span>
+        <div>
+          <h2 class="section-title">Auditoría</h2>
+          <p class="section-desc">Últimas acciones administrativas registradas</p>
+        </div>
+      </div>
+    </div>
+    <app-tabla-auditoria [eventos]="auditoria()" [admins]="admins()" />
   </section>
 </div>
 

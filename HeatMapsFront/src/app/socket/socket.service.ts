@@ -39,8 +39,8 @@
  * @see {@link ResumenSensor} — interfaz del payload del evento `sensor-data`.
  */
 
-import { Injectable, OnDestroy, inject } from '@angular/core';
-import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, InjectionToken, OnDestroy, inject } from '@angular/core';
+import { Subject, BehaviorSubject, Observable, noop } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { ResumenSensor } from './sensor-data.model';
 import { apiUrl } from '../core/config';
@@ -62,6 +62,17 @@ interface SobreCifrado {
  * SOCKET_URL = "https://backend.com"
  */
 const SOCKET_URL = apiUrl.replace(/\/api$/, '');
+
+/**
+ * Fábrica del cliente Socket.IO.
+ *
+ * Es un token y no una llamada directa a `io` para que las pruebas sustituyan
+ * la conexión por un doble sin abrir un WebSocket de verdad.
+ */
+export const CREAR_SOCKET = new InjectionToken<typeof io>('CREAR_SOCKET', {
+  providedIn: 'root',
+  factory: () => io,
+});
 
 /**
  * Servicio singleton que encapsula el cliente Socket.IO y expone los eventos
@@ -131,7 +142,7 @@ export class SocketService implements OnDestroy {
    * con un rechazo sin atender.
    */
   constructor() {
-    this.socket = io(SOCKET_URL, {
+    this.socket = inject(CREAR_SOCKET)(SOCKET_URL, {
       transports: ['websocket'],
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
@@ -142,7 +153,7 @@ export class SocketService implements OnDestroy {
     this.socket.on('connect_error', () => { this.connectedSubject.next(false); });
 
     this.socket.on('sensor-data', (sobre: SobreCifrado) => {
-      this.recibirResumen(sobre).catch(() => undefined);
+      this.recibirResumen(sobre).catch(noop);
     });
   }
 
@@ -163,7 +174,7 @@ export class SocketService implements OnDestroy {
       const resumen = await this.crypto.decrypt<ResumenSensor>(sobre.data);
       this.sensorDataSubject.next(resumen);
     } catch {
-      return;
+      // Sobre ajeno o con otra clave: se descarta sin cortar el flujo (ver arriba).
     }
   }
 

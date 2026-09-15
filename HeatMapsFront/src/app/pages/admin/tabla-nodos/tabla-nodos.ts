@@ -32,6 +32,7 @@ const textoUltimaLectura = (minutos: number | null): string => {
   return `Hace ${minutos} min`;
 };
 
+/** Tabla con el estado de cada nodo de captura. */
 @Component({
   selector: 'app-tabla-nodos',
   standalone: true,

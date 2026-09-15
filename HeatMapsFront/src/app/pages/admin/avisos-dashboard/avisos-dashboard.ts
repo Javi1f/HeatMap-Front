@@ -12,6 +12,7 @@ interface AvisoRed {
   readonly texto: string;
 }
 
+/** Avisos del dashboard: error de carga con reintento y estado de la red de nodos. */
 @Component({
   selector: 'app-avisos-dashboard',
   standalone: true,

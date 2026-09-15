@@ -29,9 +29,7 @@
     @for (item of entradas(); track item.route) {
       <a class="nav-item" [class.admin-item]="item.esAdmin" (click)="navigate(item.route)">
         <span class="material-icons">{{ item.icon }}</span>
-        @if (mostrarEtiquetas()) {
-          <span class="nav-label">{{ item.label }}</span>
-        }
+        <span class="nav-label" [style.display]="mostrarEtiquetas() ? null : 'none'">{{ item.label }}</span>
       </a>
     }
   </nav>
@@ -40,17 +38,13 @@
 
     <button class="theme-btn" (click)="toggleTheme()" [title]="tema().texto">
       <span class="material-icons">{{ tema().icono }}</span>
-      @if (mostrarEtiquetas()) {
-        <span>{{ tema().texto }}</span>
-      }
+      <span [style.display]="mostrarEtiquetas() ? null : 'none'">{{ tema().texto }}</span>
     </button>
 
     @if (isLoggedIn()) {
       <div class="admin-info">
         <span class="material-icons">account_circle</span>
-        @if (mostrarEtiquetas()) {
-          <span class="admin-name">{{ currentAdmin()?.username }}</span>
-        }
+        <span class="admin-name" [style.display]="mostrarEtiquetas() ? null : 'none'">{{ currentAdmin()?.username }}</span>
       </div>
     }
 
@@ -58,9 +52,7 @@
          componente decide cuál toca. -->
     <button [class]="accionSesion().clase" (click)="alPulsarSesion()">
       <span class="material-icons">{{ accionSesion().icono }}</span>
-      @if (mostrarEtiquetas()) {
-        <span>{{ accionSesion().texto }}</span>
-      }
+      <span [style.display]="mostrarEtiquetas() ? null : 'none'">{{ accionSesion().texto }}</span>
     </button>
   </div>
 

@@ -20,6 +20,12 @@ export interface Admin {
   username: string;
   /** Dirección de correo electrónico del administrador. */
   email: string;
+  /**
+   * Rol de la cuenta. Solo `root` gestiona usuarios, correos permitidos,
+   * sesiones y la ingesta. Opcional para tolerar sesiones abiertas antes de
+   * que el backend lo enviara.
+   */
+  rol?: 'root' | 'admin';
 }
 
 /**

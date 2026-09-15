@@ -1,0 +1,76 @@
+<section class="section-card">
+  <div class="section-header">
+    <div class="section-title-group">
+      <span class="material-icons section-icon">folder</span>
+      <div>
+        <h2 class="section-title">Reportes guardados</h2>
+        <p class="section-desc">Se recalculan cada vez que se abren</p>
+      </div>
+    </div>
+    <span class="badge" [style.display]="cargando() ? 'none' : null">{{ guardados().length }}</span>
+  </div>
+
+  @if (cargando()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando reportes...</p>
+    </div>
+  } @else if (guardados().length > 0) {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th class="col-secondary">Zona</th>
+            <th class="col-secondary">Rango</th>
+            <th class="col-secondary">Generado</th>
+            <th class="col-acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reporte of guardados(); track reporte.idReporte) {
+            <tr>
+              <td>
+                <div class="cell-flex">
+                  <span class="material-icons row-icon">description</span>
+                  <span class="cell-strong">{{ etiquetas[reporte.tipoReporte] }}</span>
+                </div>
+              </td>
+              <td class="cell-muted col-secondary">{{ reporte.zona ?? 'Todas' }}</td>
+              <td class="cell-muted col-secondary">
+                {{ reporte.rangoInicio | date: 'dd/MM/yy' }} – {{ reporte.rangoFin | date: 'dd/MM/yy' }}
+              </td>
+              <td class="cell-muted col-secondary">{{ reporte.fechaGeneracion | date: 'dd/MM HH:mm' }}</td>
+              <td class="cell-acciones">
+                <button class="btn-icono" (click)="abrir.emit(reporte.idReporte)" title="Abrir">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button class="btn-icono" (click)="descargar.emit(reporte.idReporte)" title="Descargar CSV"
+                        [disabled]="descargandoId() === reporte.idReporte">
+                  @if (descargandoId() === reporte.idReporte) {
+                    <div class="spinner spinner-sm"></div>
+                  } @else {
+                    <span class="material-icons">download</span>
+                  }
+                </button>
+                <button class="btn-icono btn-icono-peligro" (click)="eliminar.emit(reporte.idReporte)" title="Eliminar"
+                        [disabled]="eliminandoId() === reporte.idReporte">
+                  @if (eliminandoId() === reporte.idReporte) {
+                    <div class="spinner spinner-sm"></div>
+                  } @else {
+                    <span class="material-icons">delete_outline</span>
+                  }
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="material-icons">folder_off</span>
+      <p>No hay reportes guardados</p>
+    </div>
+  }
+</section>

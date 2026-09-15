@@ -31,8 +31,8 @@
       <label class="campo">
         <span class="campo-label">Tipo</span>
         <select class="campo-control" formControlName="tipoReporte">
-          @for (t of tipos; track t[0]) {
-            <option [value]="t[0]">{{ t[1] }}</option>
+          @for (tipo of tipos; track tipo[0]) {
+            <option [value]="tipo[0]">{{ tipo[1] }}</option>
           }
         </select>
       </label>
@@ -51,8 +51,8 @@
         <span class="campo-label">Zona</span>
         <select class="campo-control" formControlName="idZona">
           <option value="">Todas las zonas</option>
-          @for (z of zonas(); track z.idZona) {
-            <option [value]="z.idZona">{{ z.nombre }}</option>
+          @for (zona of zonas(); track zona.idZona) {
+            <option [value]="zona.idZona">{{ zona.nombre }}</option>
           }
         </select>
       </label>
@@ -69,146 +69,23 @@
   </section>
 
   <!-- ── Resultado ──────────────────────────────────────────────────────── -->
-  @if (actual(); as r) {
-    <section class="section-card">
-      <div class="section-header">
-        <div class="section-title-group">
-          <span class="material-icons section-icon">table_chart</span>
-          <div>
-            <h2 class="section-title">{{ etiquetas[r.tipoReporte] }}</h2>
-            <p class="section-desc">
-              {{ r.zona ?? 'Todas las zonas' }} ·
-              {{ r.rangoInicio | date: 'dd/MM/yyyy' }} – {{ r.rangoFin | date: 'dd/MM/yyyy' }}
-            </p>
-          </div>
-        </div>
-        <div class="acciones-cabecera">
-          <span class="badge">{{ r.total }}</span>
-          <button class="btn-icono" (click)="descargar(r.idReporte)" title="Descargar CSV"
-                  [disabled]="descargandoId() === r.idReporte">
-            @if (descargandoId() === r.idReporte) {
-              <div class="spinner spinner-sm"></div>
-            } @else {
-              <span class="material-icons">download</span>
-            }
-          </button>
-          <button class="btn-icono" (click)="cerrar()" title="Cerrar">
-            <span class="material-icons">close</span>
-          </button>
-        </div>
-      </div>
-
-      @if (r.total > 0) {
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                @for (c of r.columnas; track c) {
-                  <th>{{ c }}</th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (fila of r.filas; track $index) {
-                <tr>
-                  @for (celda of fila; track $index) {
-                    <td>{{ celda }}</td>
-                  }
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <div class="empty-state">
-          <span class="material-icons">search_off</span>
-          <p>Sin datos en ese rango</p>
-          <span class="empty-hint">
-            La ocupación se consolida en ventanas de varios minutos: si los nodos no estuvieron
-            emitiendo durante el periodo elegido, no hay nada que mostrar.
-          </span>
-        </div>
-      }
-    </section>
+  @if (actual(); as reporte) {
+    <app-resultado-reporte
+      [reporte]="reporte"
+      [descargando]="descargandoId() === reporte.idReporte"
+      (descargar)="descargar($event)"
+      (cerrar)="cerrar()"
+    />
   }
 
   <!-- ── Guardados ──────────────────────────────────────────────────────── -->
-  <section class="section-card">
-    <div class="section-header">
-      <div class="section-title-group">
-        <span class="material-icons section-icon">folder</span>
-        <div>
-          <h2 class="section-title">Reportes guardados</h2>
-          <p class="section-desc">Se recalculan cada vez que se abren</p>
-        </div>
-      </div>
-      @if (!isCargando()) {
-        <span class="badge">{{ guardados().length }}</span>
-      }
-    </div>
-
-    @if (isCargando()) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Cargando reportes...</p>
-      </div>
-    } @else if (guardados().length > 0) {
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th class="col-secondary">Zona</th>
-              <th class="col-secondary">Rango</th>
-              <th class="col-secondary">Generado</th>
-              <th class="col-acciones">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (r of guardados(); track r.idReporte) {
-              <tr>
-                <td>
-                  <div class="cell-flex">
-                    <span class="material-icons row-icon">description</span>
-                    <span class="cell-strong">{{ etiquetas[r.tipoReporte] }}</span>
-                  </div>
-                </td>
-                <td class="cell-muted col-secondary">{{ r.zona ?? 'Todas' }}</td>
-                <td class="cell-muted col-secondary">
-                  {{ r.rangoInicio | date: 'dd/MM/yy' }} – {{ r.rangoFin | date: 'dd/MM/yy' }}
-                </td>
-                <td class="cell-muted col-secondary">{{ r.fechaGeneracion | date: 'dd/MM HH:mm' }}</td>
-                <td class="cell-acciones">
-                  <button class="btn-icono" (click)="abrir(r.idReporte)" title="Abrir">
-                    <span class="material-icons">visibility</span>
-                  </button>
-                  <button class="btn-icono" (click)="descargar(r.idReporte)" title="Descargar CSV"
-                          [disabled]="descargandoId() === r.idReporte">
-                    @if (descargandoId() === r.idReporte) {
-                      <div class="spinner spinner-sm"></div>
-                    } @else {
-                      <span class="material-icons">download</span>
-                    }
-                  </button>
-                  <button class="btn-icono btn-icono-peligro" (click)="eliminar(r.idReporte)" title="Eliminar"
-                          [disabled]="eliminandoId() === r.idReporte">
-                    @if (eliminandoId() === r.idReporte) {
-                      <div class="spinner spinner-sm"></div>
-                    } @else {
-                      <span class="material-icons">delete_outline</span>
-                    }
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    } @else {
-      <div class="empty-state">
-        <span class="material-icons">folder_off</span>
-        <p>No hay reportes guardados</p>
-      </div>
-    }
-  </section>
+  <app-reportes-guardados
+    [guardados]="guardados()"
+    [cargando]="isCargando()"
+    [descargandoId]="descargandoId()"
+    [eliminandoId]="eliminandoId()"
+    (abrir)="abrir($event)"
+    (descargar)="descargar($event)"
+    (eliminar)="eliminar($event)"
+  />
 </div>

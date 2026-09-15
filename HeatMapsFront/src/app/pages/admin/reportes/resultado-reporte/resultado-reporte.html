@@ -1,0 +1,60 @@
+<section class="section-card">
+  <div class="section-header">
+    <div class="section-title-group">
+      <span class="material-icons section-icon">table_chart</span>
+      <div>
+        <h2 class="section-title">{{ etiquetas[reporte().tipoReporte] }}</h2>
+        <p class="section-desc">
+          {{ reporte().zona ?? 'Todas las zonas' }} ·
+          {{ reporte().rangoInicio | date: 'dd/MM/yyyy' }} – {{ reporte().rangoFin | date: 'dd/MM/yyyy' }}
+        </p>
+      </div>
+    </div>
+    <div class="acciones-cabecera">
+      <span class="badge">{{ reporte().total }}</span>
+      <button class="btn-icono" (click)="descargar.emit(reporte().idReporte)" title="Descargar CSV"
+              [disabled]="descargando()">
+        @if (descargando()) {
+          <div class="spinner spinner-sm"></div>
+        } @else {
+          <span class="material-icons">download</span>
+        }
+      </button>
+      <button class="btn-icono" (click)="cerrar.emit()" title="Cerrar">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+  </div>
+
+  @if (reporte().total > 0) {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            @for (columna of reporte().columnas; track columna) {
+              <th>{{ columna }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of reporte().filas; track $index) {
+            <tr>
+              @for (celda of fila; track $index) {
+                <td>{{ celda }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="material-icons">search_off</span>
+      <p>Sin datos en ese rango</p>
+      <span class="empty-hint">
+        La ocupación se consolida en ventanas de varios minutos: si los nodos no estuvieron
+        emitiendo durante el periodo elegido, no hay nada que mostrar.
+      </span>
+    </div>
+  }
+</section>

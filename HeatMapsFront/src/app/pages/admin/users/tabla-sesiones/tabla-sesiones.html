@@ -1,0 +1,56 @@
+@if (sesiones().length > 0) {
+  <div class="table-wrapper">
+    <table class="emails-table">
+      <thead>
+      <tr>
+        <th>Administrador</th>
+        <th class="col-secondary">Origen</th>
+        <th class="col-secondary">Inicio</th>
+        <th class="col-secondary">Expira</th>
+        <th class="col-actions">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (sesion of sesiones(); track sesion.idSesion) {
+          <tr>
+            <td>
+              <div class="cell-flex">
+                <span class="material-icons row-icon">vpn_key</span>
+                <span class="cell-strong">{{ sesion.username ?? 'Cuenta eliminada' }}</span>
+                @if (sesion.esActual) {
+                  <span class="tag tag-you">esta sesión</span>
+                }
+              </div>
+              <div class="sub-movil">
+                {{ sesion.ipOrigen ?? '—' }} · inicio {{ sesion.fechaInicio | date: 'dd/MM HH:mm' }}
+                · expira {{ sesion.fechaExpiracion | date: 'dd/MM HH:mm' }}
+              </div>
+            </td>
+            <td class="cell-muted cell-secondary">{{ sesion.ipOrigen ?? '—' }}</td>
+            <td class="cell-muted cell-secondary">{{ sesion.fechaInicio | date: 'dd/MM HH:mm' }}</td>
+            <td class="cell-muted cell-secondary">{{ sesion.fechaExpiracion | date: 'dd/MM HH:mm' }}</td>
+            <td class="cell-actions-td">
+              <button
+                class="btn-delete"
+                [disabled]="revocandoId() === sesion.idSesion"
+                (click)="revocar.emit(sesion)"
+                [title]="sesion.esActual ? 'Cerrar tu sesión actual' : 'Cerrar esta sesión'"
+              >
+                @if (revocandoId() === sesion.idSesion) {
+                  <div class="spinner spinner-sm"></div>
+                } @else {
+                  <span class="material-icons">logout</span>
+                }
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else if (!cargando()) {
+  <div class="empty-state">
+    <span class="material-icons">no_accounts</span>
+    <p>No hay sesiones abiertas</p>
+  </div>
+}
