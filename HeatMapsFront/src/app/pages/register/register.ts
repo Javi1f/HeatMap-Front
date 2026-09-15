@@ -40,7 +40,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { VerificationService } from '../../core/services/verification.service';
 import { VerifyCodeErrorResponse } from '../../core/models/admin.model';
-
+
+import { noop } from 'rxjs';
 /**
  * Componente de la página de registro.
  * Gestiona el formulario, el modal de verificación y la comunicación con el backend.
@@ -135,7 +136,7 @@ export class Register {
    * Acceso directo a los controles del formulario reactivo.
    * Útil en la plantilla para verificar estados de validación por campo.
    */
-  get f() { return this.registerForm.controls; }
+  get controles() { return this.registerForm.controls; }
 
   /**
    * Procesa el envío del formulario de registro (Paso 1).
@@ -191,7 +192,7 @@ export class Register {
     this.authService.verifyCode(this.pendingEmail, this.verificationCodeValue).subscribe({
       next: () => {
         this.showModal.set(false);
-        this.router.navigate(['/admin/dashboard']).catch(() => undefined);
+        this.router.navigate(['/admin/dashboard']).catch(noop);
       },
       error: (err: HttpErrorResponse) => {
         const body = err.error as VerifyCodeErrorResponse;

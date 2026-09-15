@@ -49,7 +49,7 @@ export class LoginModalComponent implements OnDestroy {
   /** Formulario reactivo del login. */
   get loginForm()    { return this.loginState.loginForm;    }
   /** Acceso directo a los controles del formulario. */
-  get f()            { return this.loginState.f;            }
+  get controles()            { return this.loginState.controles;            }
   /** Mensaje de error del último intento fallido. */
   get loginError()   { return this.loginState.loginError;   }
   /** `true` durante el bloqueo temporal por exceso de intentos fallidos. */

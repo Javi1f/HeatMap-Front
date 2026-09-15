@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.detalle {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #8a929e);
+  margin-top: 0.15rem;
+}
+
+.accion-fallida {
+  color: var(--color-danger, #e5484d);
+}

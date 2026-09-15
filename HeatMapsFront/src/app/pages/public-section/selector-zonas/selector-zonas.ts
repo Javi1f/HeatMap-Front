@@ -14,6 +14,7 @@ interface Opcion {
   readonly activa: boolean;
 }
 
+/** Selector de espacios en forma de pastillas, con el nivel de cada uno. */
 @Component({
   selector: 'app-selector-zonas',
   standalone: true,

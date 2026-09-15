@@ -12,6 +12,7 @@ interface NivelVista {
   readonly etiqueta: string;
 }
 
+/** Cabecera del espacio seleccionado: nombre, descripción y nivel de ocupación. */
 @Component({
   selector: 'app-cabecera-lugar',
   standalone: true,

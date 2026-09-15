@@ -115,6 +115,7 @@ const descargar = (nombreArchivo: string, contenido: string): void => {
   URL.revokeObjectURL(url);
 };
 
+/** Acceso a los reportes guardados: creación, consulta, borrado y descarga en CSV. */
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
   /** Cliente HTTP con los interceptores de auth y cifrado ya aplicados. */

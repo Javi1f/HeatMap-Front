@@ -20,7 +20,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ModalService } from '../../core/services/modal.service';
 import { AuthService } from '../../core/services/auth.service';
-
+
+import { noop } from 'rxjs';
 /**
  * Componente de la página de inicio.
  * No requiere autenticación; es la primera pantalla que ve cualquier visitante.
@@ -82,19 +83,19 @@ export class Home implements OnDestroy {
   goToRegister(): void {
     if (this.isLoggedIn()) {
       this.authService.logout().subscribe({
-        next:  () => { this.router.navigate(['/register']).catch(() => undefined); },
-        error: () => { this.router.navigate(['/register']).catch(() => undefined); }
+        next:  () => { this.router.navigate(['/register']).catch(noop); },
+        error: () => { this.router.navigate(['/register']).catch(noop); }
       });
       return;
     }
-    this.router.navigate(['/register']).catch(() => undefined);
+    this.router.navigate(['/register']).catch(noop);
   }
 
   /**
    * Navega a la sección pública de sensores en tiempo real (`/public`).
    */
   goToMaps(): void {
-    this.router.navigate(['/public']).catch(() => undefined);
+    this.router.navigate(['/public']).catch(noop);
   }
 
   /**
@@ -102,7 +103,7 @@ export class Home implements OnDestroy {
    * Llamado desde el link del mensaje "ya estás autenticado".
    */
   goToDashboard(): void {
-    this.router.navigate(['/admin/dashboard']).catch(() => undefined);
+    this.router.navigate(['/admin/dashboard']).catch(noop);
   }
 
   /**

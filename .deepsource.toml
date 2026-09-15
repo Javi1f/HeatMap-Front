@@ -4,6 +4,11 @@ exclude_patterns = [
   "**/node_modules/**",
   "**/dist/**",
   "**/.angular/**",
+  "**/coverage/**",
+]
+
+test_patterns = [
+  "HeatMapsFront/src/**/*.spec.ts",
 ]
 
 [[analyzers]]

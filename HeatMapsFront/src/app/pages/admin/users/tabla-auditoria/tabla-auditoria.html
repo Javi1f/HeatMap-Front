@@ -1,0 +1,33 @@
+@if (filas().length > 0) {
+  <div class="table-wrapper">
+    <table class="emails-table">
+      <thead>
+        <tr>
+          <th>Acción</th>
+          <th class="col-secondary">Administrador</th>
+          <th class="col-secondary">Fecha</th>
+          <th class="col-secondary">Origen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of filas(); track fila.id) {
+          <tr>
+            <td>
+              <span class="cell-strong" [class.accion-fallida]="fila.fallido">{{ fila.accion }}</span>
+              <div class="detalle">{{ fila.detalle }}</div>
+              <div class="sub-movil">{{ fila.quien }} · {{ fila.fecha }} · {{ fila.ip }}</div>
+            </td>
+            <td class="cell-muted cell-secondary">{{ fila.quien }}</td>
+            <td class="cell-muted cell-secondary">{{ fila.fecha }}</td>
+            <td class="cell-muted cell-secondary">{{ fila.ip }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="empty-state">
+    <span class="material-icons">history</span>
+    <p>Todavía no hay eventos registrados</p>
+  </div>
+}

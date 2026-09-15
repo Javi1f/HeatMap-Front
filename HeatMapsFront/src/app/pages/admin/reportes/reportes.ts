@@ -50,6 +50,7 @@ const paraInputDate = (fecha: Date): string => {
 };
 
 
+/** Página de reportes: genera, abre, descarga y elimina consultas sobre el histórico. */
 @Component({
   selector: 'app-reportes',
   standalone: true,
@@ -225,7 +226,7 @@ export class Reportes implements OnInit {
     this.eliminandoId.set(id);
     this.reportesService.eliminar(id).subscribe({
       next: () => {
-        this.guardados.update((list) => list.filter((r) => r.idReporte !== id));
+        this.guardados.update((list) => list.filter((registro) => registro.idReporte !== id));
         if (this.actual()?.idReporte === id) this.actual.set(null);
         this.eliminandoId.set(null);
       },
@@ -242,7 +243,7 @@ export class Reportes implements OnInit {
   }
 
   /** Acceso a los controles del formulario desde la plantilla. */
-  get f() {
+  get controles() {
     return this.form.controls;
   }
 }

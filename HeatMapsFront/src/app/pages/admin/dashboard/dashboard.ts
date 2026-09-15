@@ -44,6 +44,9 @@ import { IndicadoresDashboardComponent } from '../indicadores-dashboard/indicado
 import { TablaZonasComponent } from '../tabla-zonas/tabla-zonas';
 import { TablaNodosComponent } from '../tabla-nodos/tabla-nodos';
 import { describeHttpError } from '../../../core/http-error';
+import { SocketService } from '../../../socket/socket.service';
+import { crearLimitador } from '../../../core/limitar-frecuencia';
+import { Subscription } from 'rxjs';
 
 /**
  * Periodo de refresco de las métricas, en milisegundos.
@@ -55,6 +58,9 @@ import { describeHttpError } from '../../../core/http-error';
  * siguen siendo suficientemente frescos.
  */
 const REFRESH_INTERVAL_MS = 60_000;
+
+/** Intervalo mínimo entre recargas provocadas por lecturas en vivo, en milisegundos. */
+const RECARGA_EN_VIVO_MS = 2_000;
 
 /**
  * Componente del dashboard de métricas.
@@ -78,6 +84,18 @@ export class Dashboard implements OnInit, OnDestroy {
 
   /** Identificador del temporizador de refresco. */
   private refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+  /** Lecturas en vivo del WebSocket. */
+  private readonly socketService = inject(SocketService);
+
+  /** Suscripción a las lecturas, que se cierra al salir. */
+  private lecturas: Subscription | null = null;
+
+  /**
+   * Recarga el panel como mucho cada {@link RECARGA_EN_VIVO_MS} al llegar
+   * lecturas: el sondeo de 60 s solo no reflejaría los cambios en 5 s.
+   */
+  private recargarEnVivo = crearLimitador(RECARGA_EN_VIVO_MS);
 
   /** Indicadores de cabecera. `null` mientras no haya llegado la primera carga. */
   overview = signal<MetricsOverview | null>(null);
@@ -118,6 +136,9 @@ export class Dashboard implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadAll();
     this.refreshTimer = setInterval(() => this.loadAll(true), REFRESH_INTERVAL_MS);
+    this.lecturas = this.socketService.sensorData$.subscribe(() =>
+      this.recargarEnVivo(() => this.loadAll(true)),
+    );
   }
 
   /**
@@ -126,6 +147,7 @@ export class Dashboard implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     if (this.refreshTimer !== null) clearInterval(this.refreshTimer);
+    this.lecturas?.unsubscribe();
   }
 
   /**

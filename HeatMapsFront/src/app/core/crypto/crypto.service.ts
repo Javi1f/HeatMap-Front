@@ -51,7 +51,7 @@ export class CryptoService {
   private static importKey(): Promise<CryptoKey> {
     const hex = encryptionKey;
     const keyBytes = Uint8Array.from(
-      (hex.match(/.{2}/g) ?? []).map(b => parseInt(b, 16))
+      (hex.match(/.{2}/g) ?? []).map(parHex => parseInt(parHex, 16))
     );
     return crypto.subtle.importKey(
       'raw',
@@ -113,7 +113,7 @@ export class CryptoService {
    */
   async decrypt<T = unknown>(base64: string): Promise<T> {
     const key = await this.keyPromise;
-    const buf = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    const buf = Uint8Array.from(atob(base64), caracter => caracter.charCodeAt(0));
 
     const iv         = buf.slice(0, 12);
     const authTag    = buf.slice(12, 28);

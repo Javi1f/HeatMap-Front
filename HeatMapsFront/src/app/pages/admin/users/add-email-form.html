@@ -7,7 +7,7 @@
         formControlName="email"
         placeholder="nuevo@empresa.com"
         class="add-input"
-        [class.input-error]="f['email'].invalid && f['email'].touched"
+        [class.input-error]="controles['email'].invalid && controles['email'].touched"
       />
     </div>
     <button type="submit" class="btn-add" [disabled]="isAdding">
@@ -19,7 +19,7 @@
       }
     </button>
   </div>
-  @if (f['email'].invalid && f['email'].touched) {
+  @if (controles['email'].invalid && controles['email'].touched) {
     <span class="field-error">Ingresa un correo electrónico válido.</span>
   }
   @if (addError) {

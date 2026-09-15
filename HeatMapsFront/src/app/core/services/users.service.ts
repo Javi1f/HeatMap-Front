@@ -33,6 +33,33 @@ export interface AdminSummary {
 
   /** `true` si la cuenta tiene al menos una sesión viva. */
   conSesionActiva: boolean;
+
+  /** Rol de la cuenta. */
+  rol: 'root' | 'admin';
+
+  /** `false` si la cuenta está desactivada. */
+  activo: boolean;
+}
+
+/** Evento de auditoría de una acción administrativa. */
+export interface EventoAuditoria {
+  /** Identificador del evento. */
+  id: string;
+
+  /** Marca ISO del evento. */
+  fecha: string;
+
+  /** Administrador que actuó, o `null` si no llegó a identificarse. */
+  idAdmin: number | null;
+
+  /** Tipo de acción. */
+  tipo: string;
+
+  /** Contexto, sin datos personales. */
+  detalle: string | null;
+
+  /** IP de origen. */
+  ipOrigen: string | null;
 }
 
 /** Sesión de administrador actualmente abierta. */
@@ -87,5 +114,20 @@ export class UsersService {
     return this.http.delete<{ success: boolean; message: string }>(
       `${API_URL}/users/sessions/${idSesion}`
     );
+  }
+
+  /** Cambia el rol de un administrador. */
+  cambiarRol(idAdmin: number, rol: 'root' | 'admin'): Observable<{ success: boolean; message: string }> {
+    return this.http.patch<{ success: boolean; message: string }>(`${API_URL}/users/admins/${idAdmin}/rol`, { rol });
+  }
+
+  /** Activa o desactiva una cuenta; desactivarla cierra todas sus sesiones. */
+  cambiarActivo(idAdmin: number, activo: boolean): Observable<{ success: boolean; message: string }> {
+    return this.http.patch<{ success: boolean; message: string }>(`${API_URL}/users/admins/${idAdmin}/activo`, { activo });
+  }
+
+  /** Últimos eventos de auditoría. */
+  listarAuditoria(limite = 50): Observable<ApiResponse<EventoAuditoria[]>> {
+    return this.http.get<ApiResponse<EventoAuditoria[]>>(`${API_URL}/users/auditoria?limite=${limite}`);
   }
 }

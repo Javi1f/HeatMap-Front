@@ -24,7 +24,8 @@ import { Injectable, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-
+
+import { noop } from 'rxjs';
 /**
  * Servicio de estado no-singleton para el formulario de login.
  *
@@ -86,7 +87,7 @@ export class LoginStateService {
    *
    * @returns Los controles del `loginForm`.
    */
-  get f() {
+  get controles() {
     return this.loginForm.controls;
   }
 
@@ -128,7 +129,7 @@ export class LoginStateService {
       next: () => {
         this.failedAttempts = 0;
         onSuccess?.();
-        this.router.navigate(['/admin/dashboard']).catch(() => undefined);
+        this.router.navigate(['/admin/dashboard']).catch(noop);
       },
       error: () => {
         this.failedAttempts++;

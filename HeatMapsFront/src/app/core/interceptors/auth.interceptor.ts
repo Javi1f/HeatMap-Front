@@ -21,7 +21,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, noop } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 /** Endpoints donde un 401 lo produce la credencial enviada, no una sesión caducada. */
@@ -57,7 +57,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !esIntentoDeAcceso(req.url)) {
         authService.clearSession();
-        router.navigate(['/']).catch(() => undefined);
+        router.navigate(['/']).catch(noop);
       }
       return throwError(() => error);
     })

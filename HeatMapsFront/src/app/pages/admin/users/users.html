@@ -113,6 +113,7 @@
             <th>Usuario</th>
             <th class="col-secondary">Correo</th>
             <th class="col-secondary">Registro</th>
+            <th class="col-state">Rol</th>
             <th class="col-state">Estado</th>
           </tr>
           </thead>
@@ -132,7 +133,21 @@
                 <td class="cell-muted cell-truncate cell-secondary">{{ admin.email }}</td>
                 <td class="cell-muted cell-secondary">{{ admin.createdAt | date: 'dd/MM/yyyy' }}</td>
                 <td class="cell-state">
-                  @if (admin.conSesionActiva) {
+                  <select
+                    class="selector-rol"
+                    [value]="admin.rol"
+                    [disabled]="cambiandoCuentaId() === admin.id || admin.email === currentAdminEmail()"
+                    (change)="cambiarRol(admin, $any($event.target).value)"
+                    aria-label="Rol de la cuenta"
+                  >
+                    <option value="admin">admin</option>
+                    <option value="root">root</option>
+                  </select>
+                </td>
+                <td class="cell-state">
+                  @if (!admin.activo) {
+                    <span class="pill pill-warn">Desactivada</span>
+                  } @else if (admin.conSesionActiva) {
                     <span class="pill pill-ok">
                       <span class="dot"></span> En línea
                     </span>
@@ -140,6 +155,13 @@
                     <span class="pill pill-idle">Verificado</span>
                   } @else {
                     <span class="pill pill-warn">Sin verificar</span>
+                  }
+                  @if (admin.email !== currentAdminEmail()) {
+                    <button
+                      class="btn-cuenta"
+                      [disabled]="cambiandoCuentaId() === admin.id"
+                      (click)="alternarActivo(admin)"
+                    >{{ admin.activo ? 'Desactivar' : 'Activar' }}</button>
                   }
                 </td>
               </tr>
@@ -229,6 +251,20 @@
       </div>
     }
 
+  </section>
+
+  <!-- ── Auditoría ──────────────────────────────────────────────────────── -->
+  <section class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="material-icons section-icon">history</span>
+        <div>
+          <h2 class="section-title">Auditoría</h2>
+          <p class="section-desc">Últimas acciones administrativas registradas</p>
+        </div>
+      </div>
+    </div>
+    <app-tabla-auditoria [eventos]="auditoria()" [admins]="admins()" />
   </section>
 </div>
 

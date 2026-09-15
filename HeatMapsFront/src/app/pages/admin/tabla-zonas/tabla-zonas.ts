@@ -42,6 +42,7 @@ const horaLocal = (iso: string | null): string => {
     return `${hora}:${minuto}`;
 };
 
+/** Tabla con la ocupación consolidada de cada zona y su aforo. */
 @Component({
   selector: 'app-tabla-zonas',
   standalone: true,

@@ -27,10 +27,10 @@
           type="text"
           formControlName="identifier"
           placeholder="correo@ejemplo.com o usuario"
-          [class.input-error]="f['identifier'].invalid && f['identifier'].touched"
+          [class.input-error]="controles['identifier'].invalid && controles['identifier'].touched"
           [attr.disabled]="isBlocked() ? true : null"
         />
-        @if (f['identifier'].invalid && f['identifier'].touched) {
+        @if (controles['identifier'].invalid && controles['identifier'].touched) {
           <span class="error">Este campo es obligatorio.</span>
         }
       </div>
@@ -43,7 +43,7 @@
             [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
             placeholder="Contraseña"
-            [class.input-error]="f['password'].invalid && f['password'].touched"
+            [class.input-error]="controles['password'].invalid && controles['password'].touched"
             [attr.disabled]="isBlocked() ? true : null"
           />
           <button type="button" class="toggle-password" (click)="togglePassword()">
@@ -52,7 +52,7 @@
             </span>
           </button>
         </div>
-        @if (f['password'].invalid && f['password'].touched) {
+        @if (controles['password'].invalid && controles['password'].touched) {
           <span class="error">La contraseña es obligatoria.</span>
         }
       </div>

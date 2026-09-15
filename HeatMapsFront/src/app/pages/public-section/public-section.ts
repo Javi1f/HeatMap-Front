@@ -29,9 +29,13 @@ import { SelectorZonasComponent } from './selector-zonas/selector-zonas';
 import { CabeceraLugarComponent } from './cabecera-lugar/cabecera-lugar';
 import { AvisoMapaComponent, AvisoMapa } from './aviso-mapa/aviso-mapa';
 import { SocketService } from '../../socket/socket.service';
+import { crearLimitador } from '../../core/limitar-frecuencia';
 
 /** Periodo de refresco del mapa, en milisegundos. */
 const REFRESCO_MS = 30_000;
+
+/** Intervalo mínimo entre recargas provocadas por lecturas en vivo, en milisegundos. */
+const RECARGA_EN_VIVO_MS = 2_000;
 
 /** Aviso por fallo de carga, o `null` si la carga fue bien. */
 const avisoDeError = (error: string): AvisoMapa | null =>
@@ -70,6 +74,7 @@ const avisoDelMapa = (mapa: MapaPublico | null): AvisoMapa | null => {
   };
 };
 
+/** Vista pública: mapa de calor por espacio, sin autenticación y actualizado en vivo. */
 @Component({
   selector: 'app-public-section',
   standalone: true,
@@ -119,9 +124,16 @@ export class PublicSection implements OnInit, OnDestroy {
   /** `true` en cuanto llega por el socket la primera lectura de un nodo. */
   private recibiendoLecturas = signal<boolean>(false);
 
+  /**
+   * Recarga el mapa como mucho cada {@link RECARGA_EN_VIVO_MS} al llegar
+   * lecturas, para reflejar los cambios en menos de 5 s sin pedir el mapa en
+   * cada mensaje de cada nodo.
+   */
+  private recargarEnVivo = crearLimitador(RECARGA_EN_VIVO_MS);
+
   /** Zona seleccionada, resuelta a su objeto. */
   zonaActual = computed(() =>
-    this.zonas().find((z) => z.idZona === this.zonaSeleccionada()) ?? null,
+    this.zonas().find((zona) => zona.idZona === this.zonaSeleccionada()) ?? null,
   );
 
   /**
@@ -171,7 +183,10 @@ export class PublicSection implements OnInit, OnDestroy {
       this.socketService.connected$.subscribe((conectado) => this.enVivo.set(conectado)),
     );
     this.suscripciones.add(
-      this.socketService.sensorData$.subscribe(() => this.recibiendoLecturas.set(true)),
+      this.socketService.sensorData$.subscribe(() => {
+        this.recibiendoLecturas.set(true);
+        this.recargarEnVivo(() => this.cargarMapa(true));
+      }),
     );
   }
 

@@ -35,6 +35,7 @@ const tonoNodos = (resumen: MetricsOverview): MetricTone => {
   return resumen.sensoresEnLinea < resumen.sensoresTotal ? 'warn' : 'ok';
 };
 
+/** Fila de tarjetas con los indicadores de cabecera del dashboard. */
 @Component({
   selector: 'app-indicadores-dashboard',
   standalone: true,

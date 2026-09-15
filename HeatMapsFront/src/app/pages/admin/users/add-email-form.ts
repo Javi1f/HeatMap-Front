@@ -59,5 +59,5 @@ export class AddEmailFormComponent {
    * Acceso directo a los controles del `FormGroup` para verificar
    * el estado de validación en la plantilla.
    */
-  get f() { return this.addForm.controls; }
+  get controles() { return this.addForm.controls; }
 }

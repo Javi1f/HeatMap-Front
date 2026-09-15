@@ -47,7 +47,7 @@ export class Login implements OnDestroy {
   /** Formulario reactivo con los campos `identifier` y `password`. */
   get loginForm()    { return this.loginState.loginForm;    }
   /** Acceso directo a los controles del formulario. */
-  get f()            { return this.loginState.f;            }
+  get controles()            { return this.loginState.controles;            }
   /** Mensaje de error del último intento fallido, vacío si no hay error. */
   get loginError()   { return this.loginState.loginError;   }
   /** `true` durante el bloqueo temporal por exceso de intentos fallidos. */

@@ -201,6 +201,7 @@ const dibujarEtiquetaNodo = (
   ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
 };
 
+/** Lienzo que dibuja el plano de una zona, su mapa de calor y sus nodos. */
 @Component({
   selector: 'app-mapa-lienzo',
   standalone: true,

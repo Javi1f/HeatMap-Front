@@ -25,6 +25,7 @@
 
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
+import { rootGuard } from './core/guards/root-guard';
 
 /**
  * Árbol de rutas de la aplicación Angular.
@@ -33,21 +34,21 @@ import { authGuard } from './core/guards/auth-guard';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./pages/home/home').then(m => m.Home)
+    loadComponent: () => import('./pages/home/home').then(modulo => modulo.Home)
   },
   {
     path: 'public',
     /** Sección pública con tabla de sensores en tiempo real (Socket.IO). */
     loadComponent: () =>
-      import('./pages/public-section/public-section').then(m => m.PublicSection)
+      import('./pages/public-section/public-section').then(modulo => modulo.PublicSection)
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login').then(m => m.Login)
+    loadComponent: () => import('./pages/login/login').then(modulo => modulo.Login)
   },
   {
     path: 'register',
-    loadComponent: () => import('./pages/register/register').then(m => m.Register)
+    loadComponent: () => import('./pages/register/register').then(modulo => modulo.Register)
   },
   {
     path: 'admin',
@@ -58,19 +59,20 @@ export const routes: Routes = [
         /** Métricas de ocupación, salud de nodos y alertas. */
         path: 'dashboard',
         loadComponent: () =>
-          import('./pages/admin/dashboard/dashboard').then(m => m.Dashboard)
+          import('./pages/admin/dashboard/dashboard').then(modulo => modulo.Dashboard)
       },
       {
         /** Control de acceso: lista blanca, administradores y sesiones. */
         path: 'users',
+        canActivate: [rootGuard],
         loadComponent: () =>
-          import('./pages/admin/users/users').then(m => m.Users)
+          import('./pages/admin/users/users').then(modulo => modulo.Users)
       },
       {
         /** Reportes guardados sobre el histórico de ocupación. */
         path: 'reportes',
         loadComponent: () =>
-          import('./pages/admin/reportes/reportes').then(m => m.Reportes)
+          import('./pages/admin/reportes/reportes').then(modulo => modulo.Reportes)
       },
       {
         path: '',
