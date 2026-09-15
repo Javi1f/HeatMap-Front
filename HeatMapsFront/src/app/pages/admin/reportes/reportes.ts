@@ -30,6 +30,8 @@ import {
   ReportesService,
   TipoReporte,
 } from '../../../core/services/reportes.service';
+import { ResultadoReporteComponent } from './resultado-reporte/resultado-reporte';
+import { ReportesGuardadosComponent } from './reportes-guardados/reportes-guardados';
 
 /** Opciones del desplegable de tipo, derivadas de las etiquetas del servicio. */
 const TIPOS = Object.entries(ETIQUETAS_TIPO) as [TipoReporte, string][];
@@ -54,7 +56,7 @@ const paraInputDate = (fecha: Date): string => {
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ResultadoReporteComponent, ReportesGuardadosComponent],
   templateUrl: './reportes.html',
   styleUrl: './reportes.css'
 })
@@ -70,9 +72,6 @@ export class Reportes implements OnInit {
 
   /** Tipos disponibles, para el desplegable. */
   tipos = TIPOS;
-
-  /** Etiquetas legibles, para mostrar el tipo en el listado. */
-  etiquetas = ETIQUETAS_TIPO;
 
   /** Zonas activas, para acotar el reporte. */
   zonas = signal<ZoneOccupancy[]>([]);

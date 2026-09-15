@@ -17,13 +17,7 @@
           placeholder="Nombre de usuario"
           [class.input-error]="controles['username'].invalid && controles['username'].touched"
         />
-        @if (controles['username'].invalid && controles['username'].touched) {
-          @if (controles['username'].errors?.['required']) {
-            <span class="error">El usuario es obligatorio.</span>
-          } @else if (controles['username'].errors?.['minlength']) {
-            <span class="error">Mínimo 3 caracteres.</span>
-          }
-        }
+        <app-error-campo [control]="controles['username']" [mensajes]="mensajes.username" />
       </div>
 
       <div class="form-group">
@@ -35,13 +29,7 @@
           placeholder="correo@ejemplo.com"
           [class.input-error]="controles['email'].invalid && controles['email'].touched"
         />
-        @if (controles['email'].invalid && controles['email'].touched) {
-          @if (controles['email'].errors?.['required']) {
-            <span class="error">El correo es obligatorio.</span>
-          } @else if (controles['email'].errors?.['email'] || controles['email'].errors?.['pattern']) {
-            <span class="error">Ingresa un correo válido.</span>
-          }
-        }
+        <app-error-campo [control]="controles['email']" [mensajes]="mensajes.email" />
       </div>
 
       <div class="form-group">
@@ -58,15 +46,7 @@
             {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>
-        @if (controles['password'].invalid && controles['password'].touched) {
-          @if (controles['password'].errors?.['required']) {
-            <span class="error">La contraseña es obligatoria.</span>
-          } @else if (controles['password'].errors?.['minlength']) {
-            <span class="error">Mínimo 8 caracteres.</span>
-          } @else if (controles['password'].errors?.['pattern']) {
-            <span class="error">Debe incluir mayúscula, minúscula, número y carácter especial (&#64;$!%*?&).</span>
-          }
-        }
+        <app-error-campo [control]="controles['password']" [mensajes]="mensajes.password" />
       </div>
 
       <div class="form-group">

@@ -36,6 +36,23 @@ interface FilaEvento {
   readonly fallido: boolean;
 }
 
+/** Quién realizó la acción: su nombre, su identificador si ya no existe o una raya si no se identificó. */
+const autorDe = (idAdmin: number | null, nombres: ReadonlyMap<number, string>): string => {
+  if (idAdmin === null) return '—';
+  return nombres.get(idAdmin) ?? `#${idAdmin}`;
+};
+
+/** Evento de auditoría convertido en fila legible. */
+const aFila = (evento: EventoAuditoria, nombres: ReadonlyMap<number, string>): FilaEvento => ({
+  id: evento.id,
+  fecha: new Date(evento.fecha).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'medium' }),
+  quien: autorDe(evento.idAdmin, nombres),
+  accion: ETIQUETAS[evento.tipo] ?? evento.tipo,
+  detalle: evento.detalle ?? '',
+  ip: evento.ipOrigen ?? '—',
+  fallido: evento.tipo === 'inicio_sesion_fallido',
+});
+
 /** Tabla de los últimos eventos de auditoría, con acciones y administradores legibles. */
 @Component({
   selector: 'app-tabla-auditoria',
@@ -55,14 +72,6 @@ export class TablaAuditoriaComponent {
   /** Filas listas para pintar. */
   readonly filas = computed<FilaEvento[]>(() => {
     const nombres = new Map(this.admins().map((admin) => [admin.id, admin.username]));
-    return this.eventos().map((evento) => ({
-      id: evento.id,
-      fecha: new Date(evento.fecha).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'medium' }),
-      quien: evento.idAdmin === null ? '—' : nombres.get(evento.idAdmin) ?? `#${evento.idAdmin}`,
-      accion: ETIQUETAS[evento.tipo] ?? evento.tipo,
-      detalle: evento.detalle ?? '',
-      ip: evento.ipOrigen ?? '—',
-      fallido: evento.tipo === 'inicio_sesion_fallido',
-    }));
+    return this.eventos().map((evento) => aFila(evento, nombres));
   });
 }

@@ -25,7 +25,9 @@ describe('NavbarComponent', () => {
   /** Elemento raíz del componente. */
   const html = () => fixture.nativeElement as HTMLElement;
   /** Textos de las entradas de menú visibles. */
-  const etiquetas = () => [...html().querySelectorAll('.nav-label')].map((elemento) => elemento.textContent?.trim());
+  const etiquetas = () => [...html().querySelectorAll<HTMLElement>('.nav-label')]
+    .filter((elemento) => elemento.style.display !== 'none')
+    .map((elemento) => elemento.textContent?.trim());
 
   beforeEach(() => {
     localStorage.clear();

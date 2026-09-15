@@ -1,0 +1,58 @@
+<div class="table-wrapper">
+  <table class="emails-table">
+    <thead>
+    <tr>
+      <th>Usuario</th>
+      <th class="col-secondary">Correo</th>
+      <th class="col-secondary">Registro</th>
+      <th class="col-state">Rol</th>
+      <th class="col-state">Estado</th>
+    </tr>
+    </thead>
+    <tbody>
+      @for (fila of filas(); track fila.admin.id) {
+        <tr>
+          <td>
+            <div class="cell-flex">
+              <span class="material-icons row-icon">person</span>
+              <span class="cell-strong">{{ fila.admin.username }}</span>
+              @if (fila.esPropia) {
+                <span class="tag tag-you">tú</span>
+              }
+            </div>
+            <div class="sub-movil">{{ fila.admin.email }}</div>
+          </td>
+          <td class="cell-muted cell-truncate cell-secondary">{{ fila.admin.email }}</td>
+          <td class="cell-muted cell-secondary">{{ fila.admin.createdAt | date: 'dd/MM/yyyy' }}</td>
+          <td class="cell-state">
+            <select
+              class="selector-rol"
+              [value]="fila.admin.rol"
+              [disabled]="fila.cambiando || fila.esPropia"
+              (change)="cambiarRol.emit({ admin: fila.admin, rol: $any($event.target).value })"
+              aria-label="Rol de la cuenta"
+            >
+              <option value="admin">admin</option>
+              <option value="root">root</option>
+            </select>
+          </td>
+          <td class="cell-state">
+            <span class="pill" [class]="fila.estado.clase">
+              @if (fila.estado.enLinea) {
+                <span class="dot"></span>
+              }
+              {{ fila.estado.texto }}
+            </span>
+            @if (!fila.esPropia) {
+              <button
+                class="btn-cuenta"
+                [disabled]="fila.cambiando"
+                (click)="alternarActivo.emit(fila.admin)"
+              >{{ fila.accion }}</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

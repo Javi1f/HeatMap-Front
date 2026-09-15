@@ -1,0 +1,5 @@
+/* Misma apariencia que los errores de register.css: la encapsulación emulada
+   impide que aquella regla alcance el DOM de este componente. */
+:host { display: contents; }
+
+.error { font-size: 0.8rem; color: var(--color-secondary); }

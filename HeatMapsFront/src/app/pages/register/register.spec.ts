@@ -5,7 +5,11 @@ import { of, throwError } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { Register } from './register';
 
-const VALIDO = { username: 'ana', email: 'ana@unbosque.edu.co', password: 'ClaveSegura1!', confirmPassword: 'ClaveSegura1!' };
+/** Contraseña ficticia que cumple la política del formulario; no es una credencial real. */
+const CLAVE_DE_PRUEBA = 'ClaveSegura1!'; // skipcq: SCT-A000
+
+/** Datos de registro válidos. */
+const VALIDO = { username: 'ana', email: 'ana@unbosque.edu.co', password: CLAVE_DE_PRUEBA, confirmPassword: CLAVE_DE_PRUEBA };
 
 /** Rechazo del código de verificación, con los intentos restantes si se indican. */
 const errorVerificacion = (attemptsLeft?: number) =>
@@ -84,7 +88,7 @@ describe('Register', () => {
     const componente = crear();
     componente.registerForm.setValue(VALIDO);
     enviar();
-    expect(auth['register']).toHaveBeenCalledWith({ username: 'ana', email: 'ana@unbosque.edu.co', password: 'ClaveSegura1!' });
+    expect(auth['register']).toHaveBeenCalledWith({ username: 'ana', email: 'ana@unbosque.edu.co', password: CLAVE_DE_PRUEBA });
     expect(componente.showModal()).toBe(true);
     expect(html().textContent).toContain('Intentos restantes:');
 

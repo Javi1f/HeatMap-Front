@@ -31,9 +31,10 @@ const contextoFalso = () => {
 
 /** Componente anfitrión: da al lienzo un contenedor cuyo ancho se puede simular. */
 @Component({
+  selector: 'app-anfitrion-mapa-lienzo',
   standalone: true,
   imports: [MapaLienzoComponent],
-  template: `<div class="marco"><app-mapa-lienzo [mapa]="mapa()" /></div>`,
+  template: '<div class="marco"><app-mapa-lienzo [mapa]="mapa()" /></div>',
 })
 class Anfitrion {
   /** Mapa que se entrega al lienzo. */

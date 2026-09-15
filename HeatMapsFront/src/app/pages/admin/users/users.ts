@@ -48,6 +48,8 @@ import { EmailRowComponent } from './email-row';
 import { AddEmailFormComponent } from './add-email-form';
 import { DeleteConfirmModalComponent } from './delete-confirm-modal';
 import { TablaAuditoriaComponent } from './tabla-auditoria/tabla-auditoria';
+import { TablaAdministradoresComponent } from './tabla-administradores/tabla-administradores';
+import { TablaSesionesComponent } from './tabla-sesiones/tabla-sesiones';
 
 /**
  * Componente de administración de usuarios.
@@ -57,7 +59,7 @@ import { TablaAuditoriaComponent } from './tabla-auditoria/tabla-auditoria';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent, TablaAuditoriaComponent],
+  imports: [CommonModule, ReactiveFormsModule, EmailRowComponent, AddEmailFormComponent, DeleteConfirmModalComponent, TablaAuditoriaComponent, TablaAdministradoresComponent, TablaSesionesComponent],
   templateUrl: './users.html',
   styleUrl: './users.css'
 })
