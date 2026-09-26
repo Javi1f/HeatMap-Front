@@ -56,6 +56,21 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('app-login-modal')).not.toBeNull();
     expect(fixture.componentInstance.isCollapsed()).toBe(false);
   });
+
+  it('el enlace de salto lleva el foco al contenido sin navegar', () => {
+    const { fixture } = crear(null);
+    const html = fixture.nativeElement as HTMLElement;
+    (html.querySelector('.saltar') as HTMLAnchorElement).click();
+    expect(document.activeElement?.id).toBe('contenido');
+  });
+
+  it('sigue el cursor sobre las tarjetas mientras vive y deja de hacerlo al destruirse', () => {
+    const retirar = vi.spyOn(document, 'removeEventListener');
+    const { fixture } = crear(null);
+    fixture.destroy();
+    expect(retirar).toHaveBeenCalledWith('pointermove', expect.any(Function));
+    retirar.mockRestore();
+  });
 });
 
 describe('Rutas', () => {

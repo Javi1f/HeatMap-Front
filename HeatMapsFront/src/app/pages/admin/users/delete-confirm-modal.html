@@ -1,9 +1,9 @@
 <div class="modal-overlay" (click)="deleteCancelled.emit()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="titulo-borrar" (click)="$event.stopPropagation()">
     <div class="modal-icon-wrap">
       <span class="material-icons modal-icon-warn">warning_amber</span>
     </div>
-    <h3>¿Eliminar correo?</h3>
+    <h3 id="titulo-borrar">¿Eliminar correo?</h3>
     <p>
       El correo <strong>{{ email?.email }}</strong> ya no podrá
       usarse para registrarse como administrador.

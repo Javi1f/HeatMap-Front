@@ -1,60 +1,91 @@
-/* Estilos de la tarjeta de indicador. Propios del componente: su markup lo
-   renderiza él, no el dashboard. */
+/* Tarjeta de indicador: vidrio, ficha de icono teñida según el tono y un filo
+   de color arriba que se enciende al pasar el cursor. */
+
+:host { display: block; min-width: 0; }
 
 .metric-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--border-2);
-  border-radius: 12px;
-  padding: 1.1rem 1.25rem;
+  --tono: var(--color-text-muted);
+  --tono-suave: var(--bg-surface-hover);
+  height: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 0.9rem;
+  gap: var(--sp-4);
   min-width: 0;
-  transition: background-color 0.25s ease, border-color 0.2s ease;
+  padding: var(--sp-5);
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-3) var(--ease-out), box-shadow var(--dur-3) ease;
 }
+
+/* Filo superior en el color del tono. Solo lo llevan las tarjetas con estado
+   (bien, aviso o fallo): en las neutras sería una raya gris sin significado. */
+.metric-card > .metric-icon-wrap::before {
+  content: '';
+  position: absolute;
+  left: var(--sp-5);
+  right: var(--sp-5);
+  top: 0;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--tono);
+  opacity: 0.55;
+  transition: opacity var(--dur-3) ease;
+}
+
+.metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.metric-card:hover > .metric-icon-wrap::before { opacity: 1; }
+.tone-neutral > .metric-icon-wrap::before { display: none; }
 
 .metric-icon-wrap {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
-  background-color: var(--bg-surface-hover);
+  border-radius: var(--radius-sm);
+  background: var(--tono-suave);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tono) 30%, transparent);
 }
-.metric-icon-wrap .material-icons { font-size: 1.25rem; color: var(--color-text-muted); }
+.metric-icon-wrap .material-icons {
+  font-size: 1.3rem;
+  color: var(--tono);
+  transition: transform var(--dur-3) var(--ease-spring);
+}
+.metric-card:hover .metric-icon-wrap .material-icons { transform: scale(1.12) rotate(-6deg); }
 
-.metric-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.metric-body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
 
 .metric-label {
-  font-size: 0.78rem; font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 500;
   color: var(--color-text-muted);
-  text-transform: uppercase; letter-spacing: 0.04em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-/* Tabular para que los dígitos no bailen al refrescarse el valor. */
+/* Tabular para que los dígitos no bailen al contar ni al refrescarse. */
 .metric-value {
-  font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.1;
   color: var(--color-text);
-  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.metric-hint { font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.35; }
+.metric-hint { font-size: var(--text-xs); color: var(--color-text-muted); line-height: 1.4; }
 
 /* ── Tonos ───────────────────────────────────────────────────── */
 
-.tone-ok     { border-left-color: #2ea043; }
-.tone-ok     .metric-icon-wrap { background-color: rgba(46,160,67,0.12); }
-.tone-ok     .metric-icon-wrap .material-icons { color: #3fb950; }
-
-.tone-warn   { border-left-color: var(--color-secondary); }
-.tone-warn   .metric-icon-wrap { background-color: rgba(232,100,12,0.12); }
-.tone-warn   .metric-icon-wrap .material-icons { color: var(--color-secondary); }
-
-.tone-danger { border-left-color: var(--color-danger); }
-.tone-danger .metric-icon-wrap { background-color: rgba(224,90,58,0.14); }
-.tone-danger .metric-icon-wrap .material-icons { color: var(--color-danger); }
+.tone-ok     { --tono: var(--color-ok);     --tono-suave: var(--color-ok-soft); }
+.tone-warn   { --tono: var(--color-warn);   --tono-suave: var(--color-warn-soft); }
+.tone-danger { --tono: var(--color-danger); --tono-suave: var(--color-danger-soft); }
 
 @media (max-width: 480px) {
-  .metric-card  { padding: 0.9rem 1rem; gap: 0.7rem; }
-  .metric-value { font-size: 1.4rem; }
+  .metric-card  { padding: var(--sp-4); gap: var(--sp-3); }
+  .metric-value { font-size: 1.45rem; }
 }

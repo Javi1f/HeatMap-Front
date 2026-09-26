@@ -24,6 +24,15 @@ const fmt = (valor: number | null | undefined, sufijo = ''): string =>
   valor === null || valor === undefined ? '—' : `${valor}${sufijo}`;
 
 /**
+ * Entero con los miles separados por un espacio fino: «48 213».
+ *
+ * Espacio y no punto, porque el panel ya usa el punto como separador decimal
+ * («-76.5 dBm», «63.4 %»): «48.213» se leería como cuarenta y ocho con algo.
+ */
+export const agruparMiles = (valor: number): string =>
+  String(valor).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+
+/**
  * Tono de la tarjeta de nodos.
  *
  * Ninguno en línea es un fallo; alguno caído, un aviso; todos emitiendo,
@@ -60,14 +69,14 @@ export class IndicadoresDashboardComponent {
     return [
       {
         label: 'Dispositivos ahora',
-        value: metricas.dispositivosAhora.toString(),
+        value: agruparMiles(metricas.dispositivosAhora),
         icon: 'smartphone',
         tone: 'neutral',
         hint: `Presentes en los últimos ${metricas.ventanaMinutos} min, sin puntos de acceso ni señales de fuera. No equivale a personas.`,
       },
       {
         label: 'Detecciones',
-        value: metricas.detecciones.toString(),
+        value: agruparMiles(metricas.detecciones),
         icon: 'graphic_eq',
         tone: 'neutral',
         hint: 'Todas las tramas capturadas en la ventana, sin filtrar',

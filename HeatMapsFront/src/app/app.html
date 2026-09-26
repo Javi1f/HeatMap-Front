@@ -1,6 +1,12 @@
+<!-- Con teclado, la barra lateral suma media docena de paradas antes del
+     contenido; este enlace, invisible hasta recibir el foco, las salta. -->
+<a class="saltar" href="#contenido" (click)="$event.preventDefault(); saltarAlContenido()">Saltar al contenido</a>
+
+<app-fondo-radar />
+
 <div class="app-layout">
   <app-navbar />
-  <main [class.collapsed]="isCollapsed()" class="main-content">
+  <main id="contenido" tabindex="-1" [class.collapsed]="isCollapsed()" class="main-content">
     <router-outlet />
   </main>
   @if (showLogin()) {

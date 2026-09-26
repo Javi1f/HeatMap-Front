@@ -36,7 +36,7 @@ describe('SocketService', () => {
   });
 
   it('publica el resumen ya descifrado', async () => {
-    const resumen: ResumenSensor = { sensor_id: 'nodo-1', total_devices: 3, timestamp: '12:00', received_at: 'x' };
+    const resumen: ResumenSensor = { total_devices: 3, timestamp: '12:00', received_at: 'x' };
     const recibido = new Promise<ResumenSensor>((resolver) => {
       servicio.sensorData$.subscribe(resolver);
     });

@@ -37,13 +37,13 @@ interface FilaEvento {
 }
 
 /** Quién realizó la acción: su nombre, su identificador si ya no existe o una raya si no se identificó. */
-const autorDe = (idAdmin: number | null, nombres: ReadonlyMap<number, string>): string => {
+const autorDe = (idAdmin: string | null, nombres: ReadonlyMap<string, string>): string => {
   if (idAdmin === null) return '—';
-  return nombres.get(idAdmin) ?? `#${idAdmin}`;
+  return nombres.get(idAdmin) ?? `#${idAdmin.slice(0, 8)}`;
 };
 
 /** Evento de auditoría convertido en fila legible. */
-const aFila = (evento: EventoAuditoria, nombres: ReadonlyMap<number, string>): FilaEvento => ({
+const aFila = (evento: EventoAuditoria, nombres: ReadonlyMap<string, string>): FilaEvento => ({
   id: evento.id,
   fecha: new Date(evento.fecha).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'medium' }),
   quien: autorDe(evento.idAdmin, nombres),

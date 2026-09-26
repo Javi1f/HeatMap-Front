@@ -21,7 +21,7 @@
  */
 
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -33,13 +33,16 @@ import { cryptoInterceptor } from './core/interceptors/crypto.interceptor';
  * Registra:
  * - `provideBrowserGlobalErrorListeners`: captura errores no manejados del browser.
  * - `provideRouter`: configura el sistema de rutas con las rutas definidas en {@link routes}.
+ *   Cada navegación usa la API de View Transitions: el contenido sale y entra
+ *   animado (ver `styles/movimiento.css`). En navegadores sin la API se navega
+ *   igual, sin animación. La primera carga no se anima.
  * - `provideHttpClient`: habilita `HttpClient` con los interceptores funcionales
  *   `authInterceptor` y `cryptoInterceptor` aplicados globalmente.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions({ skipInitialTransition: true })),
     provideHttpClient(withInterceptors([authInterceptor, cryptoInterceptor]))
   ]
 };

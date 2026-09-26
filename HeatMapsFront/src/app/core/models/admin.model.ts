@@ -14,8 +14,8 @@
  * y se persiste en el estado de sesión de {@link AuthService}.
  */
 export interface Admin {
-  /** Identificador numérico único asignado por la base de datos. */
-  id: number;
+  /** Identificador de la cuenta (UUID). */
+  id: string;
   /** Nombre de usuario único; entre 3 y 32 caracteres `[A-Za-z0-9_-]`. */
   username: string;
   /** Dirección de correo electrónico del administrador. */
@@ -33,14 +33,16 @@ export interface Admin {
  * Solo los correos presentes en esta lista pueden completar el flujo de registro.
  */
 export interface AllowedEmail {
-  /** Identificador numérico único del registro. */
-  id: number;
+  /** Identificador del registro (UUID). */
+  id: string;
   /** Dirección de correo electrónico autorizada. */
   email: string;
-  /** Username del administrador que añadió este correo a la lista. */
-  addedBy: string;
+  /** Username del administrador que añadió este correo, o `null` si esa cuenta ya no existe. */
+  addedBy: string | null;
   /** Fecha de creación en formato ISO 8601 (ej. `"2026-05-01T12:00:00.000Z"`). */
   createdAt: string;
+  /** `true` si es el correo fundador; el servidor rechaza eliminarlo. */
+  esFundador: boolean;
 }
 
 /**

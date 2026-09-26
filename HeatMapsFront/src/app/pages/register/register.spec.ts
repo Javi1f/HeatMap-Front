@@ -40,7 +40,7 @@ describe('Register', () => {
   beforeEach(() => {
     auth = {
       register: vi.fn(() => of({ message: 'ok', verificationRequired: true })),
-      verifyCode: vi.fn(() => of({ admin: { id: 1 }, token: 't' })),
+      verifyCode: vi.fn(() => of({ admin: { id: 'a1' }, token: 't' })),
       cancelVerification: vi.fn(() => of({ message: 'ok' })),
     };
     router = { navigate: vi.fn(() => Promise.resolve(true)) };

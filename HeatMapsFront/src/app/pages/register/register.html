@@ -1,6 +1,11 @@
 <div class="register-container">
-  <div class="register-card">
-    <h2>Crear cuenta admin</h2>
+  <div class="register-card anillo">
+    <div class="acceso-cabeza">
+      <span class="acceso-emblema" aria-hidden="true">
+        <app-ondas tam="14px" />
+      </span>
+      <h2>Crear cuenta admin</h2>
+    </div>
 
     @if (formError()) {
       <div class="alert alert-error">{{ formError() }}</div>
@@ -76,9 +81,9 @@
 
 @if (showModal()) {
   <div class="modal-overlay" (click)="onCloseModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-verificacion" (click)="$event.stopPropagation()">
 
-      <h3>Verificación de correo</h3>
+      <h3 id="titulo-verificacion">Verificación de correo</h3>
       <p>Ingresa el código enviado a <strong>{{ registerForm.value.email }}</strong></p>
 
       <div class="attempts">

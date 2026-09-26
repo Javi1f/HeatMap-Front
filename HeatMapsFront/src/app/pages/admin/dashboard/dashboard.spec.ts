@@ -200,7 +200,9 @@ describe('Componentes del dashboard', () => {
     ]);
     vista.detectChanges();
     const filas = vista.componentInstance.filas();
-    expect(filas[0]).toMatchObject({ claseNivel: 'level-media', aforo: { ancho: 25, texto: '25 % de 40' }, actualizado: '12:05' });
+    expect(filas[0]).toMatchObject({ nivel: { llenos: 2, tono: 'aviso', texto: 'media' }, aforo: { ancho: 25, llenos: 3, texto: '25 % de 40' }, actualizado: '12:05' });
+    // 130 % se acota: el medidor de aforo se llena entero y no desborda.
+    expect(filas[1].aforo?.llenos).toBe(10);
     expect(filas[1]).toMatchObject({ aforo: { ancho: 100 }, actualizado: '—' });
     expect(filas[2]).toMatchObject({ aforo: null, actualizado: '—' });
     expect(filas[3].aforo?.ancho).toBe(0);

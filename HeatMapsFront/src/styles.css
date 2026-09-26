@@ -1,158 +1,31 @@
-/* ── Variables por tema ─────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   Hoja global de PlaceAt — sistema visual «Radar térmico».
 
-body[data-theme="dark"] {
-  --color-primary:        #E8640C;
-  --color-primary-hover:  #D05A0B;
-  --color-secondary:      #EA8C55;
-  --color-danger:         #E05A3A;
+   tokens      → colores, tipos, espacios, radios, sombras y tiempos.
+   base        → reinicio, atmósfera del fondo, tipografía y utilidades.
+   componentes → piezas compartidas entre pantallas (tarjetas, botones,
+                 formularios, avisos, modales, spinner, ondas).
+   movimiento  → animaciones con nombre, cascadas y transición de página.
+   ══════════════════════════════════════════════════════════════════ */
 
-  --color-text:           #F0F0F0;
-  --color-text-muted:     #888888;
-  --color-text-on-primary:#111111;
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/componentes.css';
+@import './styles/movimiento.css';
 
-  --bg-body:              #0f0f0f;
-  --bg-surface:           #1A1A1A;
-  --bg-surface-deep:      #141414;
-  --bg-surface-hover:     #202020;
-  --bg-input:             #1E1E1E;
-
-  --border:               #2a2a2a;
-  --border-2:             #333333;
-
-  /* Backward compat con var() usados en componentes */
-  --color-light:          #F0F0F0;
-  --color-accent:         #888888;
-  --color-dark:           #0f0f0f;
-
-  color-scheme: dark;
-}
-
-body[data-theme="light"] {
-  --color-primary:        #E8640C;
-  --color-primary-hover:  #C95800;
-  --color-secondary:      #D94F2A;
-  --color-danger:         #D94F2A;
-
-  --color-text:           #1A1A1A;
-  --color-text-muted:     #666666;
-  --color-text-on-primary:#FFFFFF;
-
-  --bg-body:              #F2F2F2;
-  --bg-surface:           #FFFFFF;
-  --bg-surface-deep:      #F5F5F5;
-  --bg-surface-hover:     #EFEFEF;
-  --bg-input:             #FFFFFF;
-
-  --border:               #E0E0E0;
-  --border-2:             #CCCCCC;
-
-  /* Backward compat */
-  --color-light:          #1A1A1A;
-  --color-accent:         #666666;
-  --color-dark:           #F2F2F2;
-
-  color-scheme: light;
-}
-
-/* ── Reset base ─────────────────────────────────────────────── */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: Roboto, sans-serif;
-  background-color: var(--bg-body);
-  color: var(--color-text);
-  min-height: 100vh;
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--color-primary-hover);
-}
-
-/* ── Spinner compartido ─────────────────────────────────────── */
-/* Global porque lo usan tres componentes distintos (dashboard, add-email-form
-   y email-row) y la encapsulación emulada obligaría a duplicarlo en cada uno. */
-
-.spinner {
-  width: 32px; height: 32px;
-  border: 3px solid var(--border);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-.spinner-sm { width: 16px; height: 16px; border-width: 2px; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Etiquetas y botón de acción compartidos ────────────────── */
-/* Los usan tanto las filas de correo como las tablas de administradores
-   y sesiones, que viven en componentes distintos. */
-
-.tag         { font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 20px; letter-spacing: 0.03em; flex-shrink: 0; white-space: nowrap; }
-.tag-you     { background-color: rgba(232,100,12,0.15); color: var(--color-primary); border: 1px solid var(--color-primary); }
-.tag-founder { background-color: var(--bg-surface-hover); color: var(--color-text-muted); border: 1px solid var(--border-2); }
-
-.btn-delete {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: 8px;
-  background: none; border: 1px solid var(--border-2);
-  color: var(--color-secondary); cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-.btn-delete:hover:not(:disabled) { background-color: rgba(232,100,12,0.15); border-color: var(--color-secondary); }
-.btn-delete:disabled    { opacity: 0.5; cursor: not-allowed; }
-.btn-delete-disabled    { color: var(--border-2); border-color: var(--border); cursor: not-allowed; }
-
-/* ── Mínimos para teléfono ──────────────────────────────────── */
-/* Estos tres componentes son compartidos, así que su ajuste móvil vive aquí y
-   no repetido en cada pantalla que los usa. Las etiquetas subían apenas 10,9px
-   y el botón de borrar medía 34px: por debajo de 44px el dedo falla el objetivo
-   con frecuencia. */
+/* ── Mínimos para teléfono ──────────────────────────────────────────
+   Por debajo de 44 px el dedo falla el objetivo con frecuencia, y por
+   debajo de 12 px una etiqueta de estado deja de leerse. */
 
 @media (max-width: 768px) {
-  .tag { font-size: 0.75rem; padding: 0.15rem 0.5rem; }
+  .tag  { font-size: var(--text-xs); padding: 0.15rem 0.55rem; }
 
-  .btn-delete {
-    width: 44px;
-    height: 44px;
+  .btn-icono,
+  .btn-delete,
+  .btn-resolve {
+    width: var(--toque);
+    height: var(--toque);
   }
-}
 
-/* ── Pildoras de estado ─────────────────────────────────────── */
-/* Globales porque las usan la tabla de nodos del dashboard y las de
-   administradores y sesiones, que son componentes distintos. Vivian solo en
-   users.css, encapsuladas, asi que en el dashboard salian sin estilo. */
-
-.pill {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.72rem; font-weight: 600;
-  padding: 0.2rem 0.6rem; border-radius: 20px;
-  white-space: nowrap;
-}
-.pill-ok   { background-color: rgba(46,160,67,0.12); color: #3fb950; border: 1px solid #2ea043; }
-.pill-idle { background-color: var(--bg-surface-hover); color: var(--color-text-muted); border: 1px solid var(--border-2); }
-.pill-warn { background-color: rgba(232,100,12,0.12); color: var(--color-secondary); border: 1px solid var(--color-secondary); }
-
-/* Punto pulsante del estado «en linea»: refuerza que es un dato vivo. */
-.dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background-color: currentColor;
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse { 50% { opacity: 0.35; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .dot { animation: none; }
+  .retry-btn { min-height: var(--toque); padding-inline: var(--sp-4); }
 }

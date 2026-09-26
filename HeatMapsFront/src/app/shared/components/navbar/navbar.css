@@ -1,201 +1,320 @@
+/* Barra lateral: un panel de vidrio que flota separado del borde.
+   En escritorio es un carril que se pliega; en teléfono, un cajón. */
+
 aside {
+  position: fixed;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  bottom: var(--sp-3);
+  z-index: var(--z-nav);
   display: flex;
   flex-direction: column;
-  width: 240px;
-  min-height: 100vh;
-  background-color: var(--bg-surface);
-  border-right: 2px solid var(--color-primary);
-  padding: 1rem 0.75rem;
-  transition: width 0.3s ease, background-color 0.25s ease;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 100;
+  gap: var(--sp-2);
+  width: 224px;
+  padding: var(--sp-3);
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  transition: width var(--dur-3) var(--ease-out), background-color var(--dur-3) ease;
 }
 
-aside.collapsed   { width: 64px; }
-
-/* Botón flotante que abre el cajón en teléfono. En escritorio no se muestra:
-   allí el carril siempre está visible y lleva su propio control. */
-.abrir-menu { display: none; }
-aside.mobile-open { width: 100vw !important; z-index: 150; }
-
-.mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0,0,0,0.6);
-  z-index: 140;
-  backdrop-filter: blur(2px);
+/* Filo en el borde derecho: una línea corta del color primario. */
+aside::after {
+  content: '';
+  position: absolute;
+  top: 22%;
+  bottom: 22%;
+  right: 0;
+  width: 1px;
+  background: var(--color-primary);
+  opacity: 0.45;
+  pointer-events: none;
 }
+
+aside.collapsed { width: 60px; }
+
+/* ── Cabeza: marca y control de pliegue ────────────────────────── */
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: 0 0 var(--sp-2) var(--sp-2);
+  margin-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--border);
+}
+
+aside.collapsed .cabeza {
+  flex-direction: column;
+  padding-left: 0;
+  gap: var(--sp-3);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+  padding-left: 2px;
+}
+
+aside.collapsed .marca { padding: var(--sp-2) 0 0; }
+
+.marca-nombre {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  color: var(--color-text);
+}
+.marca-nombre b { font-weight: inherit; color: var(--color-primary); }
 
 .toggle-btn {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background: none !important;
-  border: none !important;
-  color: var(--color-text);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
   cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--dur-1) ease, color var(--dur-1) ease, border-color var(--dur-1) ease;
 }
 .toggle-btn:hover {
-  background-color: var(--color-primary) !important;
-  color: var(--color-text-on-primary);
+  background: var(--bg-surface-hover);
+  border-color: var(--border-2);
+  color: var(--color-text);
 }
 
-.sidebar-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.75rem 0;
-  margin-bottom: 0.5rem;
-  min-height: 60px;
-}
-.sidebar-image img { max-width: 100%; max-height: 80px; object-fit: contain; }
+/* ── Enlaces ───────────────────────────────────────────────────── */
 
 .nav-links {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--sp-1);
   flex: 1;
-  margin-top: -3.5rem;
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.5rem;
-  border-radius: 8px;
-  color: var(--color-text);
-  font-size: 0.95rem;
+  gap: var(--sp-3);
+  min-height: 42px;
+  padding: 0 var(--sp-3) 0 0.55rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
-}
-.nav-item:hover {
-  background-color: var(--color-primary);
-  color: var(--color-text-on-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-2) ease,
+    color var(--dur-2) ease,
+    transform var(--dur-2) var(--ease-out);
 }
 
-.admin-item { color: var(--color-text-muted); }
+.nav-item:hover {
+  color: var(--color-text);
+  background: var(--bg-surface-hover);
+  transform: translateX(2px);
+}
+
+.nav-item .material-icons {
+  font-size: 1.3rem;
+  transition: color var(--dur-2) ease, transform var(--dur-3) var(--ease-spring);
+}
+.nav-item:hover .material-icons { transform: scale(1.12); }
+
+/* Entrada activa: fondo teñido y un filo del color primario a la izquierda
+   que se enciende al llegar. */
+.nav-item.activo {
+  color: var(--color-text);
+  background: var(--color-primary-soft);
+  font-weight: 600;
+}
+.nav-item.activo .material-icons { color: var(--color-primary); }
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform var(--dur-3) var(--ease-spring);
+}
+.nav-item.activo::before { transform: scaleY(1); }
+
+.admin-item .material-icons { opacity: 0.85; }
+
+/* Aire antes del primer enlace de administración: separa lo público de lo
+   privado sin otra línea más. */
+.nav-item:not(.admin-item) + .admin-item {
+  margin-top: var(--sp-4);
+}
+
+/* ── Pie ───────────────────────────────────────────────────────── */
 
 .sidebar-footer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 1rem;
+  gap: var(--sp-1);
+  padding-top: var(--sp-3);
   border-top: 1px solid var(--border);
 }
+
+.theme-btn,
+.login-btn,
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 42px;
+  padding: 0 var(--sp-3) 0 0.55rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color var(--dur-2) ease, color var(--dur-2) ease;
+}
+
+.theme-btn .material-icons,
+.login-btn .material-icons,
+.logout-btn .material-icons {
+  font-size: 1.3rem;
+  transition: transform var(--dur-3) var(--ease-spring);
+}
+
+.theme-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-text);
+}
+/* El sol o la luna dan media vuelta al pasar el cursor. */
+.theme-btn:hover .material-icons { transform: rotate(-35deg) scale(1.1); }
+
+/* Iniciar y cerrar sesión son teclas, como el resto de botones del sistema:
+   borde, canto duro debajo y rótulo en mayúsculas monoespaciado. */
+.login-btn,
+.logout-btn {
+  --tecla-color: var(--color-primary);
+  --tecla-canto: var(--color-primary-canto);
+  margin-bottom: var(--canto);
+  border: 1px solid var(--tecla-color);
+  border-radius: var(--radius-tecla);
+  color: var(--tecla-color);
+  background: var(--bg-surface-solid);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 var(--canto) 0 0 var(--tecla-canto);
+  transition: transform var(--dur-1) ease, box-shadow var(--dur-1) ease, background-color var(--dur-2) ease;
+}
+.logout-btn {
+  --tecla-color: var(--color-danger);
+  --tecla-canto: var(--color-danger-canto);
+}
+.login-btn:hover,
+.logout-btn:hover {
+  background: color-mix(in srgb, var(--tecla-color) 12%, var(--bg-surface-solid));
+  transform: translateY(-1px);
+  box-shadow: 0 calc(var(--canto) + 1px) 0 0 var(--tecla-canto);
+}
+.login-btn:active,
+.logout-btn:active {
+  transform: translateY(var(--canto));
+  box-shadow: none;
+}
+.login-btn:hover .material-icons,
+.logout-btn:hover .material-icons { transform: translateX(3px); }
 
 .admin-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
-  color: var(--color-text);
+  gap: var(--sp-3);
+  min-height: 42px;
+  padding: 0 var(--sp-2) 0 0.35rem;
   white-space: nowrap;
   overflow: hidden;
 }
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-tecla);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .admin-name {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Botón tema */
-.theme-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.5rem;
-  border-radius: 8px;
-  background: none !important;
-  border: none !important;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-  font-family: Roboto, sans-serif;
-}
-.theme-btn:hover {
-  background-color: var(--color-primary) !important;
-  color: var(--color-text-on-primary) !important;
-}
+/* Botón flotante que abre el cajón en teléfono. En escritorio no se muestra:
+   allí el carril siempre está visible y lleva su propio control. */
+.abrir-menu { display: none; }
 
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  background: none !important;
-  border: none !important;
-  color: var(--color-secondary);
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-  font-family: Roboto, sans-serif;
-}
-.logout-btn:hover {
-  background-color: var(--color-secondary) !important;
-  color: var(--color-text-on-primary);
-}
-
-.login-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.5rem;
-  border-radius: 8px;
-  color: var(--color-text) !important;
-  background: none !important;
-  border: none !important;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-  font-family: Roboto, sans-serif;
-}
-.login-btn:hover {
-  background-color: var(--color-primary) !important;
-  color: var(--color-text-on-primary) !important;
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: color-mix(in srgb, var(--bg-body) 55%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: velo var(--dur-2) ease backwards;
 }
 
 @media (max-width: 768px) {
   .abrir-menu {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: fixed;
-    top: 0.55rem;
-    left: 0.55rem;
-    z-index: 120;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background-color: var(--bg-surface);
+    top: var(--sp-3);
+    left: var(--sp-3);
+    z-index: var(--z-menu);
+    display: grid;
+    place-items: center;
+    width: var(--toque);
+    height: var(--toque);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    -webkit-backdrop-filter: var(--vidrio);
+    backdrop-filter: var(--vidrio);
     border: 1px solid var(--border-2);
     color: var(--color-text);
+    box-shadow: var(--shadow-1);
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+    animation: emerger var(--dur-3) var(--ease-spring) backwards;
   }
 
   /* Fuera de pantalla mientras está cerrado, en vez de ocupar un carril fijo.
@@ -203,35 +322,39 @@ aside.mobile-open { width: 100vw !important; z-index: 150; }
      no se reajuste en cada fotograma durante la apertura. */
   aside,
   aside.collapsed {
-    width: min(300px, 88vw);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease, background-color 0.25s ease;
-    padding: 1rem;
+    width: min(300px, 86vw);
+    transform: translateX(calc(-100% - var(--sp-6)));
+    transition: transform var(--dur-3) var(--ease-out), background-color var(--dur-3) ease;
+    padding: var(--sp-4);
+    background: color-mix(in srgb, var(--bg-surface-solid) 92%, transparent);
   }
 
   aside.mobile-open {
+    z-index: var(--z-drawer);
     transform: translateX(0);
-    width: min(300px, 88vw) !important;
+    width: min(300px, 86vw);
   }
 
-  /* El tirón negativo sube los enlaces bajo el logo en escritorio; con el cajón
-     abierto no hay sitio que recuperar y solaparía el botón de cerrar. */
-  .nav-links { margin-top: 0; }
+  aside.collapsed .cabeza { flex-direction: row; }
+
+  /* Las entradas entran en cascada al abrir el cajón. */
+  aside.mobile-open .nav-item {
+    animation: entrar var(--dur-3) var(--ease-out) backwards;
+  }
+  aside.mobile-open .nav-item:nth-child(2) { animation-delay: calc(var(--escalon) * 1); }
+  aside.mobile-open .nav-item:nth-child(3) { animation-delay: calc(var(--escalon) * 2); }
+  aside.mobile-open .nav-item:nth-child(4) { animation-delay: calc(var(--escalon) * 3); }
+  aside.mobile-open .nav-item:nth-child(5) { animation-delay: calc(var(--escalon) * 4); }
 
   .toggle-btn {
-    min-width: 44px;
-    min-height: 44px;
-    justify-content: center;
+    width: var(--toque);
+    height: var(--toque);
   }
 
   .nav-item,
   .theme-btn,
   .logout-btn,
   .login-btn {
-    min-height: 44px;
+    min-height: var(--toque);
   }
-}
-
-@media (max-width: 480px) {
-  aside.mobile-open { width: 100vw !important; }
 }

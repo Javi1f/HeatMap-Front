@@ -15,12 +15,6 @@
 
 /** Resumen de una lectura de un nodo de captura. */
 export interface ResumenSensor {
-  /**
-   * Identificador del nodo que emitió la lectura.
-   * Se usa como clave para quedarse con su conteo más reciente.
-   */
-  readonly sensor_id: string;
-
   /** Dispositivos distintos detectados en esa lectura. */
   readonly total_devices: number;
 

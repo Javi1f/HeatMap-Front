@@ -5,7 +5,7 @@ import { noop } from 'rxjs';
 import { apiUrl } from '../config';
 import { AuthService } from './auth.service';
 
-const ADMIN = { id: 1, username: 'raiz', email: 'r@unbosque.edu.co', rol: 'root' as const };
+const ADMIN = { id: 'a1', username: 'raiz', email: 'r@unbosque.edu.co', rol: 'root' as const };
 
 describe('AuthService', () => {
   let servicio: AuthService;

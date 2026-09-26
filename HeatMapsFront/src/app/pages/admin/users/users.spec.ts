@@ -10,14 +10,14 @@ import { TablaAuditoriaComponent } from './tabla-auditoria/tabla-auditoria';
 import { Users } from './users';
 
 const EMAILS = [
-  { id: 1, email: 'fundador@unbosque.edu.co', addedBy: 'sistema', createdAt: '2026-01-01' },
-  { id: 2, email: 'yo@unbosque.edu.co', addedBy: 'fundador', createdAt: '2026-02-01' },
-  { id: 3, email: 'otro@unbosque.edu.co', addedBy: 'yo', createdAt: '2026-03-01' },
+  { id: 'c1', email: 'fundador@unbosque.edu.co', addedBy: null, createdAt: '2026-01-01', esFundador: true },
+  { id: 'c2', email: 'yo@unbosque.edu.co', addedBy: 'fundador', createdAt: '2026-02-01', esFundador: false },
+  { id: 'c3', email: 'otro@unbosque.edu.co', addedBy: 'yo', createdAt: '2026-03-01', esFundador: false },
 ];
 
 /** Resumen de administrador, activo, verificado y con rol `admin`. */
-const admin = (id: number, campos: Partial<AdminSummary> = {}): AdminSummary => ({
-  id, username: `u${id}`, email: `u${id}@unbosque.edu.co`, isVerified: true, createdAt: '2026-01-01T00:00:00Z',
+const admin = (n: number, campos: Partial<AdminSummary> = {}): AdminSummary => ({
+  id: `a${n}`, username: `u${n}`, email: `u${n}@unbosque.edu.co`, isVerified: true, createdAt: '2026-01-01T00:00:00Z',
   conSesionActiva: false, rol: 'admin', activo: true, ...campos,
 });
 
@@ -30,7 +30,7 @@ const ADMINS = [
 
 /** Sesión abierta del administrador 1. */
 const sesion = (idSesion: string, esActual = false): SessionSummary => ({
-  idSesion, idAdmin: 1, username: esActual ? 'u1' : null, ipOrigen: null,
+  idSesion, idAdmin: 'a1', username: esActual ? 'u1' : null, ipOrigen: null,
   fechaInicio: '2026-09-14T10:00:00Z', fechaExpiracion: '2026-09-14T11:00:00Z', esActual,
 });
 
@@ -57,7 +57,7 @@ describe('Users', () => {
   beforeEach(() => {
     correos = {
       getAll: vi.fn(() => of({ success: true, data: EMAILS })),
-      add: vi.fn((email: string) => of({ success: true, data: { id: 9, email, addedBy: 'yo', createdAt: '2026-09-14' } })),
+      add: vi.fn((email: string) => of({ success: true, data: { id: 'c9', email, addedBy: 'yo', createdAt: '2026-09-14', esFundador: false } })),
       delete: vi.fn(() => of({ success: true, message: 'ok' })),
     };
     usuarios = {
@@ -68,7 +68,7 @@ describe('Users', () => {
       cambiarRol: vi.fn(() => of({ success: true, message: 'ok' })),
       cambiarActivo: vi.fn(() => of({ success: true, message: 'ok' })),
     };
-    auth = { currentAdmin: signal({ id: 1, username: 'u1', email: 'yo@unbosque.edu.co' }), clearSession: vi.fn() };
+    auth = { currentAdmin: signal({ id: 'a1', username: 'u1', email: 'yo@unbosque.edu.co' }), clearSession: vi.fn() };
     router = { navigate: vi.fn(() => Promise.resolve(true)) };
     TestBed.configureTestingModule({
       imports: [Users],
@@ -84,7 +84,6 @@ describe('Users', () => {
   describe('correos permitidos', () => {
     it('lista los correos y protege al fundador y al propio', () => {
       const componente = crear();
-      expect(componente.firstEmailId()).toBe(1);
       expect(EMAILS.map((correo) => componente.canDelete(correo))).toEqual([false, false, true]);
       expect(EMAILS.map((correo) => componente.getDeleteTooltip(correo))).toEqual([
         'No puedes eliminar el correo fundador', 'No puedes eliminar tu propio correo', 'Eliminar correo',
@@ -93,11 +92,10 @@ describe('Users', () => {
       expect(html().textContent).toContain('fundador');
     });
 
-    it('sin correos ni sesión propia no hay fundador ni correo actual', () => {
+    it('sin correos ni sesión propia no hay correo actual', () => {
       correos['getAll'].mockReturnValue(of({ success: true, data: [] }));
       auth.currentAdmin.set(null);
       const componente = crear();
-      expect(componente.firstEmailId()).toBeNull();
       expect(componente.currentAdminEmail()).toBe('');
       expect(html().textContent).toContain('No hay correos permitidos registrados');
     });
@@ -145,7 +143,7 @@ describe('Users', () => {
     it('pide confirmación antes de eliminar y puede cancelarse', () => {
       const componente = crear();
       (html().querySelector('tr[appEmailRow] button.btn-delete') as HTMLButtonElement).click();
-      expect(componente.emailBeingDeleted()?.id).toBe(3);
+      expect(componente.emailBeingDeleted()?.id).toBe('c3');
       fixture.detectChanges();
       expect(html().querySelector('app-delete-confirm-modal')?.textContent).toContain('otro@unbosque.edu.co');
 
@@ -159,18 +157,18 @@ describe('Users', () => {
       componente.confirmDelete();
       expect(correos['delete']).not.toHaveBeenCalled();
 
-      componente.requestDelete(3);
+      componente.requestDelete('c3');
       fixture.detectChanges();
       (html().querySelector('.btn-danger') as HTMLButtonElement).click();
-      expect(correos['delete']).toHaveBeenCalledWith(3);
-      expect(componente.emails().map((correo) => correo.id)).toEqual([1, 2]);
+      expect(correos['delete']).toHaveBeenCalledWith('c3');
+      expect(componente.emails().map((correo) => correo.id)).toEqual(['c1', 'c2']);
 
       correos['delete'].mockReturnValue(errorCon(404, 'Correo no encontrado'));
-      componente.requestDelete(2);
+      componente.requestDelete('c2');
       componente.confirmDelete();
       expect(componente.error()).toBe('Correo no encontrado');
       correos['delete'].mockReturnValue(errorCon(500));
-      componente.requestDelete(2);
+      componente.requestDelete('c2');
       componente.confirmDelete();
       expect(componente.error()).toBe('Error al eliminar el correo.');
       expect(componente.deletingId()).toBeNull();
@@ -178,11 +176,23 @@ describe('Users', () => {
 
     it('el clic fuera del cuadro de confirmación cancela; dentro no', () => {
       const componente = crear();
-      componente.requestDelete(3);
+      componente.requestDelete('c3');
       fixture.detectChanges();
       (html().querySelector('.modal-card') as HTMLElement).click();
-      expect(componente.confirmDeleteId()).toBe(3);
+      expect(componente.confirmDeleteId()).toBe('c3');
       (html().querySelector('.modal-overlay') as HTMLElement).click();
+      expect(componente.confirmDeleteId()).toBeNull();
+    });
+
+    it('Escape cancela la confirmación sólo mientras está a la vista', () => {
+      const componente = crear();
+      const cancelar = vi.spyOn(componente, 'cancelDelete');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      expect(cancelar).not.toHaveBeenCalled();
+
+      componente.requestDelete('c3');
+      fixture.detectChanges();
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
       expect(componente.confirmDeleteId()).toBeNull();
     });
   });
@@ -191,7 +201,9 @@ describe('Users', () => {
     it('muestra estado, rol y acciones de cada cuenta, sin tocar la propia', () => {
       crear();
       const filas = html().querySelectorAll<HTMLTableRowElement>('section:nth-of-type(2) tbody tr');
-      expect([...filas].map((fila) => fila.querySelector('.pill')?.textContent?.trim())).toEqual(['En línea', 'Verificado', 'Desactivada', 'Sin verificar']);
+      expect([...filas].map((fila) => fila.querySelector('app-senal .texto')?.textContent?.trim())).toEqual(['En línea', 'Verificado', 'Desactivada', 'Sin verificar']);
+      // Las barras encendidas ordenan los estados: dentro, lista, apagada, a medio registrar.
+      expect([...filas].map((fila) => fila.querySelectorAll('app-senal .encendida').length)).toEqual([4, 3, 0, 1]);
       expect(filas[0].querySelector<HTMLSelectElement>('select')?.disabled).toBe(true);
       expect(filas[0].querySelector('.btn-cuenta')).toBeNull();
       expect(filas[2].querySelector('.btn-cuenta')?.textContent?.trim()).toBe('Activar');
@@ -204,7 +216,7 @@ describe('Users', () => {
       const selector = html().querySelectorAll<HTMLSelectElement>('select.selector-rol')[1];
       selector.value = 'root';
       selector.dispatchEvent(new Event('change'));
-      expect(usuarios['cambiarRol']).toHaveBeenCalledWith(2, 'root');
+      expect(usuarios['cambiarRol']).toHaveBeenCalledWith('a2', 'root');
       expect(usuarios['listAdmins']).toHaveBeenCalledTimes(2);
 
       componente.cambiarRol(ADMINS[1], 'superusuario');
@@ -214,9 +226,9 @@ describe('Users', () => {
     it('activa y desactiva cuentas', () => {
       const componente = crear();
       (html().querySelectorAll<HTMLButtonElement>('.btn-cuenta')[0]).click();
-      expect(usuarios['cambiarActivo']).toHaveBeenCalledWith(2, false);
+      expect(usuarios['cambiarActivo']).toHaveBeenCalledWith('a2', false);
       componente.alternarActivo(ADMINS[2]);
-      expect(usuarios['cambiarActivo']).toHaveBeenLastCalledWith(3, true);
+      expect(usuarios['cambiarActivo']).toHaveBeenLastCalledWith('a3', true);
       expect(componente.cambiandoCuentaId()).toBeNull();
     });
 
@@ -295,16 +307,16 @@ describe('TablaAuditoriaComponent', () => {
 
     vista.componentRef.setInput('admins', [admin(1)]);
     vista.componentRef.setInput('eventos', [
-      { id: '1', fecha: '2026-09-14T12:00:00Z', idAdmin: 1, tipo: 'rol_cambiado', detalle: 'admin=2 rol=root', ipOrigen: '10.0.0.1' },
+      { id: '1', fecha: '2026-09-14T12:00:00Z', idAdmin: 'a1', tipo: 'rol_cambiado', detalle: 'admin=2 rol=root', ipOrigen: '10.0.0.1' },
       { id: '2', fecha: '2026-09-14T12:01:00Z', idAdmin: null, tipo: 'inicio_sesion_fallido', detalle: null, ipOrigen: null },
-      { id: '3', fecha: '2026-09-14T12:02:00Z', idAdmin: 7, tipo: 'tipo_nuevo', detalle: null, ipOrigen: null },
+      { id: '3', fecha: '2026-09-14T12:02:00Z', idAdmin: '7d0c5b3e-2f1a-4c8e-9b6d-3a5f1e2c4b7a', tipo: 'tipo_nuevo', detalle: null, ipOrigen: null },
     ]);
     vista.detectChanges();
 
     const filas = vista.componentInstance.filas();
     expect(filas[0]).toMatchObject({ quien: 'u1', accion: 'Rol cambiado', detalle: 'admin=2 rol=root', ip: '10.0.0.1', fallido: false });
     expect(filas[1]).toMatchObject({ quien: '—', accion: 'Inicio de sesión fallido', detalle: '', ip: '—', fallido: true });
-    expect(filas[2]).toMatchObject({ quien: '#7', accion: 'tipo_nuevo' });
+    expect(filas[2]).toMatchObject({ quien: '#7d0c5b3e', accion: 'tipo_nuevo' });
     expect(vista.nativeElement.querySelectorAll('.accion-fallida')).toHaveLength(1);
   });
 });

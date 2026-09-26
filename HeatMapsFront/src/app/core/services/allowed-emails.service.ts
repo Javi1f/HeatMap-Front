@@ -87,13 +87,13 @@ export class AllowedEmailsService {
   }
 
   /**
-   * Elimina un correo de la lista blanca por su identificador numérico.
+   * Elimina un correo de la lista blanca por su identificador.
    *
-   * @param id - ID numérico del registro a eliminar.
+   * @param id - UUID del registro a eliminar.
    * @returns Observable con `{ success, message }` de confirmación.
    * @throws `HttpErrorResponse` con `code: "NOT_FOUND"` si el ID no existe.
    */
-  delete(id: number): Observable<DeleteEmailResponse> {
+  delete(id: string): Observable<DeleteEmailResponse> {
     return this.http.delete<DeleteEmailResponse>(`${API_URL}/allowed-emails/${id}`);
   }
 }

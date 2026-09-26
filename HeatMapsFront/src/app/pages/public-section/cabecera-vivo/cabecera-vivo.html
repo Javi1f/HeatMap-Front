@@ -1,9 +1,12 @@
-<p class="hero-eyebrow">Ocupación en tiempo real</p>
-<h1 class="hero-titulo">Mira dónde hay sitio antes de ir</h1>
+<p class="hero-eyebrow">
+  <app-ondas tam="7px" />
+  Ocupación en tiempo real
+</p>
+<h1 class="hero-titulo">Mira dónde hay <span class="texto-calor">sitio</span> antes de ir</h1>
 
 @if (contador(); as c) {
-  <span class="vivo">
-    <i class="vivo-punto" [class.vivo-punto-quieto]="!c.enDirecto"></i>
-    {{ c.texto }}
+  <span class="vivo" [class.vivo-directo]="c.enDirecto">
+    <app-ondas tam="8px" [quieta]="!c.enDirecto" [color]="c.enDirecto ? 'var(--color-ok)' : 'var(--color-text-muted)'" />
+    <span class="cifra" [appCifra]="c.texto"></span>
   </span>
 }

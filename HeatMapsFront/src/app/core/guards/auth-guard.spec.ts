@@ -44,7 +44,7 @@ describe('authGuard', () => {
     const valor = ejecutar({
       isAuthenticated: (() => false) as AuthService['isAuthenticated'],
       getToken: () => 'valido',
-      checkSession: () => of({ isValid: true, admin: { id: 1, username: 'a', email: 'a@b.co' } }),
+      checkSession: () => of({ isValid: true, admin: { id: 'a1', username: 'a', email: 'a@b.co' } }),
     });
     expect(await resultado(valor)).toBe(true);
   });

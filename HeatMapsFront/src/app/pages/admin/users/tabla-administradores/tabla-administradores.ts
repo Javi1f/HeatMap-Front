@@ -7,14 +7,22 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AdminSummary } from '../../../../core/services/users.service';
+import { SenalComponent, Tono } from '../../../../shared/indicadores/indicadores';
 
-/** Estado de una cuenta tal como se muestra en su píldora. */
+/**
+ * Estado de una cuenta tal como lo dibuja su indicador de señal.
+ *
+ * Las barras ordenan los estados de mejor a peor: dentro ahora (4), lista para
+ * entrar (3), a medio registrar (1) y apagada (0).
+ */
 interface EstadoCuenta {
-  /** Clase de color de la píldora. */
-  readonly clase: string;
-  /** Texto de la píldora. */
+  /** Barras encendidas, de 0 a 4. */
+  readonly barras: number;
+  /** Color del indicador. */
+  readonly tono: Tono;
+  /** Texto del estado. */
   readonly texto: string;
-  /** `true` si lleva el punto de «en línea». */
+  /** `true` si tiene una sesión abierta en este momento. */
   readonly enLinea: boolean;
 }
 
@@ -42,18 +50,18 @@ export interface CambioRol {
 
 /** Estado que se muestra para una cuenta, del más al menos prioritario. */
 const estadoDe = (admin: AdminSummary): EstadoCuenta => {
-  if (!admin.activo) return { clase: 'pill-warn', texto: 'Desactivada', enLinea: false };
-  if (admin.conSesionActiva) return { clase: 'pill-ok', texto: 'En línea', enLinea: true };
+  if (!admin.activo) return { barras: 0, tono: 'peligro', texto: 'Desactivada', enLinea: false };
+  if (admin.conSesionActiva) return { barras: 4, tono: 'ok', texto: 'En línea', enLinea: true };
   return admin.isVerified
-    ? { clase: 'pill-idle', texto: 'Verificado', enLinea: false }
-    : { clase: 'pill-warn', texto: 'Sin verificar', enLinea: false };
+    ? { barras: 3, tono: 'neutro', texto: 'Verificado', enLinea: false }
+    : { barras: 1, tono: 'aviso', texto: 'Sin verificar', enLinea: false };
 };
 
 /** Tabla de administradores registrados. */
 @Component({
   selector: 'app-tabla-administradores',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, SenalComponent],
   templateUrl: './tabla-administradores.html',
   styleUrls: ['../users.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,7 +74,7 @@ export class TablaAdministradoresComponent {
   readonly correoPropio = input<string>('');
 
   /** Cuenta cuyo cambio se está guardando. */
-  readonly cambiandoId = input<number | null>(null);
+  readonly cambiandoId = input<string | null>(null);
 
   /** Se pide cambiar el rol de una cuenta. */
   readonly cambiarRol = output<CambioRol>();

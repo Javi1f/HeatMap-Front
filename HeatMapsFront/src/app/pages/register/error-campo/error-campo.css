@@ -1,5 +1,10 @@
-/* Misma apariencia que los errores de register.css: la encapsulación emulada
-   impide que aquella regla alcance el DOM de este componente. */
+/* Mismo aspecto que los errores de campo globales (`.form-group .error`): la
+   encapsulación emulada hace que esta regla gane a aquella, así que repite
+   sus valores. */
 :host { display: contents; }
 
-.error { font-size: 0.8rem; color: var(--color-secondary); }
+.error {
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  animation: aparecer var(--dur-2) var(--ease-out) backwards;
+}

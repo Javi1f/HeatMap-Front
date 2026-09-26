@@ -46,6 +46,22 @@ describe('Home', () => {
     expect(auth.logout).not.toHaveBeenCalled();
   });
 
+  it('la portada lleva directo a los mapas y dibuja el radar', () => {
+    const componente = crear();
+    const acciones = html().querySelectorAll<HTMLButtonElement>('.hero-acciones button');
+    expect(acciones).toHaveLength(1);
+    acciones[0].click();
+    expect(router.navigate).toHaveBeenCalledWith(['/public']);
+
+    // Cada eco queda dentro del radar y el barrido lo alcanza dentro de la vuelta.
+    expect(html().querySelectorAll('.eco')).toHaveLength(componente.ecos.length);
+    for (const eco of componente.ecos) {
+      expect(Math.hypot(eco.x - 50, eco.y - 50)).toBeLessThanOrEqual(50);
+      expect(eco.retraso).toBeGreaterThanOrEqual(0);
+      expect(eco.retraso).toBeLessThan(6);
+    }
+  });
+
   it('con sesión avisa durante 3 s y ofrece ir al dashboard', () => {
     vi.useFakeTimers();
     autenticado.set(true);

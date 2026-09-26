@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
@@ -36,7 +37,7 @@ describe('NavbarComponent', () => {
     rol = signal<'root' | 'admin'>('admin');
     auth = {
       isAuthenticated: computed(() => autenticado()),
-      currentAdmin: computed(() => (autenticado() ? { id: 1, username: 'ana', email: 'a@b.co', rol: rol() } : null)),
+      currentAdmin: computed(() => (autenticado() ? { id: 'a1', username: 'ana', email: 'a@b.co', rol: rol() } : null)),
       esRoot: computed(() => autenticado() && rol() === 'root'),
       logout: vi.fn(() => of({ message: 'ok' })),
     };
@@ -52,7 +53,7 @@ describe('NavbarComponent', () => {
   });
 
   it('sin sesión muestra sólo las secciones públicas y el botón de acceso', () => {
-    crear();
+    expect(crear().inicial()).toBe('');
     expect(etiquetas()).toEqual(['Inicio', 'Sección pública']);
     (html().querySelector('.login-btn') as HTMLButtonElement).click();
     expect(TestBed.inject(ModalService).showLogin()).toBe(true);
@@ -63,6 +64,7 @@ describe('NavbarComponent', () => {
     crear();
     expect(etiquetas()).toEqual(['Inicio', 'Sección pública', 'Dashboard', 'Reportes']);
     expect(html().textContent).toContain('ana');
+    expect(html().querySelector('.avatar')?.textContent?.trim()).toBe('a');
 
     rol.set('root');
     fixture.detectChanges();
@@ -118,7 +120,37 @@ describe('NavbarComponent', () => {
     fixture.detectChanges();
     expect(componente.isMobileOpen()).toBe(false);
 
+    // Escape también lo cierra; con el cajón cerrado no hace nada.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(componente.isMobileOpen()).toBe(false);
+    (html().querySelector('.abrir-menu') as HTMLButtonElement).click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(componente.isMobileOpen()).toBe(false);
+
     window.dispatchEvent(new Event('resize'));
     expect(sidebar.isCollapsed()).toBe(true);
+  });
+
+  it('marca la entrada de la página abierta, también en sus subrutas', () => {
+    autenticado.set(true);
+    const componente = crear();
+    const location = TestBed.inject(Location);
+    /** Entradas marcadas como página actual. */
+    const marcadas = () => [...html().querySelectorAll<HTMLElement>('.nav-item[aria-current="page"]')]
+      .map((enlace) => enlace.querySelector('.nav-label')?.textContent?.trim());
+
+    location.go('/');
+    fixture.detectChanges();
+    expect(marcadas()).toEqual(['Inicio']);
+
+    location.go('/admin/reportes/42?vista=tabla');
+    fixture.detectChanges();
+    expect(marcadas()).toEqual(['Reportes']);
+    expect(componente.esActiva({ label: 'Inicio', route: '/', icon: 'home' })).toBe(false);
+
+    location.go('/public');
+    fixture.detectChanges();
+    expect(marcadas()).toEqual(['Sección pública']);
+    location.go('/');
   });
 });

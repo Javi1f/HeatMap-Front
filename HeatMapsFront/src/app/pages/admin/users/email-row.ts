@@ -30,7 +30,7 @@ import { AllowedEmail } from '../../../core/models/admin.model';
  *     [tooltip]="getDeleteTooltip(email)"
  *     [deletingId]="deletingId()"
  *     [isCurrentUser]="email.email === currentAdminEmail()"
- *     [isFounder]="email.id === firstEmailId()"
+ *     [isFounder]="email.esFundador"
  *     (deleteRequested)="requestDelete($event)">
  * </tr>
  * ```
@@ -57,17 +57,17 @@ export class EmailRowComponent {
    * `null` cuando no hay operación de borrado en curso.
    * Controla la visibilidad del spinner en la celda de acciones.
    */
-  @Input() deletingId: number | null = null;
+  @Input() deletingId: string | null = null;
 
   /** `true` si el correo pertenece al administrador que está autenticado. */
   @Input() isCurrentUser = false;
 
-  /** `true` si el correo es el de menor ID en la lista (correo fundador). */
+  /** `true` si es el correo fundador. */
   @Input() isFounder = false;
 
   /**
    * Emite el `id` del correo cuando el usuario hace clic en el botón "Eliminar".
    * El componente padre gestiona el flujo de confirmación con modal.
    */
-  @Output() readonly deleteRequested = new EventEmitter<number>();
+  @Output() readonly deleteRequested = new EventEmitter<string>();
 }

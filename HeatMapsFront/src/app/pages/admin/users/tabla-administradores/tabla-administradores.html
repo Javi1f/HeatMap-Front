@@ -9,7 +9,7 @@
       <th class="col-state">Estado</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody class="escalonado">
       @for (fila of filas(); track fila.admin.id) {
         <tr>
           <td>
@@ -37,12 +37,12 @@
             </select>
           </td>
           <td class="cell-state">
-            <span class="pill" [class]="fila.estado.clase">
-              @if (fila.estado.enLinea) {
-                <span class="dot"></span>
-              }
-              {{ fila.estado.texto }}
-            </span>
+            <app-senal
+              [barras]="fila.estado.barras"
+              [tono]="fila.estado.tono"
+              [texto]="fila.estado.texto"
+              [vivo]="fila.estado.enLinea"
+            />
             @if (!fila.esPropia) {
               <button
                 class="btn-cuenta"

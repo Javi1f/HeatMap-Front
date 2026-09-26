@@ -1,5 +1,7 @@
 /* Estilos de la ocupación pública.
-   El lienzo trae los suyos: lo dibuja su propio componente. */
+   La portada, el selector, la cabecera de la tarjeta y los avisos traen sus
+   propias hojas; el lienzo lo dibuja su componente. Aquí solo queda la
+   composición de la página, la tarjeta del mapa y la leyenda. */
 
 .publico {
   /* Referencia para dimensionar el titular: lo que importa no es el ancho de
@@ -7,185 +9,41 @@
   container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
-  max-width: 1000px;
+  gap: var(--sp-6);
+  max-width: 1040px;
   margin: 0 auto;
   width: 100%;
-}
-
-/* ── Portada ─────────────────────────────────────────────────── */
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.5rem 0 0.25rem;
-}
-
-.hero-eyebrow {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-}
-
-/* Sin salto forzado ni ancho máximo.
-   El <br> fijo peleaba con `text-wrap: balance`, y el `max-width` en `ch`
-   partía la frase aunque cupiera entera: en escritorio ocupa unos 800px de los
-   1000 disponibles, así que cabe en una línea y el corte solo dejaba un hueco
-   a la derecha. Suelto, se lee de una y únicamente parte cuando la pantalla lo
-   obliga; ahí `balance` reparte las líneas en largos parecidos. */
-.hero-titulo {
-  margin: 0;
-  /* 7.2cqw: la frase ocupa unas 13,3 veces el tamaño de letra, así que por
-     debajo de 1/13,3 del contenedor (7,5%) entra en una línea. Con 7,2% queda
-     margen y el titular llena su hueco sin partirse ni dejar el vacío a la
-     derecha que dejaba el corte anterior. En pantallas estrechas manda el
-     mínimo y sí parte, que es lo que toca ahí. */
-  font-size: clamp(2.1rem, 7.2cqw, 4.25rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-  text-wrap: balance;
-}
-
-.vivo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
-  padding: 0.45rem 0.9rem;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-2);
-  border-radius: 24px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--color-text);
-  font-variant-numeric: tabular-nums;
-}
-
-/* El punto late para señalar que el dato llega solo, sin recargar. */
-.vivo-punto {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #3fb950;
-  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.18);
-  animation: latido 2.4s ease-in-out infinite;
-}
-@keyframes latido { 50% { opacity: 0.35; } }
-
-/* ── Selector de espacios ────────────────────────────────────── */
-
-.selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.pastilla {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.55rem 1rem;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-2);
-  border-radius: 24px;
-  color: var(--color-text-muted);
-  font-size: 0.92rem;
-  font-weight: 500;
-  font-family: Roboto, sans-serif;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-}
-.pastilla:hover { border-color: var(--color-primary); color: var(--color-text); }
-.pastilla:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-
-.pastilla-activa {
-  border-color: var(--color-primary);
-  background-color: rgba(232, 100, 12, 0.1);
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-/* Punto de nivel: el color dice cómo está el espacio sin gastar una etiqueta
-   en cada pastilla, que llenaría la fila de texto repetido. */
-.punto-nivel {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 /* ── Tarjeta principal ───────────────────────────────────────── */
 
 .tarjeta {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-  transition: background-color 0.25s ease;
+  gap: var(--sp-5);
   min-width: 0;
+  padding: var(--sp-6);
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2);
 }
-
-.lugar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.85rem;
-}
-.lugar-texto  { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
-.lugar-nombre { margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text); letter-spacing: -0.01em; }
-.lugar-desc   { margin: 0; font-size: 0.86rem; color: var(--color-text-muted); max-width: 58ch; line-height: 1.5; }
-
-.estado {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.42rem 0.85rem;
-  border-radius: 24px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.estado-punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-
-/* Niveles: del verde tranquilo al rojo de saturación, en la misma dirección
-   que la rampa del mapa, para que ambos se lean igual. */
-.nivel-baja  { color: #3fb950; }
-.nivel-media { color: #c99a1e; }
-.nivel-alta  { color: var(--color-danger); }
-.nivel-sin-datos { color: var(--color-text-muted); }
-
-.punto-nivel.nivel-baja       { background-color: #3fb950; }
-.punto-nivel.nivel-media      { background-color: #c99a1e; }
-.punto-nivel.nivel-alta       { background-color: var(--color-danger); }
-.punto-nivel.nivel-sin-datos { background-color: var(--border-2); }
-
-.estado.nivel-baja       { background-color: rgba(46, 160, 67, 0.13);  border: 1px solid #2ea043; }
-.estado.nivel-media      { background-color: rgba(201, 154, 30, 0.14); border: 1px solid #c99a1e; }
-.estado.nivel-alta       { background-color: rgba(208, 62, 32, 0.13);  border: 1px solid var(--color-danger); }
-.estado.nivel-sin-datos { background-color: var(--bg-surface-hover);  border: 1px solid var(--border-2); }
 
 /* ── Marco del mapa ──────────────────────────────────────────── */
 
-/* El plano se hunde ligeramente respecto a la tarjeta: separa el dibujo de los
-   controles sin necesidad de otra línea divisoria. */
+/* El plano se hunde respecto a la tarjeta, como una pantalla empotrada:
+   fondo más profundo, sombra interior y esquinas con la misma curva. */
 .lienzo-marco {
-  background-color: var(--bg-surface-deep);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.5rem;
+  position: relative;
   min-width: 0;
+  padding: var(--sp-2);
+  background: var(--bg-surface-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 2px 18px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
 }
 
 /* ── Leyenda ─────────────────────────────────────────────────── */
@@ -195,15 +53,15 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  font-size: 0.78rem;
+  gap: var(--sp-3) var(--sp-5);
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
 .leyenda {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--sp-3);
   flex: 1 1 16rem;
   min-width: 0;
 }
@@ -213,10 +71,10 @@
    escala distinta de la dibujada. */
 .leyenda-rampa {
   flex: 1 1 6rem;
-  max-width: 14rem;
+  max-width: 16rem;
   height: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-2);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 0 1px var(--border-2), 0 4px 14px -4px rgba(208, 62, 32, 0.45);
   background: linear-gradient(
     to right,
     rgba(56, 132, 196, 0.55) 0%,
@@ -227,7 +85,7 @@
   );
 }
 
-.leyenda-nodo { display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.leyenda-nodo { display: inline-flex; align-items: center; gap: var(--sp-2); white-space: nowrap; }
 .punto-nodo {
   width: 8px;
   height: 8px;
@@ -235,123 +93,117 @@
   background: var(--color-primary);
   border: 2px solid rgba(255, 255, 255, 0.85);
   box-sizing: content-box;
+  box-shadow: 0 0 10px var(--color-primary);
 }
 
-/* ── Avisos y estados ────────────────────────────────────────── */
-
-.aviso {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.4rem 0.6rem;
-  padding: 0.85rem 1rem;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-.aviso-error  { background-color: rgba(232, 100, 12, 0.1); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
-.aviso-neutro { background-color: var(--bg-surface-deep); border: 1px solid var(--border-2); color: var(--color-text-muted); }
-
-.reintentar {
-  margin-left: auto;
-  background: none;
-  border: 1px solid var(--color-secondary);
-  color: var(--color-secondary);
-  border-radius: 6px;
-  padding: 0.22rem 0.7rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-family: Roboto, sans-serif;
-}
-.reintentar:hover { background-color: rgba(232, 100, 12, 0.1); }
+/* ── Estados ─────────────────────────────────────────────────── */
 
 .cargando {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 4rem 1rem;
+  gap: var(--sp-4);
+  padding: var(--sp-12) var(--sp-4);
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-md);
 }
 
 .vacio {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  padding: 3rem 1.5rem;
+  gap: var(--sp-3);
+  padding: var(--sp-12) var(--sp-6);
   color: var(--color-text-muted);
-  font-size: 0.92rem;
+  font-size: var(--text-md);
   text-align: center;
 }
-.vacio .material-icons { font-size: 2.5rem; color: var(--border); }
-.vacio-nota { font-size: 0.82rem; max-width: 48ch; line-height: 1.55; }
+
+/* Un radar vacío: el icono en el centro y dos anillos sin ecos. */
+.vacio .material-icons {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: var(--sp-5);
+  border-radius: 50%;
+  font-size: 1.8rem;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--border-2);
+  box-shadow:
+    0 0 0 12px color-mix(in srgb, var(--border) 45%, transparent),
+    0 0 0 26px color-mix(in srgb, var(--border) 20%, transparent);
+}
+.vacio p { color: var(--color-text); font-weight: 600; }
+.vacio-nota { font-size: var(--text-sm); max-width: 48ch; line-height: 1.55; }
 
 /* ── Notas al pie ────────────────────────────────────────────── */
 
 /* Dos columnas cuando hay sitio, una cuando no.
    En una sola columna el texto dejaba casi la mitad del ancho vacío, y quitarle
-   el tope habría dado líneas de unos 125 caracteres, que no se leen. Repartido
-   en dos, se llena la fila y además cada línea se acorta. */
+   el tope habría dado líneas de unos 125 caracteres, que no se leen. */
 .notas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   align-items: start;
-  gap: 0.85rem 1.25rem;
+  gap: var(--sp-3) var(--sp-5);
 }
 
 .nota {
   margin: 0;
-  font-size: 0.83rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   line-height: 1.65;
-  padding: 0 0.25rem;
+  padding: 0 var(--sp-1);
 }
 .nota strong { color: var(--color-text); font-weight: 600; }
 
 .nota-privacidad {
   display: flex;
   align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.9rem 1rem;
-  background-color: var(--bg-surface);
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 .nota-privacidad .material-icons {
-  font-size: 1.05rem;
-  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
-  margin-top: 0.1rem;
+  border-radius: var(--radius-xs);
+  font-size: 1rem;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .publico  { gap: 1.35rem; }
-  .tarjeta  { padding: 1.15rem; gap: 1.1rem; }
-  .lugar-nombre { font-size: 1.2rem; }
+  .publico { gap: var(--sp-5); }
+  .tarjeta { padding: var(--sp-4); gap: var(--sp-4); border-radius: var(--radius-lg); }
 }
 
 @media (max-width: 480px) {
-  .publico       { gap: 1.15rem; }
-  .tarjeta       { padding: 0.9rem; border-radius: 14px; }
+  .publico { gap: var(--sp-4); }
+  .tarjeta { padding: var(--sp-3); border-radius: var(--radius-md); }
 
   /* El mapa se sale del relleno de la tarjeta y ocupa todo el ancho: en una
      pantalla de 375px cada milímetro de plano cuenta, y los bordes laterales
      del marco no aportan nada cuando ya lo enmarca la propia tarjeta. */
   .lienzo-marco {
-    margin-left: -0.9rem;
-    margin-right: -0.9rem;
+    margin-left: calc(var(--sp-3) * -1);
+    margin-right: calc(var(--sp-3) * -1);
     padding: 0.35rem 0.2rem;
     border-radius: 0;
     border-left: none;
     border-right: none;
   }
-  .selector      { flex-direction: column; }
-  .pastilla      { justify-content: space-between; }
+
   /* En columna, el `flex: 1 1 16rem` de la leyenda deja de referirse al ancho y
      pasa a fijar el ALTO: el pie crecía hasta 288px y la rampa de color se
      encogía a 2px, con lo que la escala quedaba invisible. Se repone la base
@@ -359,14 +211,10 @@
   .pie-mapa {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.6rem;
+    gap: var(--sp-2);
   }
 
-  .leyenda        { flex: 0 0 auto; width: 100%; }
-  .leyenda-rampa  { max-width: none; }
-  .leyenda-nodo   { align-self: flex-start; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .vivo-punto { animation: none; }
+  .leyenda       { flex: 0 0 auto; width: 100%; }
+  .leyenda-rampa { max-width: none; }
+  .leyenda-nodo  { align-self: flex-start; }
 }

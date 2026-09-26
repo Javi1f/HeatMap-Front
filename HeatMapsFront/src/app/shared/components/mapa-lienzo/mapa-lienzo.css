@@ -24,13 +24,14 @@
   display: block;
   width: 100%;
 
-  --plano-fondo:    #F0F2F5;
-  --plano-borde:    #C3CAD4;
-  --plano-reticula: rgba(60, 68, 81, 0.08);
-  --plano-texto:    #3C4451;
-  --plano-cota:     #7A828F;
+  /* Papel cálido del tema claro, a juego con el fondo «día». */
+  --plano-fondo:    #FBF9F6;
+  --plano-borde:    #D9CFC3;
+  --plano-reticula: rgba(90, 60, 30, 0.08);
+  --plano-texto:    #3A332D;
+  --plano-cota:     #857A6F;
   --nodo-activo:    var(--color-primary);
-  --nodo-inactivo:  #98A1AE;
+  --nodo-inactivo:  #A89E93;
 }
 
 /* `:host-context` y no `body[data-theme="dark"] .lienzo`: con encapsulación
@@ -38,10 +39,11 @@
    incluido `body`, que nunca lo lleva. Escrito de la forma directa la regla no
    llega a coincidir y el plano se dibujaba siempre con la paleta clara. */
 :host-context(body[data-theme="dark"]) .lienzo {
-  --plano-fondo:    #141920;
-  --plano-borde:    #333C49;
-  --plano-reticula: rgba(255, 255, 255, 0.05);
-  --plano-texto:    #C8CFD9;
-  --plano-cota:     #7F8894;
-  --nodo-inactivo:  #6B7481;
+  /* Pantalla de radar del tema «noche»: azul muy oscuro y retícula fría. */
+  --plano-fondo:    #0A0E17;
+  --plano-borde:    #2A3346;
+  --plano-reticula: rgba(150, 170, 230, 0.07);
+  --plano-texto:    #C9D1E4;
+  --plano-cota:     #7E88A0;
+  --nodo-inactivo:  #5E6880;
 }

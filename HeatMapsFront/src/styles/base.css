@@ -1,0 +1,155 @@
+/* ══════════════════════════════════════════════════════════════════
+   Base: reinicio, atmósfera, tipografía y utilidades.
+   ══════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: var(--bg-body);
+  color: var(--color-text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--dur-3) ease, color var(--dur-2) ease;
+  /* Los focos del fondo se salen de la ventana al derivar; sin esto
+     aparecería una barra horizontal en algunos navegadores. */
+  overflow-x: clip;
+}
+
+/* ── Atmósfera ─────────────────────────────────────────────────────
+   Detrás del radar de fondo (`app-fondo-radar`): un único resplandor del
+   color primario junto al centro del radar, que respira despacio, una malla
+   de puntos en la parte alta y un grano fino. Nada recibe eventos. */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: -18vmax;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(60vmax 60vmax at 96% 96%, var(--atmosfera-1), transparent 70%);
+  animation: deriva 40s var(--ease-in-out) infinite alternate;
+  will-change: transform;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(var(--malla) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 25%, transparent 80%);
+}
+
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grano-opacidad, 0.05);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* ── Tipografía ────────────────────────────────────────────────── */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--dur-1) ease;
+}
+a:hover { color: var(--color-primary-hover); }
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-2) transparent;
+}
+
+/* ── Utilidades ────────────────────────────────────────────────── */
+
+/* Palabra destacada de un titular: el color primario, sólido. */
+.texto-calor { color: var(--color-primary); }
+
+/* Cifras: tipografía de titular y dígitos de ancho fijo para que no bailen
+   al refrescarse. */
+.cifra {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Enlace para saltar al contenido: fuera de la vista hasta que recibe el foco. */
+.saltar {
+  position: fixed;
+  top: var(--sp-3);
+  left: 50%;
+  z-index: calc(var(--z-modal) + 1);
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-weight: 700;
+  transform: translate(-50%, -200%);
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.saltar:focus-visible { transform: translate(-50%, 0); outline-color: var(--color-text); }
+
+/* El contenido recibe el foco del enlace de salto; sin marco, porque no es un
+   control. */
+#contenido:focus { outline: none; }
+
+/* Solo para lectores de pantalla. */
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
