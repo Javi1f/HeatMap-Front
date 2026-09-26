@@ -16,8 +16,8 @@ import { ApiResponse } from './metrics.service';
 
 /** Administrador registrado. */
 export interface AdminSummary {
-  /** Identificador numérico de la cuenta. */
-  id: number;
+  /** Identificador de la cuenta (UUID). */
+  id: string;
 
   /** Nombre de usuario, ya descifrado por el backend. */
   username: string;
@@ -50,7 +50,7 @@ export interface EventoAuditoria {
   fecha: string;
 
   /** Administrador que actuó, o `null` si no llegó a identificarse. */
-  idAdmin: number | null;
+  idAdmin: string | null;
 
   /** Tipo de acción. */
   tipo: string;
@@ -68,7 +68,7 @@ export interface SessionSummary {
   idSesion: string;
 
   /** Cuenta titular de la sesión. */
-  idAdmin: number;
+  idAdmin: string;
 
   /** Username del titular, o `null` si la cuenta ya no existe. */
   username: string | null;
@@ -117,12 +117,12 @@ export class UsersService {
   }
 
   /** Cambia el rol de un administrador. */
-  cambiarRol(idAdmin: number, rol: 'root' | 'admin'): Observable<{ success: boolean; message: string }> {
+  cambiarRol(idAdmin: string, rol: 'root' | 'admin'): Observable<{ success: boolean; message: string }> {
     return this.http.patch<{ success: boolean; message: string }>(`${API_URL}/users/admins/${idAdmin}/rol`, { rol });
   }
 
   /** Activa o desactiva una cuenta; desactivarla cierra todas sus sesiones. */
-  cambiarActivo(idAdmin: number, activo: boolean): Observable<{ success: boolean; message: string }> {
+  cambiarActivo(idAdmin: string, activo: boolean): Observable<{ success: boolean; message: string }> {
     return this.http.patch<{ success: boolean; message: string }>(`${API_URL}/users/admins/${idAdmin}/activo`, { activo });
   }
 

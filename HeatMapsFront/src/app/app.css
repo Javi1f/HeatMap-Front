@@ -1,41 +1,44 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
+/* El contenido tiene nombre propio en la transición de páginas: así solo se
+   anima él, y la barra lateral se queda quieta (ver `styles/movimiento.css`). */
 .main-content {
-  margin-left: 240px;
-  padding: 2rem;
+  view-transition-name: contenido;
+  margin-left: 248px;
+  padding: var(--sp-8) clamp(var(--sp-6), 3vw, var(--sp-12));
   flex: 1;
   min-width: 0;
-  transition: margin-left 0.3s ease;
+  transition: margin-left var(--dur-3) var(--ease-out);
 }
 
 .main-content.collapsed {
-  margin-left: 64px;
+  margin-left: 76px;
 }
 
 /* En teléfono la barra lateral pasa a ser un cajón superpuesto, así que el
    contenido no le reserva sitio: los 64px del carril costaban un 17% del ancho
    de la pantalla y dejaban el mapa en poco más de 240px. El relleno superior
-   despeja el botón flotante que abre el cajón. */
+   despeja la barra flotante que abre el cajón. */
 @media (max-width: 768px) {
   .main-content,
   .main-content.collapsed {
     margin-left: 0;
-    padding: 1rem;
-    padding-top: 3.75rem;
+    padding: var(--sp-4);
+    padding-top: 4.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .main-content,
   .main-content.collapsed {
-    padding: 0.75rem;
+    padding: var(--sp-3);
     /* El atajo de arriba reinicia el relleno superior heredado de la consulta
        de 768px, así que hay que repetirlo: sin esto el contenido se desliza
-       bajo el botón flotante del menú en cualquier teléfono, que siempre
-       entra por esta consulta. */
-    padding-top: 3.75rem;
+       bajo la barra flotante del menú en cualquier teléfono. */
+    padding-top: 4.5rem;
   }
 }

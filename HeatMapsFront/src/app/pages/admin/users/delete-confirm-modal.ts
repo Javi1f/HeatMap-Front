@@ -10,7 +10,7 @@
  * @see {@link Dashboard} — componente padre que gestiona el flujo de confirmación.
  */
 
-import { Component, Input, output } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, Input, output } from '@angular/core';
 import { AllowedEmail } from '../../../core/models/admin.model';
 
 /**
@@ -45,4 +45,16 @@ export class DeleteConfirmModalComponent {
 
   /** Emite cuando el usuario cancela o cierra el modal sin eliminar. */
   readonly deleteCancelled = output();
+
+  /** Elemento del modal, para mover el foco dentro de él. */
+  private readonly anfitrion = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /**
+   * Escape cancela, como pulsar fuera. Sólo mientras está a la vista: el padre
+   * lo oculta con `[hidden]` en lugar de retirarlo del DOM.
+   */
+  @HostListener('document:keydown.escape')
+  alPulsarEscape(): void {
+    if (!this.anfitrion.nativeElement.hidden) this.deleteCancelled.emit();
+  }
 }

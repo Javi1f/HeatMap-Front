@@ -4,6 +4,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { CifraDirective } from '../../../shared/animacion/cifra.directive';
+import { OndasComponent } from '../../../shared/animacion/ondas';
 
 /** Cifra a mostrar y de dónde sale. */
 interface Contador {
@@ -18,7 +20,7 @@ const textoVentana = (minutos: number | null): string => (minutos ? `en los últ
 @Component({
   selector: 'app-cabecera-vivo',
   standalone: true,
-  imports: [],
+  imports: [CifraDirective, OndasComponent],
   templateUrl: './cabecera-vivo.html',
   styleUrl: './cabecera-vivo.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

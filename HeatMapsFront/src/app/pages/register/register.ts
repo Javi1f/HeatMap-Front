@@ -40,9 +40,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { VerificationService } from '../../core/services/verification.service';
 import { VerifyCodeErrorResponse } from '../../core/models/admin.model';
-
+
+
 import { noop } from 'rxjs';
 import { ErrorCampoComponent } from './error-campo/error-campo';
+import { OndasComponent } from '../../shared/animacion/ondas';
 
 /**
  * Mensaje por error de validación de cada campo, en orden de prioridad: se
@@ -64,7 +66,7 @@ const MENSAJES_ERROR = {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, ErrorCampoComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, ErrorCampoComponent, OndasComponent],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })

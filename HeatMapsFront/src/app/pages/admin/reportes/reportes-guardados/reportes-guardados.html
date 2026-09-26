@@ -1,4 +1,4 @@
-<section class="section-card">
+<section class="section-card foco">
   <div class="section-header">
     <div class="section-title-group">
       <span class="material-icons section-icon">folder</span>
@@ -27,7 +27,7 @@
             <th class="col-acciones">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="escalonado">
           @for (reporte of guardados(); track reporte.idReporte) {
             <tr>
               <td>

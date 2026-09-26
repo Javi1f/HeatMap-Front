@@ -1,0 +1,189 @@
+/* ══════════════════════════════════════════════════════════════════
+   Tokens del sistema visual «Radar térmico».
+
+   Todo valor de color, tipo, espacio, radio, sombra o movimiento sale de
+   aquí. Los componentes no escriben hexadecimales: si un color no existe
+   como token, se añade aquí con su versión clara y oscura.
+
+   Los nombres antiguos (--color-primary, --bg-surface…) se conservan: los
+   usan todos los componentes y el lienzo del mapa, y cambiarles el nombre
+   solo movería el riesgo sin aportar nada.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía ────────────────────────────────────────────── */
+  /* Space Grotesk para titulares y cifras: geométrica, con carácter técnico.
+     Inter para leer. JetBrains Mono para datos que se comparan en columna. */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Nada baja de 12 px: por debajo, las etiquetas de estado y los rótulos en
+     mayúsculas dejan de leerse en un teléfono. */
+  --text-2xs: 0.75rem;
+  --text-xs:  0.8125rem;
+  --text-sm:  0.875rem;
+  --text-md:  0.9375rem;
+  --text-lg:  1.125rem;
+  --text-xl:  1.375rem;
+  --text-2xl: clamp(1.45rem, 1.2rem + 1vw, 1.9rem);
+  --text-3xl: clamp(2.1rem, 1.4rem + 3vw, 3.4rem);
+
+  /* ── Espaciado (base 4 px) ─────────────────────────────────── */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+
+  /* ── Radios ────────────────────────────────────────────────── */
+  --radius-xs:   6px;
+  --radius-sm:   10px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-pill: 999px;
+  /* Teclas y campos: esquinas casi rectas, de equipo técnico. */
+  --radius-tecla: 5px;
+
+  /* Altura del canto de una tecla: lo que baja al pulsarla. */
+  --canto: 4px;
+
+  /* ── Calor ────────────────────────────────────────────────────── */
+  /* Tonos sueltos para los adornos (radar, ecos, nodos). El sistema no
+     mezcla varios tonos en un degradado: cada pieza usa uno solo. El mapa
+     de calor conserva su propia rampa (azul → rojo), que es un dato. */
+  --heat-1: #FFC24B;
+  --heat-2: #FF7A1A;
+  --heat-3: #FF3D5E;
+
+  /* ── Movimiento ────────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 140ms;
+  --dur-2: 260ms;
+  --dur-3: 520ms;
+  --dur-4: 900ms;
+  /* Separación entre elementos que entran en cascada. */
+  --escalon: 55ms;
+
+  /* ── Capas ─────────────────────────────────────────────────── */
+  --z-nav:     100;
+  --z-menu:    120;
+  --z-overlay: 140;
+  --z-drawer:  150;
+  --z-modal:   200;
+
+  /* ── Tamaños mínimos de toque ──────────────────────────────── */
+  --toque: 44px;
+}
+
+/* ── Noche (tema oscuro, por defecto) ──────────────────────────── */
+
+body[data-theme="dark"] {
+  --color-primary:         #FF7A1A;
+  --color-primary-hover:   #FF9142;
+  --color-secondary:       #FF8F57;
+  --color-danger:          #FF4D6A;
+  --color-ok:              #3DDC97;
+  --color-warn:            #FFB547;
+
+  /* Canto de las teclas: el mismo tono, mucho más oscuro. */
+  --color-primary-canto:   #9C4209;
+  --color-danger-canto:    #98233A;
+  --color-text-on-danger:  #1A0C02;
+
+  --color-primary-soft:    rgba(255, 122, 26, 0.12);
+  --color-danger-soft:     rgba(255, 77, 106, 0.12);
+  --color-ok-soft:         rgba(61, 220, 151, 0.12);
+  --color-warn-soft:       rgba(255, 181, 71, 0.13);
+
+  --color-text:            #EEF1F8;
+  --color-text-muted:      #8E97AD;
+  --color-text-on-primary: #1A0C02;
+
+  --bg-body:               #06080E;
+  /* Superficies translúcidas: dejan pasar la atmósfera del fondo y se leen
+     como vidrio. Las que necesitan ser opacas usan --bg-surface-solid. */
+  --bg-surface:            rgba(17, 21, 33, 0.72);
+  --bg-surface-solid:      #0F131E;
+  --bg-surface-deep:       rgba(6, 9, 16, 0.62);
+  --bg-surface-hover:      rgba(255, 255, 255, 0.05);
+  --bg-input:              rgba(4, 6, 12, 0.66);
+
+  --border:                rgba(148, 163, 214, 0.12);
+  --border-2:              rgba(148, 163, 214, 0.22);
+
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 28px 70px -24px rgba(0, 0, 0, 0.85);
+  --glow-primary: 0 0 0 1px rgba(255, 122, 26, 0.35), 0 10px 34px -10px rgba(255, 122, 26, 0.55);
+  --vidrio: blur(16px) saturate(150%);
+
+  /* Atmósfera del fondo: el resplandor junto al radar y la malla. */
+  --atmosfera-1: rgba(255, 122, 26, 0.13);
+  --malla:       rgba(150, 170, 230, 0.075);
+  --grano-opacidad: 0.06;
+
+  /* Compatibilidad con componentes antiguos. */
+  --color-light:  #EEF1F8;
+  --color-accent: #8E97AD;
+  --color-dark:   #06080E;
+
+  color-scheme: dark;
+}
+
+/* ── Día (tema claro) ──────────────────────────────────────────── */
+
+body[data-theme="light"] {
+  /* Los tonos de acción bajan de luz para pasar 4,5:1 sobre blanco: el naranja
+     de marca a plena intensidad se queda en 3,3:1 y no vale para texto. */
+  --color-primary:         #C2500A;
+  --color-primary-hover:   #A64406;
+  --color-secondary:       #B8430F;
+  --color-danger:          #C8233F;
+  --color-ok:              #11804F;
+  --color-warn:            #A36100;
+
+  --color-primary-canto:   #6E2D05;
+  --color-danger-canto:    #75142A;
+  --color-text-on-danger:  #FFFFFF;
+
+  --color-primary-soft:    rgba(194, 80, 10, 0.1);
+  --color-danger-soft:     rgba(200, 35, 63, 0.09);
+  --color-ok-soft:         rgba(17, 128, 79, 0.1);
+  --color-warn-soft:       rgba(163, 97, 0, 0.1);
+
+  --color-text:            #1A1614;
+  --color-text-muted:      #675F57;
+  --color-text-on-primary: #FFFFFF;
+
+  --bg-body:               #F4F1EC;
+  --bg-surface:            rgba(255, 255, 255, 0.74);
+  --bg-surface-solid:      #FFFFFF;
+  --bg-surface-deep:       rgba(244, 240, 233, 0.86);
+  --bg-surface-hover:      rgba(40, 24, 8, 0.045);
+  --bg-input:              rgba(255, 255, 255, 0.92);
+
+  --border:                rgba(70, 45, 20, 0.12);
+  --border-2:              rgba(70, 45, 20, 0.2);
+
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 12px 30px -18px rgba(60, 35, 10, 0.35);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 28px 60px -28px rgba(60, 35, 10, 0.45);
+  --glow-primary: 0 0 0 1px rgba(194, 80, 10, 0.3), 0 10px 30px -12px rgba(194, 80, 10, 0.45);
+  --vidrio: blur(16px) saturate(160%);
+
+  --atmosfera-1: rgba(255, 138, 40, 0.16);
+  --malla:       rgba(90, 60, 30, 0.08);
+  --grano-opacidad: 0.05;
+
+  --color-light:  #1A1614;
+  --color-accent: #675F57;
+  --color-dark:   #F4F1EC;
+
+  color-scheme: light;
+}

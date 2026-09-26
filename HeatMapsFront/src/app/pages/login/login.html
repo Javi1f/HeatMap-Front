@@ -1,6 +1,11 @@
 <div class="login-container">
-  <div class="login-card">
-    <h2>Iniciar sesión</h2>
+  <div class="login-card anillo">
+    <div class="acceso-cabeza">
+      <span class="acceso-emblema" aria-hidden="true">
+        <app-ondas tam="14px" />
+      </span>
+      <h2>Iniciar sesión</h2>
+    </div>
 
     @if (loginError()) {
       <div class="alert alert-error">{{ loginError() }}</div>

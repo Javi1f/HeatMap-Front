@@ -20,8 +20,41 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ModalService } from '../../core/services/modal.service';
 import { AuthService } from '../../core/services/auth.service';
-
+import { OndasComponent } from '../../shared/animacion/ondas';
+
+
 import { noop } from 'rxjs';
+
+/** Segundos que tarda el barrido del radar de la portada en dar una vuelta. */
+const PERIODO_BARRIDO_S = 6;
+
+/** Eco del radar de la portada: dónde está y cuándo lo alcanza el barrido. */
+interface Eco {
+  /** Posición horizontal, en % del radar. */
+  x: number;
+  /** Posición vertical, en % del radar. */
+  y: number;
+  /** Diámetro de la mancha, en % del radar. */
+  tam: string;
+  /** Segundos hasta que el barrido pasa por encima. */
+  retraso: number;
+}
+
+/**
+ * Sitúa un eco por ángulo (grados desde arriba, en sentido horario) y
+ * distancia al centro (en % del radio), y calcula cuándo lo alcanza el
+ * barrido, que arranca arriba y gira en el mismo sentido.
+ */
+const eco = (angulo: number, distancia: number, tam: number): Eco => {
+  const rad = (angulo * Math.PI) / 180;
+  const radio = distancia / 2;
+  return {
+    x: Math.round((50 + radio * Math.sin(rad)) * 10) / 10,
+    y: Math.round((50 - radio * Math.cos(rad)) * 10) / 10,
+    tam: `${tam}%`,
+    retraso: Math.round((angulo / 360) * PERIODO_BARRIDO_S * 100) / 100,
+  };
+};
 /**
  * Componente de la página de inicio.
  * No requiere autenticación; es la primera pantalla que ve cualquier visitante.
@@ -29,7 +62,7 @@ import { noop } from 'rxjs';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, OndasComponent],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -45,6 +78,20 @@ export class Home implements OnDestroy {
    * "ya estás autenticado" al pulsar "Iniciar sesión" con sesión activa.
    */
   alreadyLoggedMsg = signal<boolean>(false);
+
+  /**
+   * Ecos del radar decorativo de la portada. Una aglomeración grande, un par
+   * de grupos y algunos dispositivos sueltos: la misma lectura que da el mapa.
+   */
+  readonly ecos: readonly Eco[] = [
+    eco(38, 52, 34),
+    eco(52, 40, 18),
+    eco(118, 70, 20),
+    eco(200, 58, 26),
+    eco(214, 74, 14),
+    eco(282, 34, 16),
+    eco(330, 76, 12),
+  ];
 
   /**
    * Referencia al timeout activo para el mensaje transitorio.

@@ -1,0 +1,88 @@
+/* Indicadores de señal y medidor. Colores sólidos, sin degradados: cada
+   estado es un único tono del sistema. */
+
+:host {
+  --tono: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+:host(.tono-ok)      { --tono: var(--color-ok); }
+:host(.tono-aviso)   { --tono: var(--color-warn); }
+:host(.tono-peligro) { --tono: var(--color-danger); }
+
+.texto { color: var(--tono); }
+:host(.tono-neutro) .texto { color: var(--color-text-muted); }
+
+/* ── Señal ─────────────────────────────────────────────────────── */
+
+.barras {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.barras > i {
+  width: 4px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--color-text-muted) 28%, transparent);
+  transition: background-color var(--dur-2) ease;
+}
+.barras > i:nth-child(1) { height: 25%; }
+.barras > i:nth-child(2) { height: 50%; }
+.barras > i:nth-child(3) { height: 75%; }
+.barras > i:nth-child(4) { height: 100%; }
+
+.barras > i.encendida { background: var(--tono); }
+
+/* Recibiendo: un pulso recorre las barras encendidas de izquierda a derecha. */
+:host(.vivo) .barras > i.encendida { animation: recibir 2.4s var(--ease-in-out) infinite; }
+:host(.vivo) .barras > i:nth-child(2) { animation-delay: 0.12s; }
+:host(.vivo) .barras > i:nth-child(3) { animation-delay: 0.24s; }
+:host(.vivo) .barras > i:nth-child(4) { animation-delay: 0.36s; }
+
+@keyframes recibir {
+  0%, 60%, 100% { filter: none; }
+  20%           { filter: brightness(1.6); }
+}
+
+/* ── Medidor ───────────────────────────────────────────────────── */
+
+.segmentos {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.segmentos > i {
+  width: 7px;
+  height: 12px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--color-text-muted) 22%, transparent);
+}
+
+/* Cada segmento encendido entra con un retraso que fija la plantilla, así el
+   medidor se llena de izquierda a derecha al aparecer. */
+.segmentos > i.encendido {
+  background: var(--tono);
+  animation: encender var(--dur-2) var(--ease-out) backwards;
+}
+
+@keyframes encender {
+  from { background: color-mix(in srgb, var(--color-text-muted) 22%, transparent); transform: scaleY(0.4); }
+}
+
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

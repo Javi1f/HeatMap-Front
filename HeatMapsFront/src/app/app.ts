@@ -15,7 +15,7 @@
  *    del servicio.
  */
 
-import { Component, computed, OnInit } from '@angular/core';
+import { Component, computed, DOCUMENT, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { noop } from 'rxjs';
 import { NavbarComponent } from './shared/components/navbar/navbar';
@@ -24,6 +24,8 @@ import { SidebarService } from './core/services/sidebar.service';
 import { ModalService } from './core/services/modal.service';
 import { LoginModalComponent } from './shared/components/login-modal/login-modal';
 import { ThemeService } from './core/services/theme.service';
+import { activarFoco } from './shared/animacion/foco';
+import { FondoRadarComponent } from './shared/fondo/fondo-radar';
 
 /**
  * Shell de la aplicación. Renderiza el layout global y orquesta la inicialización
@@ -32,11 +34,11 @@ import { ThemeService } from './core/services/theme.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, LoginModalComponent],
+  imports: [RouterOutlet, NavbarComponent, LoginModalComponent, FondoRadarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   /**
    * `true` cuando el sidebar está en modo colapsado (ancho mínimo).
    * Usado en la plantilla para aplicar la clase `.collapsed` al contenido principal,
@@ -49,6 +51,12 @@ export class AppComponent implements OnInit {
    * Controla la renderización condicional de `<app-login-modal>` en la plantilla.
    */
   showLogin = computed(() => this.modalService.showLogin());
+
+  /** Documento de la aplicación, donde se escucha el cursor. */
+  private readonly documento = inject(DOCUMENT);
+
+  /** Deja de seguir el cursor sobre las tarjetas; se asigna al iniciar. */
+  private detenerFoco?: () => void;
 
   constructor(
     private authService:    AuthService,
@@ -66,9 +74,23 @@ export class AppComponent implements OnInit {
    */
   ngOnInit(): void {
     this.themeService.init();
+    this.detenerFoco = activarFoco(this.documento);
 
     if (this.authService.getToken()) {
       this.authService.checkSession().subscribe({ error: noop });
     }
+  }
+
+  /**
+   * Lleva el foco al contenido principal. El enlace no navega por su `href`:
+   * con `<base href="/">` un ancla relativa recargaría la página de inicio.
+   */
+  saltarAlContenido(): void {
+    this.documento.getElementById('contenido')?.focus();
+  }
+
+  /** Retira el oyente del cursor. */
+  ngOnDestroy(): void {
+    this.detenerFoco?.();
   }
 }

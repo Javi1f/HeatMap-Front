@@ -10,7 +10,7 @@
         [class.input-error]="controles['email'].invalid && controles['email'].touched"
       />
     </div>
-    <button type="submit" class="btn-add" [disabled]="isAdding">
+    <button type="submit" class="btn-primary btn-add" [disabled]="isAdding">
       @if (isAdding) {
         <div class="spinner spinner-sm"></div>
       } @else {

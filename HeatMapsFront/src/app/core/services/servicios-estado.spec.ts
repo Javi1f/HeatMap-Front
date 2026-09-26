@@ -62,6 +62,18 @@ describe('ModalService', () => {
 describe('ThemeService', () => {
   beforeEach(() => localStorage.clear());
 
+  it('ajusta el color de la barra del navegador al tema', () => {
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    document.head.appendChild(meta);
+    const servicio = TestBed.inject(ThemeService);
+    servicio.init();
+    expect(meta.content).toBe('#06080E');
+    servicio.toggle();
+    expect(meta.content).toBe('#F4F1EC');
+    meta.remove();
+  });
+
   it('arranca en oscuro, lo aplica al body y alterna recordando la elección', () => {
     const servicio = TestBed.inject(ThemeService);
     servicio.init();
@@ -129,7 +141,7 @@ describe('LoginStateService', () => {
   });
 
   it('con credenciales correctas avisa y va al dashboard', () => {
-    const login = vi.fn(() => of({ admin: { id: 1, username: 'a', email: 'a@b.co' }, token: 't' }));
+    const login = vi.fn(() => of({ admin: { id: 'a1', username: 'a', email: 'a@b.co' }, token: 't' }));
     const { s, router } = crear(login);
     const alTerminar = vi.fn();
     s.loginForm.setValue({ identifier: 'ana', password: 'x' });

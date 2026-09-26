@@ -8,6 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { SensorHealth } from '../../../core/services/metrics.service';
+import { SenalComponent } from '../../../shared/indicadores/indicadores';
 
 /** Una fila, con todo el texto ya resuelto. */
 interface FilaNodo {
@@ -16,7 +17,6 @@ interface FilaNodo {
   readonly zona: string;
   readonly ultimaLectura: string;
   readonly estado: string;
-  readonly clasePildora: string;
   readonly enLinea: boolean;
 }
 
@@ -36,7 +36,7 @@ const textoUltimaLectura = (minutos: number | null): string => {
 @Component({
   selector: 'app-tabla-nodos',
   standalone: true,
-  imports: [],
+  imports: [SenalComponent],
   templateUrl: './tabla-nodos.html',
   styleUrls: ['../tablas-comunes.css', './tabla-nodos.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,7 +59,6 @@ export class TablaNodosComponent {
       zona: nodo.zona ?? '—',
       ultimaLectura: textoUltimaLectura(nodo.minutosDesdeUltimaLectura),
       estado: nodo.enLinea ? 'En línea' : 'Sin señal',
-      clasePildora: nodo.enLinea ? 'pill-ok' : 'pill-warn',
       enLinea: nodo.enLinea,
     })),
   );

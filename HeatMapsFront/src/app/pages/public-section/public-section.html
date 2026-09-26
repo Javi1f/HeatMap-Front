@@ -1,4 +1,4 @@
-<div class="publico">
+<div class="publico escalonado">
 
   <app-cabecera-vivo
     [valor]="conteoVisible()"
@@ -8,7 +8,7 @@
 
   @if (cargando()) {
     <div class="cargando">
-      <div class="spinner"></div>
+      <div class="spinner spinner-lg"></div>
       <p>Cargando ocupación...</p>
     </div>
   } @else if (zonas().length === 0) {
@@ -23,13 +23,17 @@
     </div>
   } @else {
 
-    <app-selector-zonas
-      [zonas]="zonas()"
-      [seleccionada]="zonaSeleccionada()"
-      (seleccionar)="alCambiarZona($event)"
-    />
+    <!-- Con un solo espacio no hay nada que elegir: la pastilla repetiría el
+         nombre que ya encabeza la tarjeta. -->
+    @if (zonas().length > 1) {
+      <app-selector-zonas
+        [zonas]="zonas()"
+        [seleccionada]="zonaSeleccionada()"
+        (seleccionar)="alCambiarZona($event)"
+      />
+    }
 
-    <section class="tarjeta">
+    <section class="tarjeta foco">
 
       @if (zonaActual(); as zona) {
         <app-cabecera-lugar [zona]="zona" [situados]="mapa()?.situados ?? 0" />

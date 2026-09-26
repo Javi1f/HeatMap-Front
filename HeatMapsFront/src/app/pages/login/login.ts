@@ -24,6 +24,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoginStateService } from '../../core/services/login-state.service';
+import { OndasComponent } from '../../shared/animacion/ondas';
 
 /**
  * Componente de la ruta `/login`.
@@ -32,7 +33,7 @@ import { LoginStateService } from '../../core/services/login-state.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, OndasComponent],
   templateUrl: './login.html',
   styleUrl: './login.css',
   /** Instancia propia del servicio, aislada de otros formularios de login. */

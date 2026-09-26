@@ -99,13 +99,13 @@ export class Users implements OnInit {
    * Se usa para mostrar el spinner en la fila correspondiente durante la petición.
    * `null` cuando no hay eliminación en curso.
    */
-  deletingId = signal<number | null>(null);
+  deletingId = signal<string | null>(null);
 
   /**
    * ID del correo pendiente de confirmación en el modal de borrado.
    * `null` cuando el modal de confirmación no está visible.
    */
-  confirmDeleteId = signal<number | null>(null);
+  confirmDeleteId = signal<string | null>(null);
 
   /** Formulario reactivo para el campo de email del formulario de añadir. */
   addForm: FormGroup = this.fb.group({
@@ -122,17 +122,6 @@ export class Users implements OnInit {
    * Cadena vacía si no hay sesión activa.
    */
   currentAdminEmail = computed(() => this.authService.currentAdmin()?.email ?? '');
-
-  /**
-   * ID numérico más pequeño de la lista (el "correo fundador").
-   * Se protege de eliminación independientemente de quién lo añadió.
-   * `null` si la lista está vacía.
-   */
-  firstEmailId = computed(() => {
-    const list = this.emails();
-    if (!list.length) return null;
-    return list.reduce((minId, correo) => (correo.id < minId ? correo.id : minId), list[0].id);
-  });
 
   /**
    * Entidad `AllowedEmail` que está esperando confirmación para ser eliminada.
@@ -166,7 +155,7 @@ export class Users implements OnInit {
   revokingSessionId = signal<string | null>(null);
 
   /** Id de la cuenta cuyo rol o activación se está cambiando. */
-  cambiandoCuentaId = signal<number | null>(null);
+  cambiandoCuentaId = signal<string | null>(null);
 
   /** Últimos eventos de auditoría. */
   auditoria = signal<EventoAuditoria[]>([]);
@@ -203,7 +192,7 @@ export class Users implements OnInit {
   }
 
   /** Ejecuta un cambio sobre una cuenta y recarga la pantalla. */
-  private aplicarCambioCuenta(idAdmin: number, peticion: Observable<unknown>): void {
+  private aplicarCambioCuenta(idAdmin: string, peticion: Observable<unknown>): void {
     this.cambiandoCuentaId.set(idAdmin);
     this.accountsError.set('');
     peticion.subscribe({
@@ -350,7 +339,7 @@ export class Users implements OnInit {
   canDelete(email: AllowedEmail): boolean {
     return (
       email.email !== this.currentAdminEmail() &&
-      email.id !== this.firstEmailId()
+      !email.esFundador
     );
   }
 
@@ -361,7 +350,7 @@ export class Users implements OnInit {
    * @returns Texto descriptivo del estado o la acción disponible.
    */
   getDeleteTooltip(email: AllowedEmail): string {
-    if (email.id === this.firstEmailId())        return 'No puedes eliminar el correo fundador';
+    if (email.esFundador)                         return 'No puedes eliminar el correo fundador';
     if (email.email === this.currentAdminEmail()) return 'No puedes eliminar tu propio correo';
     return 'Eliminar correo';
   }
@@ -371,7 +360,7 @@ export class Users implements OnInit {
    *
    * @param id - ID del correo a eliminar.
    */
-  requestDelete(id: number): void {
+  requestDelete(id: string): void {
     this.confirmDeleteId.set(id);
   }
 

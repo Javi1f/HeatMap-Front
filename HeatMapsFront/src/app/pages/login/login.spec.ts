@@ -36,7 +36,7 @@ describe.each([
   };
 
   beforeEach(() => {
-    login = vi.fn(() => of({ admin: { id: 1 }, token: 't' }));
+    login = vi.fn(() => of({ admin: { id: 'a1' }, token: 't' }));
     TestBed.configureTestingModule({
       imports: [Componente],
       providers: [provideRouter([]), { provide: AuthService, useValue: { login } }],
@@ -120,5 +120,9 @@ describe('LoginModalComponent: cierre', () => {
     fixture.componentInstance.onSubmit();
     expect(modal.showLogin()).toBe(false);
     expect(fixture.componentInstance.loginForm.value.identifier).toBeNull();
+
+    modal.openLogin();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(modal.showLogin()).toBe(false);
   });
 });

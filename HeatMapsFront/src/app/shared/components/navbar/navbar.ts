@@ -16,14 +16,16 @@
  * al tamaño de pantalla actual.
  */
 
-import { Component, computed, HostListener, inject } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { AuthService }    from '../../../core/services/auth.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { ModalService }   from '../../../core/services/modal.service';
 import { ThemeService }   from '../../../core/services/theme.service';
-
+import { OndasComponent } from '../../animacion/ondas';
+
+
 import { noop } from 'rxjs';
 /**
  * Descriptor de un elemento de navegación en el sidebar.
@@ -52,7 +54,7 @@ export interface NavItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, OndasComponent],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
@@ -128,6 +130,9 @@ export class NavbarComponent {
       : { clase: 'login-btn',  icono: 'login',  texto: 'Iniciar sesión' },
   );
 
+  /** Inicial del administrador, para el avatar del pie; vacía sin sesión. */
+  inicial = computed(() => (this.currentAdmin()?.username ?? '').charAt(0));
+
   /** Icono del control que pliega la barra o cierra el cajón. */
   iconoDelPliegue = computed(() => {
     if (this.isMobileOpen()) return 'close';
@@ -149,8 +154,30 @@ export class NavbarComponent {
   /** Navegacion al pulsar una entrada del menu. */
   private router         = inject(Router);
 
+  /** Dirección actual, para saber qué entrada marcar. */
+  private location       = inject(Location);
+
+  /**
+   * Ruta visible, sin parámetros de consulta. Se sigue con `Location` y no con
+   * los eventos del router porque también cambia al usar atrás y adelante.
+   */
+  private ruta = signal(this.location.path());
+
   constructor() {
     this.sidebarService.initResponsive();
+    const dejarDeEscuchar = this.location.onUrlChange((url) => this.ruta.set(url));
+    inject(DestroyRef).onDestroy(dejarDeEscuchar);
+  }
+
+  /**
+   * `true` si la entrada corresponde a la página abierta.
+   *
+   * El inicio sólo coincide exacto; las demás, también con sus subrutas.
+   */
+  esActiva(item: NavItem): boolean {
+    const ruta = this.ruta().split('?')[0] || '/';
+    if (item.route === '/') return ruta === '/';
+    return ruta === item.route || ruta.startsWith(`${item.route}/`);
   }
 
   /**
@@ -164,6 +191,12 @@ export class NavbarComponent {
 
   /** Alterna el sidebar entre expandido y colapsado (o abre/cierra el menú móvil). */
   toggleSidebar(): void  { this.sidebarService.toggle(); }
+
+  /** Escape cierra el cajón del teléfono, como cualquier panel superpuesto. */
+  @HostListener('document:keydown.escape')
+  alPulsarEscape(): void {
+    if (this.isMobileOpen()) this.sidebarService.closeMobile();
+  }
 
   /** Alterna entre tema oscuro y claro. */
   toggleTheme(): void    { this.themeService.toggle(); }

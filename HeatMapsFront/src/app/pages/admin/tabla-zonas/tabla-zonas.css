@@ -1,22 +1,33 @@
 /**
  * Estilos propios de la tabla de ocupación por zona.
  *
- * Lo común con la tabla de nodos vive en `tablas-comunes.css`, que este
- * componente también incluye.
+ * Nivel y aforo se dibujan con el medidor compartido
+ * (`shared/indicadores`); lo común con la tabla de nodos vive en
+ * `tablas-comunes.css`, que este componente también incluye.
  */
 
 :host { display: block; }
 
-.level-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.level-baja  { background-color: #3fb950; }
-.level-media { background-color: var(--color-secondary); }
-.level-alta  { background-color: var(--color-danger); }
+.col-nivel { width: 140px; }
 
-.aforo-bar {
-  height: 7px; width: 100%;
-  background-color: var(--bg-surface-hover);
-  border-radius: 20px; overflow: hidden;
-  margin-bottom: 0.3rem;
+/* En el aforo, el texto va debajo de los segmentos: «63.5 % de 200» junto a
+   diez segmentos no cabe en una línea sin ensanchar la columna. */
+.medidor-aforo {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
 }
-.aforo-fill { height: 100%; border-radius: 20px; transition: width 0.4s ease; }
-.aforo-text { font-size: 0.75rem; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 768px) {
+  /* En teléfono el nivel se queda en los segmentos: el color y cuántos hay
+     encendidos ya lo dicen, y la palabra no cabe. Se oculta a la vista pero no
+     a los lectores de pantalla. */
+  .col-nivel { width: auto; }
+  .col-nivel app-medidor ::ng-deep .texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}

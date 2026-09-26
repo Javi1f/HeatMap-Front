@@ -60,13 +60,25 @@ export class ThemeService {
   }
 
   /**
+   * Color de la barra del navegador en el teléfono para cada tema: el mismo
+   * fondo que la página, para que la barra no se vea como una franja aparte.
+   */
+  private static readonly COLOR_BARRA: Record<Theme, string> = { dark: '#06080E', light: '#F4F1EC' };
+
+  /** Escribe el tema en `<body>` y ajusta el color de la barra del navegador. */
+  private aplicar(tema: Theme): void {
+    document.body.setAttribute('data-theme', tema);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', ThemeService.COLOR_BARRA[tema]);
+  }
+
+  /**
    * Aplica el tema actual al DOM estableciendo `data-theme` en `<body>`.
    *
    * Debe llamarse una sola vez al arrancar la aplicación (`AppComponent.ngOnInit`)
    * para sincronizar el atributo del DOM con el estado inicial leído de `localStorage`.
    */
   init(): void {
-    document.body.setAttribute('data-theme', this._theme());
+    this.aplicar(this._theme());
   }
 
   /**
@@ -77,6 +89,6 @@ export class ThemeService {
     const next: Theme = this._theme() === 'dark' ? 'light' : 'dark';
     this._theme.set(next);
     localStorage.setItem('theme', next);
-    document.body.setAttribute('data-theme', next);
+    this.aplicar(next);
   }
 }

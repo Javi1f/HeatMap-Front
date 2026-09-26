@@ -36,7 +36,7 @@ describe('Servicios HTTP', () => {
     const servicio = TestBed.inject(AllowedEmailsService);
     comprobar(() => servicio.getAll(), 'GET', '/allowed-emails');
     comprobar(() => servicio.add('a@b.co'), 'POST', '/allowed-emails', { email: 'a@b.co' });
-    comprobar(() => servicio.delete(4), 'DELETE', '/allowed-emails/4');
+    comprobar(() => servicio.delete('c4'), 'DELETE', '/allowed-emails/c4');
   });
 
   it('MetricsService', () => {
@@ -63,8 +63,8 @@ describe('Servicios HTTP', () => {
     comprobar(() => servicio.listAdmins(), 'GET', '/users/admins');
     comprobar(() => servicio.listSessions(), 'GET', '/users/sessions');
     comprobar(() => servicio.revokeSession('s1'), 'DELETE', '/users/sessions/s1');
-    comprobar(() => servicio.cambiarRol(2, 'root'), 'PATCH', '/users/admins/2/rol', { rol: 'root' });
-    comprobar(() => servicio.cambiarActivo(2, false), 'PATCH', '/users/admins/2/activo', { activo: false });
+    comprobar(() => servicio.cambiarRol('a2', 'root'), 'PATCH', '/users/admins/a2/rol', { rol: 'root' });
+    comprobar(() => servicio.cambiarActivo('a2', false), 'PATCH', '/users/admins/a2/activo', { activo: false });
     comprobar(() => servicio.listarAuditoria(), 'GET', '/users/auditoria?limite=50');
     comprobar(() => servicio.listarAuditoria(10), 'GET', '/users/auditoria?limite=10');
   });

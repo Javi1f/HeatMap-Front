@@ -9,6 +9,7 @@
  */
 
 import { Component, Input } from '@angular/core';
+import { CifraDirective } from '../../../shared/animacion/cifra.directive';
 
 /** Intención visual de la tarjeta, que tiñe el icono y el borde. */
 export type MetricTone = 'neutral' | 'ok' | 'warn' | 'danger';
@@ -19,7 +20,7 @@ export type MetricTone = 'neutral' | 'ok' | 'warn' | 'danger';
 @Component({
   selector: 'app-metric-card',
   standalone: true,
-  imports: [],
+  imports: [CifraDirective],
   templateUrl: './metric-card.html',
   styleUrl: './metric-card.css'
 })

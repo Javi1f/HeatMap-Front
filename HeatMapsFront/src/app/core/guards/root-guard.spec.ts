@@ -19,7 +19,7 @@ const ejecutar = (auth: Partial<AuthService>): unknown => {
 const destino = (valor: unknown): string => TestBed.inject(Router).serializeUrl(valor as UrlTree);
 
 /** Administrador con el rol indicado. */
-const admin = (rol: 'root' | 'admin'): Admin => ({ id: 1, username: 'a', email: 'a@b.co', rol });
+const admin = (rol: 'root' | 'admin'): Admin => ({ id: 'a1', username: 'a', email: 'a@b.co', rol });
 
 describe('rootGuard', () => {
   it('deja pasar a un root', async () => {

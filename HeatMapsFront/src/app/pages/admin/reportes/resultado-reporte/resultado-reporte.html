@@ -1,4 +1,4 @@
-<section class="section-card">
+<section class="section-card foco">
   <div class="section-header">
     <div class="section-title-group">
       <span class="material-icons section-icon">table_chart</span>
@@ -36,7 +36,7 @@
             }
           </tr>
         </thead>
-        <tbody>
+        <tbody class="escalonado">
           @for (fila of reporte().filas; track $index) {
             <tr>
               @for (celda of fila; track $index) {

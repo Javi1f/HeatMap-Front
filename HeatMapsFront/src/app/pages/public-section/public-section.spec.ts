@@ -66,6 +66,13 @@ describe('PublicSection', () => {
     expect(texto()).toContain('no personas');
   });
 
+  it('con un solo espacio no muestra el selector', () => {
+    publico.zonas.mockReturnValue(of({ success: true, data: [ZONAS[0]] }));
+    crear();
+    expect(fixture.nativeElement.querySelector('app-selector-zonas')).toBeNull();
+    expect(publico.mapa).toHaveBeenCalledWith('z1');
+  });
+
   it('sin espacios lo dice en lugar de mostrar un mapa vacío', () => {
     publico.zonas.mockReturnValue(of({ success: true, data: [] }));
     const componente = crear();

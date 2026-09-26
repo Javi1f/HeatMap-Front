@@ -4,16 +4,20 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.5rem 0 0.25rem;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0 var(--sp-1);
   container-type: inline-size;
 }
 
 .hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
   margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-primary);
 }
@@ -24,10 +28,10 @@
    mínimo y sí parte, que es lo que toca ahí. */
 .hero-titulo {
   margin: 0;
-  font-size: clamp(2.1rem, 7.2cqw, 4.25rem);
+  font-size: clamp(2.2rem, 7.2cqw, 4.4rem);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
   color: var(--color-text);
   text-wrap: balance;
 }
@@ -35,35 +39,23 @@
 .vivo {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
-  padding: 0.45rem 0.9rem;
-  background-color: var(--bg-surface);
+  gap: var(--sp-3);
+  margin-top: var(--sp-1);
+  padding: 0.5rem 1rem 0.5rem 0.85rem;
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
   border: 1px solid var(--border-2);
-  border-radius: 24px;
-  font-size: 0.86rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-text);
-  font-variant-numeric: tabular-nums;
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--dur-3) ease, box-shadow var(--dur-3) ease;
 }
 
-/* El punto late para señalar que el dato llega solo, sin recargar. Cuando la
-   cifra viene del último mapa y no del directo, se queda quieto y apagado. */
-.vivo-punto {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #3fb950;
-  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.18);
-  animation: latido 2.4s ease-in-out infinite;
-}
-.vivo-punto-quieto {
-  background-color: var(--border-2);
-  box-shadow: none;
-  animation: none;
-}
-@keyframes latido { 50% { opacity: 0.35; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .vivo-punto { animation: none; }
+/* En directo, la píldora se tiñe del verde del estado «en línea». */
+.vivo-directo {
+  border-color: color-mix(in srgb, var(--color-ok) 40%, transparent);
+  box-shadow: var(--shadow-1), 0 0 24px -8px color-mix(in srgb, var(--color-ok) 60%, transparent);
 }

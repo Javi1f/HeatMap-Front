@@ -17,7 +17,7 @@
  * `/login`.
  */
 
-import { Component, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -66,6 +66,13 @@ export class LoginModalComponent implements OnDestroy {
    * Cierra el modal y resetea el formulario a su estado inicial.
    * Llamado cuando el usuario hace clic fuera del modal o en el botón de cerrar.
    */
+  /** Escape cierra el cuadro, igual que la X o pulsar fuera. */
+  @HostListener('document:keydown.escape')
+  alPulsarEscape(): void {
+    this.closeModal();
+  }
+
+  /** Cierra el modal y deja el formulario como al abrirlo. */
   closeModal(): void {
     this.modalService.closeLogin();
     this.loginState.reset();

@@ -6,10 +6,78 @@
   <component name="ChangeListManager">
     <list default="true" id="5ccc4914-4d39-4a3d-b308-b766e0cff0f8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/services/metrics.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/metrics.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/servicios-estado.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/servicios-estado.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/services/theme.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/services/theme.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/avisos-dashboard/avisos-dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/avisos-dashboard/avisos-dashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/dashboard.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/dashboard/metric-card.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/indicadores-dashboard/indicadores-dashboard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes-guardados/reportes-guardados.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes-guardados/reportes-guardados.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/reportes/reportes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/reportes/resultado-reporte/resultado-reporte.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/reportes/resultado-reporte/resultado-reporte.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tabla-nodos/tabla-nodos.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tabla-nodos/tabla-nodos.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tabla-nodos/tabla-nodos.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tabla-nodos/tabla-nodos.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tabla-zonas/tabla-zonas.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/tablas-comunes.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/tablas-comunes.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/add-email-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/delete-confirm-modal.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/email-row.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-administradores/tabla-administradores.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-administradores/tabla-administradores.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-administradores/tabla-administradores.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-administradores/tabla-administradores.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-auditoria/tabla-auditoria.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-auditoria/tabla-auditoria.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-sesiones/tabla-sesiones.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/tabla-sesiones/tabla-sesiones.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/users.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/admin/users/users.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/admin/users/users.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/home/home.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/home/home.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/home/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/home/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/home/home.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/home/home.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/home/home.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/home/home.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/login/login.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/login/login.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/aviso-mapa/aviso-mapa.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/aviso-mapa/aviso-mapa.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-lugar/cabecera-lugar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-lugar/cabecera-lugar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/cabecera-vivo/cabecera-vivo.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/public-section.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/public-section.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/public-section/selector-zonas/selector-zonas.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/public-section/selector-zonas/selector-zonas.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/error-campo/error-campo.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/error-campo/error-campo.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/pages/register/register.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/pages/register/register.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/login-modal/login-modal.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/mapa-lienzo/mapa-lienzo.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/navbar/navbar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,6 +242,9 @@
       <workItem from="1789232437952" duration="693000" />
       <workItem from="1789238887061" duration="1074000" />
       <workItem from="1789253001142" duration="3635000" />
+      <workItem from="1789776206190" duration="618000" />
+      <workItem from="1790363852351" duration="5271000" />
+      <workItem from="1790430238558" duration="700000" />
     </task>
     <servers />
   </component>

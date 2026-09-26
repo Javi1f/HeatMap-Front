@@ -195,7 +195,7 @@ const dibujarEtiquetaNodo = (
   const haciaAbajo = nodo.y > mapa.alto / 2;
 
   ctx.fillStyle = color;
-  ctx.font = '600 12px "Roboto", system-ui, sans-serif';
+  ctx.font = '600 12px "Space Grotesk", "Inter", system-ui, sans-serif';
   ctx.textAlign = haciaLaIzquierda ? 'right' : 'left';
   ctx.textBaseline = haciaAbajo ? 'top' : 'bottom';
   ctx.fillText(nodo.nombre, x + (haciaLaIzquierda ? -11 : 11), y + (haciaAbajo ? 8 : -8));
@@ -514,7 +514,7 @@ export class MapaLienzoComponent implements AfterViewInit, OnChanges, OnDestroy 
   ): void {
     const estilo = getComputedStyle(this.lienzoRef.nativeElement);
     ctx.fillStyle = tokenCss(estilo, '--plano-cota', '#8a929e');
-    ctx.font = '500 11px "Roboto", system-ui, sans-serif';
+    ctx.font = '500 11px "JetBrains Mono", ui-monospace, monospace';
 
     const separacion = separacionCota(this.margen);
 

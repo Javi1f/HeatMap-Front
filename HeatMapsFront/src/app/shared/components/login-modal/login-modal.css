@@ -1,89 +1,56 @@
-.modal-overlay {
-  position: fixed; inset: 0;
-  background-color: rgba(0,0,0,0.6);
-  display: flex; justify-content: center;
-  z-index: 200; backdrop-filter: blur(4px);
-  padding: 1rem;
-  /* `safe center` + `overflow-y` + `margin: auto`: un elemento centrado con
-     flex que no cabe desborda por los dos lados a la vez, y la parte de arriba
-     queda fuera de la pantalla sin forma de desplazarse hasta ella. Se nota en
-     teléfono apaisado, donde la tarjeta es más alta que la ventana. */
-  align-items: safe center;
-  overflow-y: auto;
-}
-.modal-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--color-primary);
-  border-radius: 16px; padding: 2.5rem;
-  width: 100%; max-width: 440px; margin: auto;
-  display: flex; flex-direction: column; gap: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-  transition: background-color 0.25s ease;
-}
+/* Modal de inicio de sesión. Overlay, tarjeta, campos, avisos y botón son
+   globales; la tarjeta lleva además el anillo de calor. */
+
 .modal-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
 }
-.modal-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--color-text); }
+.modal-header h2 { font-size: var(--text-2xl); font-weight: 700; color: var(--color-text); }
 
+/* Cerrar: una tecla cuadrada de icono, como las acciones de fila. */
 .close-btn {
-  background: none; border: none; color: var(--color-text); cursor: pointer;
-  border-radius: 6px; padding: 0.25rem; display: flex; align-items: center;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-.close-btn:hover { color: var(--color-secondary); background-color: rgba(232,100,12,0.1); }
-
-.alert { padding: 0.85rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; }
-.alert-error   { background-color: rgba(232,100,12,0.12); border: 1px solid var(--color-secondary); color: var(--color-secondary); }
-.alert-blocked { background-color: rgba(232,100,12,0.08); border: 1px solid var(--color-primary);   color: var(--color-primary); }
-
-form { display: flex; flex-direction: column; gap: 1.25rem; }
-.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-group label { font-size: 0.9rem; font-weight: 600; color: var(--color-text-muted); letter-spacing: 0.02em; }
-
-.input-wrapper { position: relative; display: flex; align-items: center; }
-.form-group input {
-  width: 100%; padding: 0.75rem 1rem;
-  background-color: var(--bg-input);
+  display: grid;
+  place-items: center;
+  width: var(--toque);
+  height: var(--toque);
+  flex-shrink: 0;
+  background: var(--bg-surface-solid);
   border: 1px solid var(--border-2);
-  border-radius: 8px; color: var(--color-text); font-size: 0.95rem;
-  outline: none; transition: border-color 0.2s ease;
+  border-radius: var(--radius-tecla);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  box-shadow: 0 3px 0 0 var(--border-2);
+  transition: transform var(--dur-1) ease, box-shadow var(--dur-1) ease, color var(--dur-2) ease, border-color var(--dur-2) ease;
 }
-.form-group input:focus       { border-color: var(--color-primary); }
-.form-group input.input-error { border-color: var(--color-secondary); }
-
-.toggle-password {
-  position: absolute; right: 0.6rem;
-  background: none; border: none; color: var(--color-text-muted); cursor: pointer;
-  display: flex; align-items: center; padding: 0.25rem; border-radius: 4px;
-  transition: color 0.2s ease;
+.close-btn:hover {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 0 var(--color-danger-canto);
 }
-.toggle-password:hover { color: var(--color-primary); }
+.close-btn:active { transform: translateY(3px); box-shadow: none; }
 
-.error { font-size: 0.8rem; color: var(--color-secondary); }
+form { display: flex; flex-direction: column; gap: var(--sp-5); }
 
-.btn-primary {
-  width: 100%; padding: 0.85rem; margin-top: 0.5rem;
-  background-color: var(--color-primary);
-  color: var(--color-text-on-primary);
-  border: none; border-radius: 8px;
-  font-size: 1rem; font-weight: 700; cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.1s ease;
-  letter-spacing: 0.03em;
-}
-.btn-primary:hover:not(:disabled)  { opacity: 0.88; transform: translateY(-1px); }
-.btn-primary:active:not(:disabled) { transform: translateY(0); }
-.btn-primary:disabled              { opacity: 0.4; cursor: not-allowed; }
+.btn-primary { width: 100%; margin-top: var(--sp-2); }
 
 .register-link {
-  text-align: center; font-size: 0.9rem; color: var(--color-text);
-  padding-top: 0.25rem; border-top: 1px solid var(--border);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: var(--text-md);
+  color: var(--color-text-muted);
 }
-.register-link a { color: var(--color-primary); font-weight: 600; margin-left: 0.25rem; }
-.register-link a:hover { color: var(--color-primary-hover); }
+.register-link a {
+  display: inline-block;
+  padding: 0.75rem 0.4rem;
+  font-weight: 700;
+}
 
-/* ── Responsive ──────────────────────────────────────────────── */
-/* Con 2,5rem de relleno a cada lado, en una pantalla de 320px al formulario le
-   quedaban 240px. */
+/* Con el relleno completo, en una pantalla de 320px al formulario le quedaban
+   240px. */
 @media (max-width: 480px) {
-  .modal-card { padding: 1.5rem; gap: 1.15rem; }
+  .modal-card { padding: var(--sp-6) var(--sp-5); gap: var(--sp-4); }
 }

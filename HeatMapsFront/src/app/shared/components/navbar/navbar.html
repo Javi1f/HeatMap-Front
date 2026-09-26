@@ -15,19 +15,29 @@
   [class.mobile-open]="isMobileOpen()"
 >
 
-  <button class="toggle-btn" (click)="toggleSidebar()">
-    <span class="material-icons">{{ iconoDelPliegue() }}</span>
-  </button>
+  <div class="cabeza">
+    <div class="marca">
+      <app-ondas tam="12px" />
+      <span class="marca-nombre" [style.display]="mostrarEtiquetas() ? null : 'none'">Place<b>At</b></span>
+    </div>
 
-  <div class="sidebar-image">
-    <img src="assets/logo.png" alt="logo" onerror="this.style.display='none'" />
+    <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Plegar o desplegar el menú">
+      <span class="material-icons">{{ iconoDelPliegue() }}</span>
+    </button>
   </div>
 
   <!-- Un único recorrido: las entradas de administración solo se diferencian
-       por su clase, y esa marca viaja ya en el propio elemento. -->
+       por su clase, y esa marca viaja ya en el propio elemento. El `href` las
+       hace alcanzables con el teclado; la navegación la hace el componente. -->
   <nav class="nav-links">
     @for (item of entradas(); track item.route) {
-      <a class="nav-item" [class.admin-item]="item.esAdmin" (click)="navigate(item.route)">
+      <a class="nav-item"
+         [class.admin-item]="item.esAdmin"
+         [class.activo]="esActiva(item)"
+         [attr.aria-current]="esActiva(item) ? 'page' : null"
+         [attr.href]="item.route"
+         [title]="mostrarEtiquetas() ? '' : item.label"
+         (click)="$event.preventDefault(); navigate(item.route)">
         <span class="material-icons">{{ item.icon }}</span>
         <span class="nav-label" [style.display]="mostrarEtiquetas() ? null : 'none'">{{ item.label }}</span>
       </a>
@@ -43,7 +53,7 @@
 
     @if (isLoggedIn()) {
       <div class="admin-info">
-        <span class="material-icons">account_circle</span>
+        <span class="avatar" aria-hidden="true">{{ inicial() }}</span>
         <span class="admin-name" [style.display]="mostrarEtiquetas() ? null : 'none'">{{ currentAdmin()?.username }}</span>
       </div>
     }

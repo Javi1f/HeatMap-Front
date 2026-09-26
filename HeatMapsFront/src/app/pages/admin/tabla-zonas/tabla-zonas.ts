@@ -8,10 +8,31 @@
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { ZoneOccupancy } from '../../../core/services/metrics.service';
+import { MedidorComponent, Tono } from '../../../shared/indicadores/indicadores';
 
-/** Barra de aforo, cuando la zona declara uno. */
+/** Segmentos del medidor de aforo: uno por cada 10 %. */
+const SEGMENTOS_AFORO = 10;
+
+/** Nivel de ocupación tal como lo dibuja su medidor de tres segmentos. */
+interface Nivel {
+  readonly llenos: number;
+  readonly tono: Tono;
+  readonly texto: string;
+}
+
+/** Medidor para cada nivel: baja enciende uno, media dos, alta los tres. */
+const NIVELES: Record<ZoneOccupancy['nivelOcupacion'], Nivel> = {
+  baja:  { llenos: 1, tono: 'ok',      texto: 'baja' },
+  media: { llenos: 2, tono: 'aviso',   texto: 'media' },
+  alta:  { llenos: 3, tono: 'peligro', texto: 'alta' },
+};
+
+/** Medidor de aforo, cuando la zona declara uno. */
 interface Aforo {
+  /** Porcentaje acotado a 100, para no desbordar el medidor. */
   readonly ancho: number;
+  /** Segmentos encendidos de {@link SEGMENTOS_AFORO}. */
+  readonly llenos: number;
   readonly texto: string;
 }
 
@@ -21,7 +42,7 @@ interface FilaZona {
   readonly nombre: string;
   readonly unicos: number;
   readonly estables: number;
-  readonly claseNivel: string;
+  readonly nivel: Nivel;
   readonly aforo: Aforo | null;
   readonly actualizado: string;
 }
@@ -46,7 +67,7 @@ const horaLocal = (iso: string | null): string => {
 @Component({
   selector: 'app-tabla-zonas',
   standalone: true,
-  imports: [],
+  imports: [MedidorComponent],
   templateUrl: './tabla-zonas.html',
   styleUrls: ['../tablas-comunes.css', './tabla-zonas.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,6 +75,9 @@ const horaLocal = (iso: string | null): string => {
 export class TablaZonasComponent {
   /** Zonas a mostrar, tal como las devuelve la API de métricas. */
   readonly zonas = input.required<ZoneOccupancy[]>();
+
+  /** Segmentos del medidor de aforo, para la plantilla. */
+  protected readonly segmentosAforo = SEGMENTOS_AFORO;
 
   /**
    * Filas listas para pintar.
@@ -69,10 +93,11 @@ export class TablaZonasComponent {
       nombre: zona.nombre,
       unicos: zona.dispositivosUnicos,
       estables: zona.dispositivosEstables,
-      claseNivel: `level-${zona.nivelOcupacion}`,
+      nivel: NIVELES[zona.nivelOcupacion],
       aforo: zona.capacidadMax
         ? {
             ancho: Math.min(zona.porcentajeAforo ?? 0, 100),
+            llenos: Math.round(Math.min(zona.porcentajeAforo ?? 0, 100) / SEGMENTOS_AFORO),
             texto: `${zona.porcentajeAforo} % de ${zona.capacidadMax}`,
           }
         : null,

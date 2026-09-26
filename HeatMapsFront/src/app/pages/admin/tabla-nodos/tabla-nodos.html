@@ -9,7 +9,7 @@
           <th class="col-state">Estado</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="escalonado">
         @for (fila of filas(); track fila.idSensor) {
           <tr>
             <td>
@@ -21,12 +21,14 @@
             <td class="cell-muted col-secondary">{{ fila.zona }}</td>
             <td class="cell-muted col-secondary">{{ fila.ultimaLectura }}</td>
             <td class="cell-state">
-              <span class="pill" [class]="fila.clasePildora">
-                @if (fila.enLinea) {
-                  <span class="dot"></span>
-                }
-                {{ fila.estado }}
-              </span>
+              <!-- En línea, señal completa; sin señal, una barra: el nodo existe
+                   pero no llega nada. -->
+              <app-senal
+                [barras]="fila.enLinea ? 4 : 1"
+                [tono]="fila.enLinea ? 'ok' : 'aviso'"
+                [texto]="fila.estado"
+                [vivo]="fila.enLinea"
+              />
             </td>
           </tr>
         }

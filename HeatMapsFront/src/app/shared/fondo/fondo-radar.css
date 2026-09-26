@@ -1,0 +1,89 @@
+/* Radar de fondo. Todo sale del mismo centro, la esquina inferior derecha
+   (`at 100% 100%`), y se desvanece hacia la esquina opuesta con una máscara
+   para no competir con el contenido. Colores sólidos: el haz es un sector
+   translúcido de un solo tono con el borde que avanza bien marcado. */
+
+:host {
+  --anillo: rgba(150, 170, 230, 0.095);
+  --haz: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --haz-borde: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --paso: 12vmax;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 0, #000 65vmax, transparent 140vmax);
+  mask-image: radial-gradient(circle at 100% 100%, #000 0, #000 65vmax, transparent 140vmax);
+}
+
+:host-context(body[data-theme="light"]) {
+  --anillo: rgba(90, 60, 30, 0.09);
+  --haz: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  --haz-borde: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+/* Anillos cada 12 vmax y radios cada 15°. */
+.anillos {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-radial-gradient(circle at 100% 100%,
+      transparent 0 calc(var(--paso) - 1px),
+      var(--anillo) calc(var(--paso) - 1px) var(--paso)),
+    repeating-conic-gradient(from 270deg at 100% 100%,
+      var(--anillo) 0deg 0.12deg,
+      transparent 0.12deg 15deg);
+}
+
+/* El haz. `--barrido` es el ángulo del borde que avanza; se anima gracias a
+   @property. Sin ella el haz se queda quieto, que tampoco molesta. */
+@property --barrido {
+  syntax: '<angle>';
+  initial-value: 255deg;
+  inherits: false;
+}
+
+.barrido {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from calc(var(--barrido) - 26deg) at 100% 100%,
+    var(--haz) 0deg 25.7deg,
+    var(--haz-borde) 25.7deg 26deg,
+    transparent 26deg);
+  animation: barrer 12s linear infinite;
+}
+
+@keyframes barrer {
+  from { --barrido: 255deg; }
+  to   { --barrido: 372deg; }
+}
+
+/* Ecos: reposan casi apagados y se encienden cuando el haz pasa por su
+   ángulo (el retraso lo calcula el componente). */
+.eco {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--eco);
+  box-shadow: 0 0 12px 2px var(--eco);
+  transform: translate(50%, 50%);
+  opacity: 0.1;
+  animation: eco 12s var(--ease-out) infinite;
+  animation-fill-mode: none;
+}
+
+.eco-primario { --eco: var(--color-primary); }
+.eco-ambar    { --eco: var(--color-warn); }
+.eco-rojo     { --eco: var(--color-danger); }
+
+@keyframes eco {
+  0%   { opacity: 1;    transform: translate(50%, 50%) scale(1.25); }
+  12%  { opacity: 0.85; transform: translate(50%, 50%) scale(1); }
+  60%  { opacity: 0.1; }
+  100% { opacity: 0.1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barrido { display: none; }
+  .eco { opacity: 0.4; }
+}
