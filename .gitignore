@@ -1,0 +1,63 @@
+# --- Secretos y entorno (nunca subir) ---
+.env
+.env.*
+*.env
+!.env.example
+/env/
+
+# --- IA / asistentes locales (claude, opencode, etc.) ---
+.claude/
+.opencode/
+opencode/
+.codex/
+.cursor/
+.claudio/
+
+# --- Carpeta de nube local del usuario ---
+cloud/
+Cloud/
+CLOUD/
+
+# --- IDEs y editores ---
+.idea/
+.vscode/
+*.launch
+*.sublime-workspace
+*.sublime-project
+.history/
+
+# --- Dependencias y compilaciÃ³n ---
+node_modules/
+dist/
+build/
+out-tsc/
+tmp/
+.angular/
+.nx/
+
+# --- Logs y cobertura ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.nyc_output/
+
+# --- Sistema operativo / OneDrive ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+~$*
+
+# --- Respaldos y basura ---
+respaldos/
+*.bak
+*.orig
+qodana.yaml
+
+# RevisiÃ³
+
+# Revision de diseno: capturas y superficies del asistente
+.impeccable/
