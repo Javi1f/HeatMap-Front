@@ -1,0 +1,99 @@
+/* Aviso de cookies: una placa de vidrio fija al pie. En escritorio flota
+   centrada; en teléfono se ancla de borde a borde para no robar ancho de
+   lectura. Manda por encima del contenido pero por debajo de los modales. */
+
+.aviso {
+  position: fixed;
+  bottom: var(--sp-5);
+  left: 50%;
+  z-index: var(--z-overlay);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: calc(100% - 2 * var(--sp-5));
+  max-width: 620px;
+  margin: 0;
+  padding: var(--sp-4) var(--sp-5);
+  background: color-mix(in srgb, var(--bg-surface-solid) 88%, transparent);
+  -webkit-backdrop-filter: var(--vidrio);
+  backdrop-filter: var(--vidrio);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  animation: emerger var(--dur-3) var(--ease-out) backwards;
+}
+
+.aviso-ficha {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+.aviso-ficha .material-icons { font-size: 1.15rem; }
+
+.aviso-texto {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.aviso-texto strong { color: var(--color-text); }
+.aviso-texto a { white-space: nowrap; font-weight: 600; }
+
+.aviso-tecla {
+  flex-shrink: 0;
+  min-height: var(--toque);
+  padding: 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-text-muted) 50%, transparent);
+  border-radius: var(--radius-tecla);
+  background: var(--bg-surface-solid);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 var(--canto) 0 0 var(--border-2);
+  transition: transform var(--dur-1) ease, box-shadow var(--dur-1) ease,
+    color var(--dur-2) ease, border-color var(--dur-2) ease;
+}
+
+.aviso-tecla:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 calc(var(--canto) + 1px) 0 0 var(--color-primary-canto);
+}
+
+.aviso-tecla:active {
+  transform: translateY(var(--canto));
+  box-shadow: none;
+}
+
+@media (max-width: 480px) {
+  .aviso {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    transform: none;
+    margin: 0;
+    bottom: calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+    padding: var(--sp-3) var(--sp-4);
+    gap: var(--sp-3);
+  }
+
+  /* En teléfono la ficha del icono sale del turno: el texto necesita el ancho. */
+  .aviso-ficha { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso { animation: none; }
+}

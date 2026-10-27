@@ -21,10 +21,13 @@
  */
 
 import { Injectable, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AuthService } from './auth.service';
-
+
+
 import { noop } from 'rxjs';
 /**
  * Servicio de estado no-singleton para el formulario de login.
@@ -57,6 +60,20 @@ export class LoginStateService {
   showPassword = signal<boolean>(false);
 
   /**
+   * `true` desde que se envían las credenciales hasta que llega la respuesta:
+   * bloquea el formulario y despliega la cortina de verificación, y evita
+   * que se vuelva a enviar la misma petición.
+   */
+  isSubmitting = signal<boolean>(false);
+
+  /**
+   * `true` cuando la respuesta fue correcta: la cortina anuncia el acceso
+   * durante un instante antes de navegar, para que el cierre del proceso
+   * se vea en lugar de saltarse.
+   */
+  isGranted = signal<boolean>(false);
+
+  /**
    * Contador acumulado de intentos fallidos en la sesión actual del componente.
    * Se usa para aplicar el bloqueo cada 3 fallos consecutivos.
    */
@@ -67,6 +84,22 @@ export class LoginStateService {
    * Se usa para limpiarlo en {@link clearCountdown} y evitar fugas de memoria.
    */
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+  /**
+   * Suscripción a la petición de login en vuelo, o `null` si no hay ninguna.
+   * Guardarla permite abortarla si el usuario cierra el formulario mientras
+   * las credenciales se están verificando.
+   */
+  private peticionLogin: Subscription | null = null;
+
+  /**
+   * Temporizador del instante de «acceso concedido», o `null` si no está activo.
+   * Se cancela al cerrar el formulario para que no dispare la navegación.
+   */
+  private tempoAcceso: ReturnType<typeof setTimeout> | null = null;
+
+  /** Instante que la cortina anuncia «Acceso concedido» antes de navegar (ms). */
+  private readonly latidoAcceso = 900;
 
   constructor(
     private fb: FormBuilder,
@@ -101,8 +134,15 @@ export class LoginStateService {
   /**
    * Procesa el envío del formulario de login.
    *
-   * Si el formulario es inválido o el usuario está bloqueado, marca todos los
-   * campos como tocados (para mostrar validaciones) y no hace nada más.
+   * Si el formulario es inválido, el usuario está bloqueado o ya hay una
+   * petición en vuelo, marca todos los campos como tocados (para mostrar
+   * validaciones) y no hace nada más.
+   *
+   * Al enviar, enciende {@link isSubmitting}: el formulario queda bloqueado
+   * y la cortina de verificación lo cubre hasta que llega la respuesta. Con
+   * error, la cortina se aparta y revela el aviso; con éxito, cambia a
+   * «acceso concedido» ({@link isGranted}) durante {@link latidoAcceso} y
+   * solo entonces cierra la vista y navega al dashboard.
    *
    * En éxito, `AuthService.login` ya persiste la sesión internamente via `tap`.
    * Se puede pasar un callback `onSuccess` para ejecutar lógica adicional
@@ -115,7 +155,7 @@ export class LoginStateService {
    *                    antes de navegar al dashboard.
    */
   onSubmit(onSuccess?: () => void): void {
-    if (this.loginForm.invalid || this.isBlocked()) {
+    if (this.loginForm.invalid || this.isBlocked() || this.isSubmitting()) {
       this.loginForm.markAllAsTouched();
       return;
     }
@@ -125,15 +165,33 @@ export class LoginStateService {
       password: this.loginForm.value.password
     };
 
-    this.authService.login(request).subscribe({
+    // Limpio restos del intento anterior y despliego la cortina.
+    this.loginError.set('');
+    this.isGranted.set(false);
+    this.isSubmitting.set(true);
+
+    this.peticionLogin = this.authService.login(request).subscribe({
       next: () => {
         this.failedAttempts = 0;
-        onSuccess?.();
-        this.router.navigate(['/admin/dashboard']).catch(noop);
+        this.isGranted.set(true);
+
+        /** Respira el instante de acceso y después abre paso. */
+        this.tempoAcceso = setTimeout(() => {
+          this.tempoAcceso = null;
+          this.peticionLogin = null;
+          this.isSubmitting.set(false);
+          onSuccess?.();
+          this.router.navigate(['/admin/dashboard']).catch(noop);
+        }, this.latidoAcceso);
       },
-      error: () => {
+      error: (err: unknown) => {
+        this.isSubmitting.set(false);
         this.failedAttempts++;
-        this.loginError.set('Credenciales incorrectas.');
+        this.loginError.set(
+          err instanceof HttpErrorResponse && err.status >= 500
+            ? 'Error del servidor, inténtalo de nuevo en unos segundos.'
+            : 'Credenciales incorrectas.'
+        );
         if (this.failedAttempts % 3 === 0) {
           this.startBlockCountdown();
         }
@@ -143,7 +201,9 @@ export class LoginStateService {
 
   /**
    * Resetea el formulario a su estado inicial: limpia valores, errores,
-   * bloqueo y cuenta atrás.
+   * bloqueo y cuenta atrás. Aborta también cualquier petición de login en
+   * vuelo, de modo que cerrar el formulario durante la verificación no
+   * navegue más tarde.
    *
    * Llamado cuando el usuario cierra el modal sin completar el login, o cuando
    * se reutiliza el componente después de un logout.
@@ -153,15 +213,17 @@ export class LoginStateService {
     this.loginError.set('');
     this.isBlocked.set(false);
     this.clearCountdown();
+    this.cancelarVuelo();
   }
 
   /**
    * Limpia los recursos del servicio. Debe ser invocado desde `ngOnDestroy`
    * del componente que proporciona este servicio para evitar fugas de memoria
-   * si el componente se destruye durante un bloqueo activo.
+   * si el componente se destruye durante un bloqueo o una petición activos.
    */
   destroy(): void {
     this.clearCountdown();
+    this.cancelarVuelo();
   }
 
   /**
@@ -173,6 +235,24 @@ export class LoginStateService {
       clearInterval(this.countdownInterval);
       this.countdownInterval = null;
     }
+  }
+
+  /**
+   * Aborta la petición de login en vuelo y cancela el temporizador del
+   * instante de acceso, si los hay, y apaga ambos signals de estado.
+   * Operación segura: no hace nada si no hay petición activa.
+   */
+  private cancelarVuelo(): void {
+    if (this.peticionLogin !== null) {
+      this.peticionLogin.unsubscribe();
+      this.peticionLogin = null;
+    }
+    if (this.tempoAcceso !== null) {
+      clearTimeout(this.tempoAcceso);
+      this.tempoAcceso = null;
+    }
+    this.isSubmitting.set(false);
+    this.isGranted.set(false);
   }
 
   /**

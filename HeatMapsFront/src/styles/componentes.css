@@ -261,6 +261,101 @@
 .retry-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
 .retry-btn:active { transform: translateY(2px); box-shadow: none; }
 
+/* ── Cortina de verificación ──────────────────────────────────────
+   Cuando el formulario de acceso envía las credenciales, la tarjeta queda
+   cubierta por un plano de vidrio: deshabilitada bajo la niebla, un radar
+   barriendo y un haz del primario recorriendo la superficie. El rótulo en
+   mayúsculas cambia cuando llega la respuesta: en verde anuncia «acceso
+   concedido» el instante previo a la navegación; con error la cortina se
+   aparta y deja ver el aviso debajo. La tarjeta que la contiene debe llevar
+   `position: relative`. */
+
+.cortina {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  overflow: hidden;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--bg-surface-deep) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  animation: velo var(--dur-2) ease backwards;
+}
+
+.cortina-rotulo {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-align: center;
+  animation: entrar var(--dur-3) var(--ease-out) backwards;
+}
+
+/* Puntos que siguen al rótulo mientras se espera la respuesta. */
+.cortina-rotulo::after {
+  content: '...';
+  animation: puntos 1.2s infinite;
+}
+
+.cortina-rotulo-ok {
+  color: var(--color-ok);
+}
+.cortina-rotulo-ok::after {
+  content: '';
+  animation: none;
+}
+
+/* Emblema de acceso: el disco del emblema, en el color de la concesión. */
+.cortina-emblema {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: var(--color-ok);
+  background: var(--color-ok-soft);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-ok) 35%, transparent),
+    0 0 34px -8px var(--color-ok);
+  animation: entrar var(--dur-3) var(--ease-out) backwards;
+}
+.cortina-emblema .material-icons { font-size: 1.7rem; }
+
+/* El haz: una banda del primario que barre la cortina de arriba abajo. */
+.cortina-barrido {
+  position: absolute;
+  inset-inline: 0;
+  height: 30%;
+  pointer-events: none;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--color-primary) 14%, transparent), transparent);
+  animation: barrido 2s linear infinite;
+}
+
+.cortina-ok .cortina-barrido {
+  border-top-color: color-mix(in srgb, var(--color-ok) 45%, transparent);
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--color-ok) 14%, transparent), transparent);
+}
+
+/* Con «reducir movimiento», la cortina queda firme y sin haces: el vidrio
+   y el rótulo comunican la espera del mismo modo. */
+@media (prefers-reduced-motion: reduce) {
+  .cortina,
+  .cortina-rotulo,
+  .cortina-emblema { animation: none; }
+  .cortina-rotulo::after { content: '...'; animation: none; }
+  .cortina-barrido { display: none; }
+}
+
 /* ── Estados de carga y vacíos ─────────────────────────────────── */
 
 .loading-state {
@@ -668,6 +763,7 @@
 }
 
 .modal-card {
+  position: relative; /* ancla la cortina de verificación cuando la cubre */
   width: 100%;
   max-width: 440px;
   margin: auto;
@@ -835,6 +931,46 @@
 .cell-muted  { color: var(--color-text-muted); font-size: var(--text-sm); }
 .cell-num    { font-family: var(--font-display); font-variant-numeric: tabular-nums; text-align: right; }
 .row-icon    { font-size: 1.05rem; color: var(--color-primary); flex-shrink: 0; }
+
+/* ── Líneas de desglose: la cifra y su porqué ──────────────────────
+   Patrón compartido por la lectura viva de la cotización y el detalle
+   del panel: un rótulo, la medida en mono y la anotación pequeña. */
+
+.desglose-titulo {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.desglose-valor {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.desglose-detalle {
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* Lista anotada con filo del primario: integraciones y notas. */
+.lista-anotada {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-anotada li {
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  padding-left: var(--sp-3);
+  border-left: 2px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+}
 
 @media (max-width: 768px) {
   .data-table th,

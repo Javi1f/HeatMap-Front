@@ -82,8 +82,3 @@
   60%  { opacity: 0.1; }
   100% { opacity: 0.1; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .barrido { display: none; }
-  .eco { opacity: 0.4; }
-}

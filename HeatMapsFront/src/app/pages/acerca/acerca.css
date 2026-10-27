@@ -1,0 +1,537 @@
+/* ══════════════════════════════════════════════════════════════════
+   ¿Qué es PlaceAt? — el viaje de la señal.
+
+   El primer acto es un lienzo pegajoso a sangre (escapa del relleno del
+   shell con márgenes negativos) sobre el que fluye el relato: héroe,
+   cifras y cinco etapas. Los actos siguientes vuelven al ancho del
+   contenedor con la gramática editorial del apartado legal: rieles,
+   registros rayados y teclas técnicas.
+   ══════════════════════════════════════════════════════════════════ */
+
+.acerca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  padding-bottom: var(--sp-12);
+}
+
+/* ══ El viaje ═════════════════════════════════════════════════════ */
+
+/* El primer acto ocupa el ancho del contenedor, como el resto de la
+   aplicación: el lienzo llena el bloque completo y el relato fluye por
+   encima. La composición es constante: las palabras a la izquierda, el
+   fenómeno a la derecha. */
+.viaje {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+/* El escenario pegajoso: el lienzo vive aquí durante todo el primer acto.
+   El margen negativo anula su altura en el flujo: el relato arranca en la
+   parte superior de .viaje y el héroe es visible a la vez que el lienzo,
+   en el primer viewport. A sangre: el lienzo cubre todo el ancho de la
+   ventana, como el fondo que sustituye — no hay borde que lo delate. */
+.escenario {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  margin-bottom: -100svh;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+/* Cuando el acto siguiente alcanza la pantalla, la escena se apaga:
+   el cielo sigue, el fenómeno del relato no compite con los textos. */
+.escenario.desvanecer { opacity: 0; }
+
+.lienzo-viaje {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+
+  /* Paleta del plano, leída por el motor con getComputedStyle.
+     El lienzo es transparente: el cielo del fondo vive detrás. */
+  --ev-reticula: rgba(150, 170, 230, 0.08);
+  --ev-texto:    #C9D1E4;
+  --ev-cota:     #7E88A0;
+  --ev-senal:    #8FA6CE;
+  --ev-plano:    rgba(4, 7, 13, 0.55);
+}
+
+:host-context(body[data-theme="light"]) .lienzo-viaje {
+  --ev-reticula: rgba(90, 60, 30, 0.13);
+  --ev-texto:    #362E27;
+  --ev-cota:     #6E6459;
+  --ev-senal:    #745A43;
+  --ev-plano:    rgba(255, 255, 255, 0.55);
+}
+
+/* El relato fluye por encima del lienzo. */
+.relato {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── El riel de conexión: tramos punteados entre tarjetas ────────
+   Cada tramo enlaza una tarjeta con la siguiente por el eje del riel
+   numeral: la idea se lee como una constelación de pasos, no como
+   fichas sueltas. Anima despacio la caída del punteado; con «reducir
+   movimiento» queda quieto. */
+.riel-vias {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.via-linea {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-text-muted) 55%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 2 8;
+  animation: recorrer 2.6s linear infinite;
+}
+
+.via-nodo {
+  fill: var(--color-primary);
+  opacity: 0.9;
+}
+
+@keyframes recorrer {
+  to { stroke-dashoffset: -10; } /* un período del mantel (2 + 8) */
+}
+
+.bloque {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-inline: clamp(var(--sp-6), 5vw, var(--sp-12));
+  padding-block: var(--sp-10);
+}
+
+/* ── Héroe ──────────────────────────────────────────────────────── */
+
+.heroe {
+  align-items: center;
+}
+
+.heroe-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-5);
+  max-width: 620px;
+}
+
+.heroe-titulo {
+  font-size: clamp(2.5rem, 1.2rem + 4.4vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.heroe-sub {
+  font-size: clamp(var(--text-lg), 1rem + 0.6vw, 1.35rem);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.heroe-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+/* La pista de scroll: un pulso hacia abajo, junto al borde inferior. */
+.heroe-pista {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(var(--sp-5), 4vh, var(--sp-8));
+  transform: translateX(-50%);
+  color: var(--color-text-muted);
+  animation: flotar 2.6s var(--ease-in-out) infinite;
+}
+
+.heroe-pista .material-icons { font-size: 1.6rem; }
+
+@keyframes flotar {
+  0%, 100% { transform: translate(-50%, 0);   opacity: 0.55; }
+  50%      { transform: translate(-50%, 8px); opacity: 1; }
+}
+
+/* ── Paneles del relato ─────────────────────────────────────────── */
+
+.panel {
+  border-radius: var(--radius-lg);
+  padding: clamp(var(--sp-6), 3vw, var(--sp-8));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.panel-cifras {
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+/* ── Las cifras: un libro de medidas, no tarjetas ───────────────── */
+
+.cifras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+
+.cifra-item {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-6);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.cifra-valor {
+  font-size: clamp(2.2rem, 1.2rem + 3vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-primary);
+}
+
+.cifra-lectura {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.cifras-fuente {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+/* ── Los pasos: riel numeral + cuerpo, como las cláusulas legales ──
+   El panel vive a la izquierda: el fenómeno del lienzo queda a la
+   derecha, nunca detrás del vidrio. */
+
+.paso { justify-content: flex-start; }
+
+.panel-paso {
+  width: min(100%, 520px);
+  display: grid;
+  grid-template-columns: 4.25rem 1fr;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out);
+}
+
+/* El paso activo se enciende: el borde toma el primario y el vidrio
+   deja pasar un poco más de la escena. */
+.panel-paso.paso-activo {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  box-shadow: var(--shadow-2), 0 0 40px -18px color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+
+.paso-riel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6) 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface-deep);
+}
+
+.paso-numero {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  transition: color var(--dur-3) var(--ease-out);
+}
+
+.paso-activo .paso-numero { color: var(--color-primary); }
+
+.paso-etapa {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+.paso-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+}
+
+.paso-titulo {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.paso-texto {
+  font-size: var(--text-md);
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+/* ══ Actos siguientes ═════════════════════════════════════════════ */
+
+.acto {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding-inline: var(--sp-2);
+  /* Los actos corren sobre el lienzo pegajoso si coincide en pantalla. */
+  position: relative;
+  z-index: 3;
+}
+
+.acto-cabeza {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 68ch;
+}
+
+.acto-titulo {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.acto-intro {
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+/* ── Registros rayados: principios, capacidades y límites ───────── */
+
+.registro {
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.registro-fila {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.9fr) 1.6fr;
+  gap: var(--sp-5);
+  padding: var(--sp-5) var(--sp-2);
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--dur-2) ease;
+}
+
+.registro-fila:hover { background: var(--bg-surface-hover); }
+
+.registro-nombre {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.registro-detalle {
+  font-size: var(--text-md);
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+/* Capacidades: dos columnas con el icono como ficha técnica. */
+.registro-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--sp-10);
+  border-top: 0;
+}
+
+.registro-capacidad {
+  grid-template-columns: auto minmax(140px, 0.8fr) 1.4fr;
+  align-items: start;
+  gap: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.capacidad-icono {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  font-size: 1.15rem;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+/* La nota frente a las cámaras: un aviso del sistema, no un adorno. */
+.nota-camaras {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-5) var(--sp-6);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+  font-size: var(--text-md);
+  line-height: 1.65;
+}
+
+.nota-camaras .material-icons {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ── Cierre ─────────────────────────────────────────────────────── */
+
+.acto-cierre {
+  align-items: flex-start;
+  gap: var(--sp-6);
+  padding-block: var(--sp-6);
+}
+
+.cierre-titulo {
+  font-size: clamp(2.2rem, 1.2rem + 3.4vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.cierre-texto {
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+
+/* La invitación a cotizar es el remate del relato: pasa del tono apagado
+   al pleno para que quien llegó hasta aquí sepa cuál es el paso. */
+.cierre-invitacion {
+  font-size: var(--text-md);
+  color: var(--color-text);
+}
+
+.cierre-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+/* ══ Responsive ═══════════════════════════════════════════════════ */
+
+@media (max-width: 1100px) {
+  .registro-doble { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .acerca { gap: var(--sp-10); }
+
+  /* El lienzo pasa a banda superior, en flujo: la escena vive arriba y el
+     relato se desliza por encima de ella (el vidrio de las tarjetas corre
+     sobre el cielo, como en escritorio). Sin borde: el cielo no tiene
+     borde, y los actos siguientes pasan sobre el lienzo al terminar. */
+  .escenario {
+    height: 40svh;
+    margin-bottom: 0;
+  }
+
+  .bloque {
+    min-height: 0;
+    padding-inline: var(--sp-4);
+    padding-block: var(--sp-8);
+  }
+
+  /* El héroe completa el primer viewport junto a la banda. */
+  .heroe {
+    min-height: 60svh;
+    padding-top: var(--sp-6);
+    align-items: center;
+  }
+
+  .heroe-texto { max-width: 100%; }
+  .heroe-pista { display: none; }
+
+  .cifras { grid-template-columns: 1fr; }
+  .cifra-item { padding: var(--sp-4) var(--sp-5); }
+
+  .panel-paso {
+    width: 100%;
+    grid-template-columns: 3.4rem 1fr;
+  }
+  .paso-riel { padding: var(--sp-5) 0; }
+  .paso-numero { font-size: 1.1rem; }
+
+  .acto { padding-inline: 0; }
+
+  .registro-fila { grid-template-columns: 1fr; gap: var(--sp-2); }
+  .registro-capacidad { grid-template-columns: auto 1fr; }
+  .registro-capacidad .registro-detalle { grid-column: 2; }
+}
+
+@media (max-width: 480px) {
+  .heroe-acciones { width: 100%; }
+  .heroe-acciones > * { flex: 1 1 100%; }
+  .cierre-acciones { width: 100%; }
+  .cierre-acciones > * { flex: 1 1 100%; }
+  .panel { padding: var(--sp-5); }
+}
+
+/* ══ Movimiento reducido ═════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .heroe-pista { animation: none; }
+  .panel-paso,
+  .paso-numero,
+  .registro-fila { transition: none; }
+  .via-linea { animation: none; }
+}

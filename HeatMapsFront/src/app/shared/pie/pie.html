@@ -1,0 +1,20 @@
+<!-- Pie legal del shell: enlaces a los documentos del apartado y una
+     identificación sobria del producto — nombre, año y jurisdicción — sin
+     pretensiones de registro. -->
+
+<footer class="pie">
+  <div class="pie-marca">
+    <app-ondas tam="10px" />
+    <span class="pie-nombre">Place<b>At</b></span>
+  </div>
+
+  <nav class="pie-fichas" aria-label="Documentos legales">
+    @for (entrada of entradas; track entrada.ruta) {
+      <a class="pie-ficha" [routerLink]="entrada.ruta">{{ entrada.texto }}</a>
+    }
+  </nav>
+
+  <p class="pie-detalle">
+    Servicio de monitoreo de ocupación · 2026 · Bogotá D.C., Colombia
+  </p>
+</footer>

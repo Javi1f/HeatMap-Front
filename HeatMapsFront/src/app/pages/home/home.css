@@ -315,6 +315,10 @@
 /* Toma el aspecto de la tecla secundaria (`.btn-secondary`). */
 .card-btn { margin-top: var(--sp-2); }
 
+/* El «Ver más» de la tarjeta de presentación no se estira: es una tecla
+   que ocupa lo que su rótulo pide. */
+.ver-mas { align-self: flex-start; }
+
 /* ── Aviso de sesión ya iniciada ───────────────────────────────── */
 
 .already-logged-msg {
@@ -369,9 +373,4 @@
   .hero-acciones { width: 100%; }
   .hero-acciones > * { flex: 1 1 100%; }
   .card-body { padding: var(--sp-5); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .eco { opacity: 0.75; }
-  .radar-barrido { opacity: 0.5; }
 }

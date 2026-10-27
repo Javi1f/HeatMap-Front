@@ -1,0 +1,28 @@
+/* Fondo de «¿Qué es PlaceAt?»: cielo de estrellas y constelaciones.
+   Igual que el radar: fijo, detrás de todo, sin eventos y oculto para los
+   lectores de pantalla. */
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  display: block;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  /* Noche: estrellas azul-blancas con puntos de marca.
+     Día: tinta cálida sobre papel, como las cartas celestes antiguas. */
+  --es-estrella: #B9C6E2;
+  --es-linea:    rgba(150, 170, 230, 0.16);
+}
+
+:host-context(body[data-theme="light"]) canvas {
+  --es-estrella: #6B5340;
+  --es-linea:    rgba(90, 60, 30, 0.18);
+}

@@ -62,6 +62,7 @@ describe('PublicSection', () => {
     expect(componente.zonaActual()?.nombre).toBe('Plazoleta');
     expect(componente.conteoVisible()).toBe(3);
     expect(texto()).toContain('Plazoleta');
+    vi.advanceTimersByTime(2_000);
     expect(texto()).toContain('3 dispositivos en los últimos 5 min');
     expect(texto()).toContain('no personas');
   });
@@ -164,6 +165,7 @@ describe('PublicSection', () => {
 
 describe('Subcomponentes de la vista pública', () => {
   it('CabeceraVivo: sin valor no muestra contador; con valor indica cuándo', () => {
+    vi.useFakeTimers();
     const vista = TestBed.createComponent(CabeceraVivoComponent);
     vista.detectChanges();
     expect(vista.componentInstance.contador()).toBeNull();
@@ -174,7 +176,9 @@ describe('Subcomponentes de la vista pública', () => {
     expect(vista.componentInstance.contador()?.texto).toBe('4 dispositivos en los últimos 5 min');
     vista.componentRef.setInput('enDirecto', true);
     vista.detectChanges();
+    vi.advanceTimersByTime(2_000);
     expect(vista.nativeElement.textContent).toContain('4 dispositivos ahora');
+    vi.useRealTimers();
   });
 
   it('CabeceraLugar: oculta «sin datos» si hay dispositivos situados', () => {

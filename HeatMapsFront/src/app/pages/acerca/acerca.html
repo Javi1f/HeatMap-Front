@@ -1,0 +1,185 @@
+<!-- ¿Qué es PlaceAt? — el viaje de la señal.
+     El contenido vive aquí; el lienzo (aria-hidden) es la ilustración del
+     mismo relato y se funde entre siete escenas según el scroll. -->
+
+<div class="acerca">
+
+  <!-- ══ El viaje: lienzo pegajoso + relato ════════════════════════ -->
+  <section class="viaje">
+
+    <div class="escenario" #escenario aria-hidden="true">
+      <canvas #lienzo class="lienzo-viaje"></canvas>
+    </div>
+
+    <div class="relato" #relato>
+
+      <!-- El riel de conexión: tramos punteados que enlazan cada tarjeta
+           con la siguiente, como estrellas unidas en una constelación.
+           Las posiciones las mide el componente; el SVG es decorativo. -->
+      <svg #rielVias class="riel-vias" aria-hidden="true">
+        @for (v of vias(); track $index) {
+          <path class="via-linea" [attr.d]="v.d" />
+          <circle class="via-nodo" [attr.cx]="v.ax" [attr.cy]="v.ay" r="3.5" />
+          <circle class="via-nodo" [attr.cx]="v.bx" [attr.cy]="v.by" r="3.5" />
+        }
+      </svg>
+
+      <!-- Héroe: el mecanismo demostrándose detrás del titular. -->
+      <div class="bloque heroe" #bloque>
+        <div class="heroe-texto">
+          <h1 class="heroe-titulo">
+            La señal ya está en el aire.<br>
+            <span class="texto-calor">Solo hace falta escucharla.</span>
+          </h1>
+          <p class="heroe-sub">
+            PlaceAt convierte las señales Wi-Fi que los teléfonos emiten por sí solos
+            en un mapa de ocupación en vivo. Sin cámaras. Sin apps. Sin identificar a nadie.
+          </p>
+          <div class="heroe-acciones">
+            <a class="btn-primary" routerLink="/public">
+              <span class="material-icons">local_fire_department</span>
+              Ver el mapa en vivo
+            </a>
+            <button class="btn-secondary" type="button" (click)="irAlRelato()">
+              <span class="material-icons">south</span>
+              Así funciona
+            </button>
+          </div>
+        </div>
+        <div class="heroe-pista" aria-hidden="true">
+          <span class="material-icons">expand_more</span>
+        </div>
+      </div>
+
+      <!-- El problema, con las cifras de la encuesta propia. -->
+      <div class="bloque cifras-bloque" #bloque>
+        <div class="panel vidrio foco panel-cifras" #panel #panelCifras>
+          <h2 class="acto-titulo">Saber cuántos somos sigue siendo un trabajo manual.</h2>
+          <p class="acto-intro">
+            En aulas, auditorios y plazoletas, la ocupación se mide a mano o con formularios:
+            procesos lentos, propensos al error y siempre después del problema.
+            Preguntamos a quienes viven eso todos los días:
+          </p>
+          <dl class="cifras">
+            @for (c of [70.73, 78.05, 11.78, 70]; track $index) {
+              <div class="cifra-item">
+                <dt class="cifra-lectura">{{ lecturaCifra($index) }}</dt>
+                <dd class="cifra-valor cifra">
+                  <span class="solo-lector">{{ cifraFinal($index) }}</span>
+                  <span aria-hidden="true">{{ textoCifra($index) }}</span>
+                </dd>
+              </div>
+            }
+          </dl>
+          <p class="cifras-fuente">
+            Encuesta estructurada a usuarios de espacios con control de acceso · n = 41 · Bogotá D.C., 2026
+          </p>
+        </div>
+      </div>
+
+      <!-- Las cinco etapas del viaje. -->
+      @for (etapa of etapas; track etapa.numero) {
+        <article class="bloque paso" #bloque>
+          <div class="panel vidrio foco panel-paso" #panel [class.paso-activo]="etapaActiva() === $index + 2">
+            <div class="paso-riel" aria-hidden="true">
+              <span class="paso-numero cifra">{{ etapa.numero }}</span>
+              <span class="paso-etapa">{{ etapa.etapa }}</span>
+            </div>
+            <div class="paso-cuerpo">
+              <h2 class="paso-titulo">{{ etapa.titulo }}</h2>
+              <p class="paso-texto">{{ etapa.cuerpo }}</p>
+            </div>
+          </div>
+        </article>
+      }
+
+    </div>
+  </section>
+
+  <!-- ══ Privacidad por diseño ════════════════════════════════════ -->
+  <section class="acto acto-privacidad" #actoPrivacidad>
+    <div class="acto-cabeza">
+      <h2 class="acto-titulo">Información sobre espacios, nunca sobre personas.</h2>
+      <p class="acto-intro">
+        Toda la arquitectura está diseñada para que no exista la posibilidad de identificar
+        a nadie — no para proteger datos que nunca deberían existir.
+      </p>
+    </div>
+    <ul class="registro">
+      @for (p of principios; track p.nombre) {
+        <li class="registro-fila">
+          <span class="registro-nombre">{{ p.nombre }}</span>
+          <span class="registro-detalle">{{ p.detalle }}</span>
+        </li>
+      }
+    </ul>
+    <p class="nota-camaras">
+      <span class="material-icons">videocam_off</span>
+      <span>
+        Frente a las cámaras: no generamos imagen, no hay rostros, no hay grabaciones.
+        La captura pasiva sin imágenes reduce la superficie de protección de datos de raíz.
+      </span>
+    </p>
+  </section>
+
+  <!-- ══ Capacidades ══════════════════════════════════════════════ -->
+  <section class="acto acto-capacidades">
+    <div class="acto-cabeza">
+      <h2 class="acto-titulo">Una sola plataforma, ocho capacidades.</h2>
+    </div>
+    <ul class="registro registro-doble">
+      @for (c of capacidades; track c.nombre) {
+        <li class="registro-fila registro-capacidad">
+          <span class="capacidad-icono material-icons" aria-hidden="true">{{ c.icono }}</span>
+          <span class="registro-nombre">{{ c.nombre }}</span>
+          <span class="registro-detalle">{{ c.detalle }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- ══ Límites honestos ═════════════════════════════════════════ -->
+  <section class="acto acto-limites">
+    <div class="acto-cabeza">
+      <h2 class="acto-titulo">Sabemos dónde están los límites.</h2>
+      <p class="acto-intro">La confianza se construye nombrando lo que el sistema no hace:</p>
+    </div>
+    <ul class="registro">
+      @for (l of limites; track l.nombre) {
+        <li class="registro-fila">
+          <span class="registro-nombre">{{ l.nombre }}</span>
+          <span class="registro-detalle">{{ l.detalle }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- ══ Cierre ═══════════════════════════════════════════════════ -->
+  <section class="acto acto-cierre">
+    <h2 class="cierre-titulo">El espacio deja de ser una incógnita<br>y se vuelve un <span class="texto-calor">dato</span>.</h2>
+    <p class="cierre-texto">
+      PlaceAt no reemplaza a las personas que vigilan los espacios:
+      les da la información que hoy no tienen. Escuchar el espacio, sin mirar a nadie — esa es la idea.
+    </p>
+    <p class="cierre-texto cierre-invitacion">
+      ¿Y en tu recinto? Ya sabes cómo funciona y qué no hace.
+      Describe tu espacio y el sistema estima los nodos que necesitarías:
+      una estimación preliminar, gratis y sin compromiso, que el equipo comercial refina contigo.
+    </p>
+    <div class="cierre-acciones">
+      <a class="btn-primary" routerLink="/cotizacion">
+        <span class="material-icons">request_quote</span>
+        Pedir cotización
+      </a>
+      <a class="btn-secondary" routerLink="/public">
+        <span class="material-icons">local_fire_department</span>
+        Ver el mapa en vivo
+      </a>
+      <a class="btn-secondary" routerLink="/register">
+        <span class="material-icons">person_add</span>
+        Crear cuenta
+      </a>
+    </div>
+  </section>
+
+</div>

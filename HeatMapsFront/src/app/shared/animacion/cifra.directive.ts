@@ -9,8 +9,8 @@
  *
  * El elemento anfitrión debe estar vacío: la directiva escribe su contenido.
  *
- * Con «reducir movimiento» activado, o donde no hay fotogramas (pruebas,
- * pestañas en segundo plano), el texto aparece directamente con su valor final.
+ * Donde no hay fotogramas (pruebas, pestañas en segundo plano), el texto
+ * aparece directamente con su valor final.
  */
 
 import { DestroyRef, Directive, ElementRef, effect, inject, input } from '@angular/core';
@@ -30,11 +30,9 @@ const MILES = '\u202F';
 /** Curva de salida: rápida al principio, suave al llegar. */
 const suavizar = (t: number): number => 1 - (1 - t) ** 3;
 
-/** `true` si el entorno permite animar y el usuario no pidió reducir el movimiento. */
+/** `true` si el entorno permite animar (hay fotogramas disponibles). */
 const puedeAnimar = (): boolean =>
-  typeof requestAnimationFrame === 'function'
-  && typeof matchMedia === 'function'
-  && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof requestAnimationFrame === 'function';
 
 /** Número leído de un texto, con lo necesario para volver a escribirlo igual. */
 interface Lectura {

@@ -1,5 +1,5 @@
 <div class="modal-overlay" (click)="closeModal()">
-  <div class="modal-card anillo" role="dialog" aria-modal="true" aria-labelledby="titulo-login" (click)="$event.stopPropagation()">
+  <div class="modal-card anillo" role="dialog" aria-modal="true" aria-labelledby="titulo-login" [attr.aria-busy]="isSubmitting() ? true : null" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
       <h2 id="titulo-login">Iniciar sesión</h2>
@@ -9,11 +9,15 @@
     </div>
 
     @if (loginError()) {
-      <div class="alert alert-error">{{ loginError() }}</div>
+      <div class="alert alert-error">
+        <span class="material-icons">error_outline</span>
+        {{ loginError() }}
+      </div>
     }
 
     @if (isBlocked()) {
       <div class="alert alert-blocked">
+        <span class="material-icons">hourglass_top</span>
         Demasiados intentos. Espera <strong>{{ countdown() }}</strong> segundos.
       </div>
     }
@@ -28,7 +32,7 @@
           formControlName="identifier"
           placeholder="correo@ejemplo.com o usuario"
           [class.input-error]="controles['identifier'].invalid && controles['identifier'].touched"
-          [attr.disabled]="isBlocked() ? true : null"
+          [attr.disabled]="isBlocked() || isSubmitting() ? true : null"
         />
         @if (controles['identifier'].invalid && controles['identifier'].touched) {
           <span class="error">Este campo es obligatorio.</span>
@@ -44,9 +48,14 @@
             formControlName="password"
             placeholder="Contraseña"
             [class.input-error]="controles['password'].invalid && controles['password'].touched"
-            [attr.disabled]="isBlocked() ? true : null"
+            [attr.disabled]="isBlocked() || isSubmitting() ? true : null"
           />
-          <button type="button" class="toggle-password" (click)="togglePassword()">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            [disabled]="isBlocked() || isSubmitting()"
+          >
             <span class="material-icons">
               {{ showPassword() ? 'visibility_off' : 'visibility' }}
             </span>
@@ -60,7 +69,7 @@
       <button
         type="submit"
         class="btn-primary"
-        [disabled]="isBlocked()"
+        [disabled]="isBlocked() || isSubmitting()"
       >
         Iniciar sesión
       </button>
@@ -71,6 +80,21 @@
       ¿No tienes cuenta?
       <a routerLink="/register" (click)="closeModal()">Regístrate</a>
     </div>
+
+    @if (isSubmitting()) {
+      <div class="cortina" role="status" [class.cortina-ok]="isGranted()">
+        @if (isGranted()) {
+          <span class="cortina-emblema" aria-hidden="true">
+            <span class="material-icons">check_circle</span>
+          </span>
+          <p class="cortina-rotulo cortina-rotulo-ok">Acceso concedido</p>
+        } @else {
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="cortina-rotulo">Verificando credenciales</p>
+        }
+        <span class="cortina-barrido" aria-hidden="true"></span>
+      </div>
+    }
 
   </div>
 </div>

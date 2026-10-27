@@ -86,15 +86,17 @@ export class NavbarComponent {
 
   /** Elementos de navegación siempre visibles (rutas públicas). */
   navItems: NavItem[] = [
-    { label: 'Inicio',          route: '/',       icon: 'home'   },
-    { label: 'Sección pública', route: '/public', icon: 'local_fire_department' }
+    { label: 'Inicio',          route: '/',           icon: 'home'   },
+    { label: 'Sección pública', route: '/public',     icon: 'local_fire_department' },
+    { label: 'Cotización',      route: '/cotizacion', icon: 'request_quote' }
   ];
 
   /** Elementos de navegación exclusivos del área de administración. */
   adminItems: NavItem[] = [
-    { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard',       esAdmin: true },
-    { label: 'Usuarios',  route: '/admin/users',     icon: 'manage_accounts', esAdmin: true, soloRoot: true },
-    { label: 'Reportes',  route: '/admin/reportes',  icon: 'description',     esAdmin: true }
+    { label: 'Dashboard',    route: '/admin/dashboard',    icon: 'dashboard',       esAdmin: true },
+    { label: 'Usuarios',     route: '/admin/users',        icon: 'manage_accounts', esAdmin: true, soloRoot: true },
+    { label: 'Reportes',     route: '/admin/reportes',     icon: 'description',     esAdmin: true },
+    { label: 'Cotizaciones', route: '/admin/cotizaciones', icon: 'inbox',           esAdmin: true }
   ];
 
   /**

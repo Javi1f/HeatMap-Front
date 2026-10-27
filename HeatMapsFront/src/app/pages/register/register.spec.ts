@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { Register } from './register';
@@ -8,8 +8,14 @@ import { Register } from './register';
 /** Contraseña ficticia que cumple la política del formulario; no es una credencial real. */
 const CLAVE_DE_PRUEBA = 'ClaveSegura1!'; // skipcq: SCT-A000
 
-/** Datos de registro válidos. */
-const VALIDO = { username: 'ana', email: 'ana@unbosque.edu.co', password: CLAVE_DE_PRUEBA, confirmPassword: CLAVE_DE_PRUEBA };
+/** Datos de registro válidos, con la autorización de datos ya concedida. */
+const VALIDO = {
+  username: 'ana',
+  email: 'ana@unbosque.edu.co',
+  password: CLAVE_DE_PRUEBA,
+  confirmPassword: CLAVE_DE_PRUEBA,
+  aceptaDatos: true,
+};
 
 /** Rechazo del código de verificación, con los intentos restantes si se indican. */
 const errorVerificacion = (attemptsLeft?: number) =>
@@ -43,11 +49,14 @@ describe('Register', () => {
       verifyCode: vi.fn(() => of({ admin: { id: 'a1' }, token: 't' })),
       cancelVerification: vi.fn(() => of({ message: 'ok' })),
     };
-    router = { navigate: vi.fn(() => Promise.resolve(true)) };
     TestBed.configureTestingModule({
       imports: [Register],
-      providers: [{ provide: AuthService, useValue: auth }, { provide: Router, useValue: router }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
     });
+    // Navegación real del router, con `navigate` reemplazado por un registro:
+    // la real no sirve en pruebas y así las aserciones conocen el destino.
+    router = { navigate: vi.fn((_camino: string[]) => Promise.resolve(true)) };
+    (TestBed.inject(Router) as unknown as { navigate: unknown }).navigate = router.navigate;
   });
 
   it('valida cada campo y explica el problema', () => {
@@ -58,7 +67,7 @@ describe('Register', () => {
     expect(html().textContent).toContain('El correo es obligatorio.');
     expect(html().textContent).toContain('La contraseña es obligatoria.');
 
-    componente.registerForm.setValue({ username: 'an', email: 'no-correo', password: 'corta', confirmPassword: 'otra' });
+    componente.registerForm.setValue({ username: 'an', email: 'no-correo', password: 'corta', confirmPassword: 'otra', aceptaDatos: false });
     componente.registerForm.markAllAsTouched();
     fixture.detectChanges();
     expect(html().textContent).toContain('Mínimo 3 caracteres.');
@@ -82,6 +91,16 @@ describe('Register', () => {
     expect(componente.registerForm.errors).toEqual({ passwordMismatch: true });
     componente.registerForm.setValue(VALIDO);
     expect(componente.registerForm.valid).toBe(true);
+  });
+
+  it('no registra sin la autorización de datos personales', () => {
+    const componente = crear();
+    componente.registerForm.setValue({ ...VALIDO, aceptaDatos: false });
+    componente.registerForm.markAllAsTouched();
+    enviar();
+    expect(auth['register']).not.toHaveBeenCalled();
+    expect(componente.registerForm.invalid).toBe(true);
+    expect(html().textContent).toContain('Debes aceptar la política de datos para continuar.');
   });
 
   it('registra y abre la verificación; muestra u oculta contraseñas', () => {

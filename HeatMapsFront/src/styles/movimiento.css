@@ -23,6 +23,22 @@
   100% { transform: scale(3.4); opacity: 0; }
 }
 
+/* El haz de la cortina de verificación: recorre la tarjeta de arriba abajo.
+   Guarda el frente de la banda abajo para que su iteración vuelva a empezar
+   donde nace. */
+@keyframes barrido {
+  from { top: -32%; }
+  to   { top: 102%; }
+}
+
+/* Los puntos del rótulo de la cortina: el contenido cambia a saltos. */
+@keyframes puntos {
+  0%, 24%  { content: ''; }
+  25%, 49% { content: '.'; }
+  50%, 74% { content: '..'; }
+  75%, 100% { content: '...'; }
+}
+
 /* Entrada estándar: sube, se enfoca y aparece. */
 @keyframes entrar {
   from { opacity: 0; transform: translateY(16px); filter: blur(6px); }
@@ -87,29 +103,4 @@ tbody.escalonado > * { animation-name: aparecer; }
 }
 @keyframes vt-entrar {
   from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(8px); }
-}
-
-/* ── Reducir movimiento ────────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-
-  /* Las ondas y la deriva no tienen estado final útil: se ocultan o se
-     quedan quietas. */
-  .ondas > i { display: none; }
-  body::before { animation: none; }
 }

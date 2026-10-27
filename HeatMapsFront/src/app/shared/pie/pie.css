@@ -1,0 +1,62 @@
+/* Pie legal: fino, con el borde superior como única divisoria. Los enlaces
+   son fichas de texto plano que se encienden al pasar; la norma de referencia
+   se muestra como placa de confianza al final de la línea. */
+
+.pie {
+  max-width: 1100px;
+  margin: var(--sp-12) auto 0;
+  padding: var(--sp-6) 0 var(--sp-8);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.pie-marca {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pie-nombre {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+.pie-nombre b { color: var(--color-primary); }
+
+.pie-fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-6);
+}
+
+.pie-ficha {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.pie-ficha:hover { color: var(--color-primary); }
+
+.pie-detalle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+/* La ley de protección de datos y su autoridad viven en los documentos del
+   apartado; el pie no carga placas: se queda en la identificación sobria. */
+
+@media (max-width: 480px) {
+  .pie { margin-top: var(--sp-10); }
+}

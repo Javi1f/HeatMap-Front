@@ -57,6 +57,10 @@ export class Login implements OnDestroy {
   get countdown()    { return this.loginState.countdown;    }
   /** `true` cuando la contraseña se muestra en texto plano. */
   get showPassword() { return this.loginState.showPassword; }
+  /** `true` mientras la petición de login está en vuelo: cortina y bloqueo. */
+  get isSubmitting() { return this.loginState.isSubmitting; }
+  /** `true` cuando la cortina anuncia el acceso concedido. */
+  get isGranted()    { return this.loginState.isGranted;    }
 
   /** Alterna la visibilidad de la contraseña. */
   togglePassword(): void { this.loginState.togglePassword(); }

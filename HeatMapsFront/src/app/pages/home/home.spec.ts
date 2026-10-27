@@ -35,7 +35,8 @@ describe('Home', () => {
 
   it('sin sesión abre el login y lleva al registro y a los mapas', () => {
     crear();
-    (html().querySelector('.card-btn') as HTMLButtonElement).click();
+    // La primera tarjeta es «Ver más» (acerca); la del acceso va después.
+    (html().querySelectorAll('.card-btn')[1] as HTMLButtonElement).click();
     expect(TestBed.inject(ModalService).showLogin()).toBe(true);
 
     (html().querySelector('.card-btn.secondary') as HTMLButtonElement).click();

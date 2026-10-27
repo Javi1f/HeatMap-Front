@@ -102,6 +102,22 @@ describe('Rutas', () => {
     expect(componentes).toEqual([Home, PublicSection, Login, Register, Dashboard, Users, Reportes]);
   });
 
+  it('las cuatro rutas legales cargan el apartado y eligen su documento', async () => {
+    const legales: Array<[string, string]> = [
+      ['legal/privacidad', 'privacidad'],
+      ['legal/aviso', 'aviso'],
+      ['legal/terminos', 'terminos'],
+      ['legal/cookies', 'cookies'],
+    ];
+    for (const [camino, documento] of legales) {
+      const ruta = buscar([camino]);
+      expect(ruta.data?.['documento']).toBe(documento);
+      expect((await (ruta.loadComponent as () => Promise<unknown>)())).toBe(
+        (await import('./pages/legal/legal')).Legal,
+      );
+    }
+  });
+
   it('la configuración registra router, cliente HTTP con interceptores y el manejo global de errores', () => {
     expect(appConfig.providers.length).toBe(3);
   });

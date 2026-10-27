@@ -31,7 +31,6 @@ describe('CifraDirective', () => {
   let cuadros: Map<number, FrameRequestCallback>;
   let siguiente: number;
   let ahora: number;
-  let reducir: boolean;
 
   /** Texto visible del elemento. */
   const texto = () => (fixture.nativeElement as HTMLElement).querySelector('span')?.textContent;
@@ -54,14 +53,12 @@ describe('CifraDirective', () => {
     cuadros = new Map();
     siguiente = 1;
     ahora = 1000;
-    reducir = false;
     vi.stubGlobal('requestAnimationFrame', vi.fn((cuadro: FrameRequestCallback) => {
       const id = siguiente++;
       cuadros.set(id, cuadro);
       return id;
     }));
     vi.stubGlobal('cancelAnimationFrame', vi.fn((id: number) => cuadros.delete(id)));
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: reducir })));
     vi.spyOn(performance, 'now').mockImplementation(() => ahora);
   });
 
@@ -120,7 +117,7 @@ describe('CifraDirective', () => {
     expect(texto()).toBe('5 dispositivos');
   });
 
-  it('el mismo valor, un texto sin número o «reducir movimiento» se pintan al instante', () => {
+  it('el mismo valor o un texto sin número se pintan al instante', () => {
     crear();
     avanzar(900);
 
@@ -131,16 +128,11 @@ describe('CifraDirective', () => {
     fixture.componentInstance.texto.set('Sin datos');
     fixture.detectChanges();
     expect(texto()).toBe('Sin datos');
-
-    reducir = true;
-    fixture.componentInstance.texto.set('40 dispositivos');
-    fixture.detectChanges();
-    expect(texto()).toBe('40 dispositivos');
     expect(cuadros.size).toBe(0);
   });
 
-  it('sin fotogramas ni matchMedia pinta el valor final', () => {
-    vi.stubGlobal('matchMedia', undefined);
+  it('sin fotogramas pinta el valor final', () => {
+    vi.stubGlobal('requestAnimationFrame', undefined);
     crear();
     expect(texto()).toBe('127 dispositivos');
   });

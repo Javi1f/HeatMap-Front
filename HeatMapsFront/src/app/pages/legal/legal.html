@@ -1,0 +1,1037 @@
+﻿<!--
+  Apartado legal: los cuatro documentos comparten maqueta. El conmutador
+  elige cuál se lee; cada artículo trae su índice de cláusulas y el bloque de
+  «otros documentos» se renderiza una sola vez, fuera del conmutador.
+-->
+
+<div class="legal-container">
+
+  <!-- Encabezado: título del documento activo y sello de versión alineado con
+       el borde derecho del texto. -->
+  <header class="legal-cabeza">
+    <div class="insignia">
+      <span class="insignia-codigo">{{ version.codigo }}</span>
+      <span class="insignia-sello">{{ version.sello }}</span>
+    </div>
+    <h1 class="legal-titulo">{{ ficha().titulo }}</h1>
+    <p class="legal-resumen">{{ ficha().resumen }}</p>
+  </header>
+
+  <!-- Conmutador entre los documentos del apartado. -->
+  <nav class="legal-piezas" aria-label="Documentos del apartado legal">
+    @for (pieza of fichas; track pieza.id) {
+      <a class="pieza"
+         [class.activa]="pieza.id === documento()"
+         [routerLink]="pieza.ruta"
+         [attr.aria-current]="pieza.id === documento() ? 'page' : null">
+        <span class="material-icons" aria-hidden="true">{{ pieza.icono }}</span>
+        {{ pieza.etiqueta }}
+      </a>
+    }
+  </nav>
+
+  <!-- ════════════ DOCUMENTO 1 · POLÍTICA DE PRIVACIDAD ════════════ -->
+  @switch (documento()) {
+    @case ('privacidad') {
+      <article class="documento">
+        <nav class="indice" aria-label="Índice de la política de privacidad">
+          <span class="indice-rotulo">Contenido</span>
+          <ol>
+            <li><a href="#p-2">La información que recogemos</a></li>
+            <li><a href="#p-3">Para qué la usamos</a></li>
+            <li><a href="#p-4">La autorización</a></li>
+            <li><a href="#p-5">La detección pasiva</a></li>
+            <li><a href="#p-6">Cuánto tiempo conservamos</a></li>
+            <li><a href="#p-8">Sus derechos</a></li>
+            <li><a href="#p-9">Cómo ejercerlos</a></li>
+            <li><a href="#p-10">La SIC</a></li>
+          </ol>
+        </nav>
+
+        <section class="clausula" id="p-1">
+          <span class="clausula-no" aria-hidden="true">01</span>
+          <div class="clausula-cuerpo">
+            <h2>El responsable</h2>
+            <p>
+              Esta política se publica en cumplimiento del deber informativo del artículo 13 de
+              la Ley 1581 de 2012. Explica qué información maneja PlaceAt y responde, con nombre
+              propio, por ella:
+            </p>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Servicio</th>
+                    <td>PlaceAt — plataforma de monitoreo de ocupación de espacios.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Responsable</th>
+                    <td>
+                      <strong>Joann Alejandro Zamudio Castro</strong> y
+                      <strong>Javier Felipe Meza Montero</strong>, personas naturales y
+                      titulares de la plataforma.
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Identificación</th>
+                    <td>
+                      <mark class="pendiente">C.C. [por completar]</mark> ·
+                      <mark class="pendiente">C.C. [por completar]</mark>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Domicilio</th>
+                    <td>
+                      Bogotá D.C., Colombia · Dirección de notificación:
+                      <mark class="pendiente">[por completar]</mark>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Contacto y soporte</th>
+                    <td>
+                      <a href="mailto:jazamudioc@unbosque.edu.co">jazamudioc@unbosque.edu.co</a>
+                      · <a href="mailto:jmezam@unbosque.edu.co">jmezam@unbosque.edu.co</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-2">
+          <span class="clausula-no" aria-hidden="true">02</span>
+          <div class="clausula-cuerpo">
+            <h2>La información que recogemos</h2>
+            <p>
+              El mapa público no registra nada sobre usted: no hay cuenta, no hay datos
+              personales y no hay rastro asociado a su visita. La información se recoge solo
+              cuando usted crea una cuenta de administración o nos escribe:
+            </p>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Cuando</th>
+                    <th scope="col">Qué recogemos</th>
+                    <th scope="col">Para qué</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Se registra un administrador</td>
+                    <td>
+                      Nombre de usuario, correo electrónico y contraseña. La contraseña se
+                      guarda cifrada y sin lectura en texto claro.
+                    </td>
+                    <td>Crear la cuenta y verificar que el correo es quien dice ser.</td>
+                  </tr>
+                  <tr>
+                    <td>Llega la verificación</td>
+                    <td>El código de cinco dígitos enviado al correo.</td>
+                    <td>Confirmar la cuenta en dos pasos.</td>
+                  </tr>
+                  <tr>
+                    <td>Se entra al panel</td>
+                    <td>Las credenciales y la sesión activa (token de acceso).</td>
+                    <td>Autenticar el acceso a las funciones de gestión.</td>
+                  </tr>
+                  <tr>
+                    <td>El panel queda en uso</td>
+                    <td>Las acciones de cada administrador, con fecha y hora.</td>
+                    <td>Seguridad y trazabilidad ante incidentes.</td>
+                  </tr>
+                  <tr>
+                    <td>Nos escribe</td>
+                    <td>Su correo de contacto y el contenido del mensaje.</td>
+                    <td>Responder y atender su solicitud.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              En el navegador solo quedan su preferencia de tema y, si administra el sistema, el
+              token de sesión: lo cuenta la
+              <a routerLink="/legal/cookies">política de cookies</a>.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-3">
+          <span class="clausula-no" aria-hidden="true">03</span>
+          <div class="clausula-cuerpo">
+            <h2>Para qué la usamos</h2>
+            <ul>
+              <li>Crear, verificar y mantener las cuentas de administración, con verificación en dos pasos al correo.</li>
+              <li>Sostener la seguridad del panel: sesiones controladas, lista de correos autorizados y auditoría de acciones.</li>
+              <li>Prevenir accesos indebidos, investigar incidentes y atender los deberes legales aplicables.</li>
+              <li>Responder lo que usted nos escriba por los canales habilitados.</li>
+              <li>Producir las métricas de ocupación —conteos por zona, niveles y alertas— que nunca identifican personas.</li>
+            </ul>
+            <p>
+              <strong>Lo que nunca hacemos.</strong> No vendemos ni alquilamos su información, no
+              la cedemos con fines comerciales, no la usamos para publicidad ni para perfilar
+              comportamiento, y no tomamos decisiones automatizadas sobre una persona.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-4">
+          <span class="clausula-no" aria-hidden="true">04</span>
+          <div class="clausula-cuerpo">
+            <h2>La autorización</h2>
+            <p>
+              El tratamiento de sus datos necesita una autorización previa, expresa e informada
+              (artículo 9 de la Ley 1581 de 2012). En la práctica, esta es una casilla del
+              formulario de registro que llega desmarcada: la cuenta solo se crea si usted marca
+              que ha leído esta política y acepta los
+              <a routerLink="/legal/terminos">términos y condiciones</a>. Sin esa caja marcada,
+              el formulario no envía nada.
+            </p>
+            <p>
+              Puede revocar la autorización y pedir la supresión de sus datos en cualquier
+              momento (canal en la cláusula 08). La revocación no tiene efectos retroactivos y,
+              si la ley obliga a conservar algo por más tiempo, conservamos únicamente eso y lo
+              eliminamos al vencer el deber.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-5">
+          <span class="clausula-no" aria-hidden="true">05</span>
+          <div class="clausula-cuerpo">
+            <h2>La detección pasiva</h2>
+            <div class="nota">
+              <span class="material-icons" aria-hidden="true">sensors</span>
+              <p>
+                Esta cláusula existe para que el sistema de sensores le quede claro. Los nodos
+                escuchan las tramas que los dispositivos inalámbricos emiten por sí solos dentro
+                del espacio monitoreado: usted no tiene que habilitar nada para ser contado,
+                porque lo que se cuenta no es a usted.
+              </p>
+            </div>
+            <p>
+              De cada trama se extraen la dirección MAC, la intensidad de la señal (RSSI), el
+              canal, el tipo de trama y la hora. Antes de que nada toque la base de datos, el
+              sistema hace lo siguiente:
+            </p>
+            <ul>
+              <li>
+                La dirección MAC nunca se almacena: se sustituye por su
+                <code class="dato">HMAC-SHA256</code>, calculada con una clave que solo reside en
+                el servidor.
+              </li>
+              <li>
+                Se descartan las tramas mal formadas, las de grupo y las repetidas dentro de una
+                misma lectura; se marca si la dirección es aleatorizada, por el bit U/L del
+                estándar IEEE 802 para direcciones EUI-48.
+              </li>
+              <li>
+                Las capturas crudas se agregan cada cinco minutos por zona en conteos, señales
+                promedio y niveles de ocupación; el histórico persistente es el agregado.
+              </li>
+              <li>
+                El mapa público y sus canales de datos entregan rejillas y conteos por zona:
+                nunca la posición de un dispositivo ni el hash individual.
+              </li>
+            </ul>
+            <p>
+              El resultado cuenta <strong>dispositivos</strong>, no personas: bajo el supuesto de
+              un dispositivo activo por persona, la cifra de ocupación es una estimación derivada.
+              Lo que persiste no permite identificar, asociar ni ubicar persona alguna, y se
+              trata bajo los principios de finalidad, transparencia, seguridad, confidencialidad
+              y temporalidad del artículo 4 de la Ley 1581 de 2012.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-6">
+          <span class="clausula-no" aria-hidden="true">06</span>
+          <div class="clausula-cuerpo">
+            <h2>Cuánto tiempo conservamos</h2>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Información</th>
+                    <th scope="col">Conservación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Cuenta de administración (usuario, correo cifrado, credencial)</td>
+                    <td>Mientras exista la cuenta; al suprimirse, los datos se eliminan.</td>
+                  </tr>
+                  <tr>
+                    <td>Sesiones activas, controladas con tokens</td>
+                    <td>Mientras la sesión esté vigente; caducan o se revocan por el sistema.</td>
+                  </tr>
+                  <tr>
+                    <td>Auditoría del panel</td>
+                    <td>
+                      El tiempo necesario para investigar incidentes y responder requerimientos
+                      legales.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Capturas anonimizadas de los sensores</td>
+                    <td>
+                      Solo durante el período de pruebas y evaluación; después se depuran y el
+                      histórico queda en agregados por zona.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              La regla es el principio de temporalidad: nada se conserva más tiempo del que su
+              finalidad justifica.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-7">
+          <span class="clausula-no" aria-hidden="true">07</span>
+          <div class="clausula-cuerpo">
+            <h2>Cómo la protegemos</h2>
+            <ul>
+              <li>
+                Comunicaciones cifradas en tránsito (HTTPS y TLS) y respuestas de la API cifradas
+                con <code class="dato">AES-256-GCM</code>.
+              </li>
+              <li>
+                Datos sensibles de las cuentas almacenados de forma cifrada, sin lectura en texto
+                claro.
+              </li>
+              <li>Sesiones con tokens, control de acceso por roles y verificación en dos pasos.</li>
+              <li>Análisis estático de código y revisión automática de dependencias en cada cambio.</li>
+              <li>
+                Deber de confidencialidad sobre toda la información tratada, incluso después de
+                terminada la operación.
+              </li>
+            </ul>
+            <p>
+              Si una falla de seguridad comprometiera datos personales, se aplicarán las medidas
+              de mitigación y se informará a los titulares y a la autoridad competente conforme a
+              la normativa.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-8">
+          <span class="clausula-no" aria-hidden="true">08</span>
+          <div class="clausula-cuerpo">
+            <h2>Sus derechos</h2>
+            <p>Usted puede en todo momento:</p>
+            <ul>
+              <li>Conocer, actualizar y rectificar sus datos personales.</li>
+              <li>Solicitar prueba de la autorización otorgada.</li>
+              <li>Ser informado, previa solicitud, del uso que se ha dado a sus datos.</li>
+              <li>
+                Presentar quejas ante la Superintendencia de Industria y Comercio (SIC) por
+                presuntas violaciones de la Ley.
+              </li>
+              <li>
+                Revocar la autorización y/o solicitar la supresión del dato cuando no exista un
+                deber legal de conservación (artículo 8 de la Ley 1581 de 2012).
+              </li>
+              <li>Acceder de forma gratuita a sus datos personales que hayan sido objeto de tratamiento.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-9">
+          <span class="clausula-no" aria-hidden="true">09</span>
+          <div class="clausula-cuerpo">
+            <h2>Cómo ejercerlos</h2>
+            <p>
+              Escríbanos a
+              <a href="mailto:jazamudioc@unbosque.edu.co">jazamudioc@unbosque.edu.co</a> o
+              <a href="mailto:jmezam@unbosque.edu.co">jmezam@unbosque.edu.co</a>. El mensaje debe
+              llevar su nombre completo, sus datos de contacto y una descripción concreta de lo
+              que pide (conocer, actualizar, rectificar o suprimir), con el documento que acredite
+              su identidad.
+            </p>
+            <ul>
+              <li>
+                <strong>Consultas.</strong> Respuesta en máximo diez (10) días hábiles desde su
+                recibo; si no alcanza, avisamos el día exacto en que se resuelve, que puede ser
+                hasta cinco (5) días hábiles más (artículo 14 de la Ley 1581 de 2012).
+              </li>
+              <li>
+                <strong>Reclamos.</strong> Quedan con constancia en el sistema —identificación,
+                fecha y asunto— y se responden en quince (15) días hábiles contados desde el día
+                siguiente al recibo, prorrogables hasta ocho (8) días hábiles más cuando falten
+                medios para atenderlos (artículo 15 de la Ley 1581 de 2012 y Decreto 1377 de 2013).
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-10">
+          <span class="clausula-no" aria-hidden="true">10</span>
+          <div class="clausula-cuerpo">
+            <h2>Si algo falla: la SIC</h2>
+            <p>
+              La Superintendencia de Industria y Comercio (SIC) vigila el cumplimiento de la Ley
+              1581 de 2012. Si ya usó nuestro canal de la cláusula 08 y considera que sus
+              derechos siguen afectados, puede presentar una queja ante la SIC:
+            </p>
+            <ul>
+              <li>
+                Sitio web:
+                <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer">www.sic.gov.co</a>
+              </li>
+              <li>Correo: ciudadanoelectronico&#64;sic.gov.co</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-11">
+          <span class="clausula-no" aria-hidden="true">11</span>
+          <div class="clausula-cuerpo">
+            <h2>Menores y datos sensibles</h2>
+            <p>
+              PlaceAt no recoge datos de menores de 18 años, ni datos sensibles —salud, huellas
+              biométricas u otro dato del artículo 5 de la Ley. El sistema de sensores tampoco:
+              de los dispositivos registra únicamente el tránsito radioeléctrico, ya anonimizado.
+              Si un menor apareciera como titular de una cuenta, el caso se atendería con el
+              privilegio de los artículos 7 y 12 de la Ley, que exige autorización de sus
+              padres o cuidadores para cualquier tratamiento.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="p-12">
+          <span class="clausula-no" aria-hidden="true">12</span>
+          <div class="clausula-cuerpo">
+            <h2>Cambios de esta política</h2>
+            <p>
+              La versión vigente es siempre la visible en esta página, con su sello de fecha.
+              Cuando la política cambie, el cambio se publica aquí; el aviso del pie de la
+              pantalla y el formulario de registro enlazan siempre a esta versión.
+            </p>
+          </div>
+        </section>
+      </article>
+    }
+
+    <!-- ════════════ DOCUMENTO 2 · AVISO LEGAL ════════════ -->
+    @case ('aviso') {
+      <article class="documento">
+        <nav class="indice" aria-label="Índice del aviso legal">
+          <span class="indice-rotulo">Contenido</span>
+          <ol>
+            <li><a href="#a-1">Quién es PlaceAt</a></li>
+            <li><a href="#a-2">Qué es y qué no es el sitio</a></li>
+            <li><a href="#a-3">Soporte y contacto</a></li>
+            <li><a href="#a-4">Terceros de la operación</a></li>
+            <li><a href="#a-5">Contenido y marca</a></li>
+          </ol>
+        </nav>
+
+        <section class="clausula" id="a-1">
+          <span class="clausula-no" aria-hidden="true">01</span>
+          <div class="clausula-cuerpo">
+            <h2>Quién es PlaceAt</h2>
+            <p>
+              PlaceAt es una plataforma de monitoreo de ocupación de espacios que opera con
+              estos datos de identificación:
+            </p>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Producto</th>
+                    <td>PlaceAt — mapas de calor y ocupación de espacios en tiempo cercano al real.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Operación y titularidad</th>
+                    <td>
+                      <strong>Joann Alejandro Zamudio Castro</strong> —
+                      <mark class="pendiente">C.C. [por completar]</mark>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Operación y titularidad</th>
+                    <td>
+                      <strong>Javier Felipe Meza Montero</strong> —
+                      <mark class="pendiente">C.C. [por completar]</mark>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Domicilio y dirección</th>
+                    <td>
+                      Bogotá D.C., Colombia ·
+                      <mark class="pendiente">[dirección de notificación por completar]</mark>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Contacto directo</th>
+                    <td>
+                      <a href="mailto:jazamudioc@unbosque.edu.co">jazamudioc@unbosque.edu.co</a>
+                      · <a href="mailto:jmezam@unbosque.edu.co">jmezam@unbosque.edu.co</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Año de publicación</th>
+                    <td>2026</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="clausula" id="a-2">
+          <span class="clausula-no" aria-hidden="true">02</span>
+          <div class="clausula-cuerpo">
+            <h2>Qué es y qué no es el sitio</h2>
+            <p>
+              PlaceAt es un <strong>servicio informativo y de gestión, sin transacciones
+              económicas</strong>: publica mapas de calor y niveles agregados de ocupación y
+              ofrece un panel de administración para las cuentas autorizadas. No se venden
+              productos ni se prestan servicios remunerados por medio del sitio, por lo que no
+              constituye comercio electrónico en el sentido de la Ley 527 de 1999.
+            </p>
+            <p>
+              La información del mapa es <strong>agregada y estimada</strong>: el sistema cuenta
+              dispositivos de forma pasiva, no personas. Su uso se regula en los
+              <a routerLink="/legal/terminos">términos y condiciones</a>, junto a los límites de
+              responsabilidad del servicio.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="a-3">
+          <span class="clausula-no" aria-hidden="true">03</span>
+          <div class="clausula-cuerpo">
+            <h2>Soporte y contacto</h2>
+            <p>
+              El canal es el correo electrónico, atendido en horario hábil de Colombia
+              (GMT&minus;5). Las consultas sobre datos personales se responden en los plazos de la
+              <a routerLink="/legal/privacidad">política de privacidad</a> —diez y quince días
+              hábiles, según el caso— y la dirección de notificación del titular es la vía
+              habilitada distinta del correo.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="a-4">
+          <span class="clausula-no" aria-hidden="true">04</span>
+          <div class="clausula-cuerpo">
+            <h2>Terceros que sostienen la operación</h2>
+            <p>
+              El servicio corre sobre proveedores en la nube, cada uno bajo sus propias
+              condiciones, a cuyos términos remitimos:
+            </p>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Proveedor</th>
+                    <th scope="col">Rol en el sistema</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Netlify</td>
+                    <td>Entrega del front-end del sitio.</td>
+                  </tr>
+                  <tr>
+                    <td>Northflank</td>
+                    <td>Alojamiento del back-end y de su API cifrada.</td>
+                  </tr>
+                  <tr>
+                    <td>Aiven</td>
+                    <td>
+                      Bróker de mensajería Apache Kafka para el flujo de datos de los sensores.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>MySQL</td>
+                    <td>Base de datos relacional en infraestructura propia del sistema.</td>
+                  </tr>
+                  <tr>
+                    <td>Google Fonts</td>
+                    <td>
+                      Tipografías (Inter, Space Grotesk, JetBrains Mono) e iconos Material Icons.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Ninguno recibe de PlaceAt datos personales adicionales a los técnicos
+              estrictamente necesarios para entregar su servicio; el detalle técnico está en la
+              <a routerLink="/legal/cookies">política de cookies</a>.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="a-5">
+          <span class="clausula-no" aria-hidden="true">05</span>
+          <div class="clausula-cuerpo">
+            <h2>Contenido y marca</h2>
+            <p>
+              El nombre «PlaceAt», su logotipo, los textos, el diseño y el código pertenecen a
+              sus titulares y están protegidos por la legislación colombiana de derecho de autor
+              y marcas (Ley 23 de 1982, Ley 44 de 1993 y Decisión 486 de la Comunidad Andina).
+              Las condiciones de uso se exponen en los
+              <a routerLink="/legal/terminos">términos y condiciones</a>.
+            </p>
+          </div>
+        </section>
+      </article>
+    }
+
+    <!-- ════════════ DOCUMENTO 3 · TÉRMINOS Y CONDICIONES ════════════ -->
+    @case ('terminos') {
+      <article class="documento">
+        <nav class="indice" aria-label="Índice de los términos y condiciones">
+          <span class="indice-rotulo">Contenido</span>
+          <ol>
+            <li><a href="#t-1">El alcance</a></li>
+            <li><a href="#t-2">Qué ofrece el servicio</a></li>
+            <li><a href="#t-3">El mapa público</a></li>
+            <li><a href="#t-4">Cuentas de administración</a></li>
+            <li><a href="#t-5">Lo que sí está permitido</a></li>
+            <li><a href="#t-6">Lo que no está permitido</a></li>
+            <li><a href="#t-7">Lo que es de PlaceAt</a></li>
+            <li><a href="#t-8">Límites de responsabilidad</a></li>
+            <li><a href="#t-9">Sin transacciones</a></li>
+            <li><a href="#t-10">Cambios</a></li>
+            <li><a href="#t-11">Ley aplicable y jurisdicción</a></li>
+          </ol>
+        </nav>
+
+        <section class="clausula" id="t-1">
+          <span class="clausula-no" aria-hidden="true">01</span>
+          <div class="clausula-cuerpo">
+            <h2>El alcance</h2>
+            <p>
+              Estos términos regulan el uso de PlaceAt. Entrar al sitio, consultar el mapa
+              público o usar el panel significa aceptar esta versión, que integra la
+              <a routerLink="/legal/privacidad">política de privacidad</a>, la
+              <a routerLink="/legal/cookies">política de cookies</a> y el
+              <a routerLink="/legal/aviso">aviso legal</a>. Si no está de acuerdo, no use el
+              sitio.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-2">
+          <span class="clausula-no" aria-hidden="true">02</span>
+          <div class="clausula-cuerpo">
+            <h2>Qué ofrece el servicio</h2>
+            <p>
+              PlaceAt mide la ocupación de espacios con sensores IoT de detección pasiva y la
+              publica en dos superficies:
+            </p>
+            <ul>
+              <li>
+                <strong>El mapa público:</strong> mapa de calor y niveles de ocupación de las
+                zonas monitoreadas, sin registro. La información es agregada y aproximada: el
+                sistema cuenta dispositivos, no personas, y bajo el supuesto de un dispositivo
+                activo por persona la cifra solo estima la ocupación.
+              </li>
+              <li>
+                <strong>El panel de administración:</strong> gestión de cuentas autorizadas,
+                zonas, nodos, alertas y reportes del histórico. Exige registro con un correo
+                previamente autorizado por otro administrador y verificación en dos pasos.
+              </li>
+            </ul>
+            <p>
+              El servicio se despliega para validación técnica en espacios delimitados: sus
+              métricas no constituyen una medición certificada ni generan obligaciones distintas
+              de las de este documento.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-3">
+          <span class="clausula-no" aria-hidden="true">03</span>
+          <div class="clausula-cuerpo">
+            <h2>El mapa público</h2>
+            <p>
+              El acceso al mapa público es gratuito y no exige identificación. Consúltelo con un
+              uso razonable, sin lecturas automatizadas o masivas que degraden el servicio: lo
+              detallado está en la cláusula 06.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-4">
+          <span class="clausula-no" aria-hidden="true">04</span>
+          <div class="clausula-cuerpo">
+            <h2>Cuentas de administración</h2>
+            <ul>
+              <li>
+                Solo se registra un correo incluido previamente en la lista de autorizados del
+                sistema, confirmado con el código que llega a ese correo.
+              </li>
+              <li>
+                Cada administrador responde por sus credenciales y avisa de inmediato si su
+                cuenta fue usada sin autorización.
+              </li>
+              <li>
+                Las sesiones se controlan con tokens y pueden revocarse; las acciones quedan en
+                la auditoría del sistema.
+              </li>
+              <li>
+                PlaceAt puede suspender o cancelar cuentas usadas contra estos términos o contra
+                la seguridad del servicio.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-5">
+          <span class="clausula-no" aria-hidden="true">05</span>
+          <div class="clausula-cuerpo">
+            <h2>Lo que sí está permitido</h2>
+            <ul>
+              <li>
+                Consultar la ocupación para decidir con datos: elegir zonas menos concurridas,
+                planificar visitas u organizar recursos.
+              </li>
+              <li>Usar el panel de administración dentro de sus funciones, conforme al rol asignado.</li>
+              <li>Reportar errores, anomalías de conteo o fallos del servicio por los canales de contacto.</li>
+              <li>Citar y referir el sistema en contextos académicos, con la atribución correspondiente.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-6">
+          <span class="clausula-no" aria-hidden="true">06</span>
+          <div class="clausula-cuerpo">
+            <h2>Lo que no está permitido</h2>
+            <ul>
+              <li>
+                Usar el sitio para fines ilícitos, difamatorios o contrarios al ordenamiento
+                colombiano.
+              </li>
+              <li>
+                Suplantar identidades, registrar cuentas con correos no autorizados o evadir la
+                verificación en dos pasos, el control de sesiones o cualquier mecanismo de
+                seguridad.
+              </li>
+              <li>
+                Alterar las mediciones: emitir deliberadamente tramas inalámbricas pensadas para
+                falsear el conteo.
+              </li>
+              <li>
+                Atacar la infraestructura: interferir con los nodos de captura, el bróker o la
+                API; escaneos agresivos, denegaciones de servicio o inyecciones de datos.
+              </li>
+              <li>
+                Extraer datos masivamente con scraping, robots o herramientas automatizadas sin
+                autorización escrita.
+              </li>
+              <li>
+                Acceder a información de otros usuarios, a funciones fuera del rol asignado o a
+                los materiales de anonimización del sistema.
+              </li>
+              <li>
+                Reproducir, revender o explotar comercialmente el contenido o el software sin
+                autorización.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-7">
+          <span class="clausula-no" aria-hidden="true">07</span>
+          <div class="clausula-cuerpo">
+            <h2>Lo que es de PlaceAt</h2>
+            <p>
+              El nombre <strong>PlaceAt</strong> y su logotipo, los textos, el diseño, los
+              gráficos y el código fuente pertenecen a sus titulares como dueños de los
+              derechos patrimoniales y morales, conforme a la Ley 23 de 1982, la Ley 44 de 1993
+              y la Decisión 486 de la Comunidad Andina de Naciones. Todos los derechos
+              reservados.
+            </p>
+            <ul>
+              <li>
+                Reproducir, distribuir, modificar o comunicar públicamente el contenido requiere
+                autorización expresa y escrita, salvo lo que las excepciones del límite legal
+                colombiano (uso justo, cita y análogos) permitan.
+              </li>
+              <li>
+                Las tipografías, los iconos y las librerías de terceros conservan las licencias
+                de sus propietarios, que se listan en el
+                <a routerLink="/legal/aviso">aviso legal</a>.
+              </li>
+              <li>
+                La documentación técnica y el código del sistema se publican en el repositorio
+                del proyecto bajo sus propias condiciones; para otros usos, escríbanos.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-8">
+          <span class="clausula-no" aria-hidden="true">08</span>
+          <div class="clausula-cuerpo">
+            <h2>Límites de responsabilidad</h2>
+            <p>
+              El servicio se presta <strong>«tal cual»</strong>, sin garantía de disponibilidad
+              continua, exactitud sostenida o ausencia de fallas:
+            </p>
+            <ul>
+              <li>
+                El conteo es <strong>una estimación</strong>: la aleatorización de direcciones,
+                las interferencias físicas y la ubicación de los sensores afectan la medición.
+              </li>
+              <li>
+                Puede haber cortes por mantenimiento, caídas de los servicios en la nube,
+                condiciones de la red o ajustes de la arquitectura, sin obligación de
+                compensación.
+              </li>
+              <li>
+                No respondemos por decisiones tomadas con base en la información del sitio ni
+                por daños indirectos, consecuentes o lucro cesante, hasta donde la ley lo
+                permita.
+              </li>
+              <li>
+                Quedan fuera los hechos de terceros, la fuerza mayor y los usos contrarios a
+                estos términos.
+              </li>
+            </ul>
+            <div class="nota">
+              <span class="material-icons" aria-hidden="true">warning</span>
+              <p>
+                Los niveles de ocupación <strong>no sustituyen</strong> los aforos máximos
+                legales ni las obligaciones de seguridad y salubridad de quien administra el
+                espacio: son una referencia operativa de gestión.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-9">
+          <span class="clausula-no" aria-hidden="true">09</span>
+          <div class="clausula-cuerpo">
+            <h2>Sin transacciones</h2>
+            <p>
+              Aquí no se venden bienes ni servicios con transacción en línea: no existen
+              precios, medios de pago, tiempos de entrega ni políticas de cambios o
+              devoluciones. El derecho de retracto del artículo 47 de la Ley 1480 de 2011
+              (Estatuto del Consumidor), aplicable a ventas a distancia, no rige para este
+              sitio.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-10">
+          <span class="clausula-no" aria-hidden="true">10</span>
+          <div class="clausula-cuerpo">
+            <h2>Cambios</h2>
+            <p>
+              Estos términos pueden actualizarse con la evolución del servicio; la versión
+              vigente y su sello de fecha están siempre en esta página, y seguir usando el sitio
+              implica aceptar la más reciente.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="t-11">
+          <span class="clausula-no" aria-hidden="true">11</span>
+          <div class="clausula-cuerpo">
+            <h2>Ley aplicable y jurisdicción</h2>
+            <p>
+              Estos términos se rigen por las leyes de la <strong>República de Colombia</strong>,
+              en particular la Ley 1581 de 2012 y su reglamentación (protección de datos
+              personales), la Ley 527 de 1999 (comercio electrónico) y las normas civiles sobre
+              prestación de servicios. Ante cualquier controversia derivada del sitio, las
+              partes aceptan la jurisdicción de los jueces competentes de la ciudad de
+              <strong>Bogotá D.C.</strong> y renuncian expresamente a cualquier otro fuero.
+            </p>
+          </div>
+        </section>
+      </article>
+    }
+
+    <!-- ════════════ DOCUMENTO 4 · COOKIES ════════════ -->
+    @case ('cookies') {
+      <article class="documento">
+        <nav class="indice" aria-label="Índice de la política de cookies">
+          <span class="indice-rotulo">Contenido</span>
+          <ol>
+            <li><a href="#c-1">Qué son</a></li>
+            <li><a href="#c-2">Las tres claves</a></li>
+            <li><a href="#c-3">Terceros y datos técnicos</a></li>
+            <li><a href="#c-4">Cómo borrarlas o bloquearlas</a></li>
+            <li><a href="#c-5">Cambios y contacto</a></li>
+          </ol>
+        </nav>
+
+        <section class="clausula" id="c-1">
+          <span class="clausula-no" aria-hidden="true">01</span>
+          <div class="clausula-cuerpo">
+            <h2>Qué son</h2>
+            <p>
+              Una <strong>cookie</strong> es un archivo que un sitio guarda en el navegador y
+              devuelve al servidor después. El <strong>almacenamiento local</strong> hace lo
+              mismo sin salir del navegador: el propio sitio conserva datos. Este documento
+              cubre las dos cosas, porque el aviso del pie que aparece la primera vez que usted
+              entra habla de ambas.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="c-2">
+          <span class="clausula-no" aria-hidden="true">02</span>
+          <div class="clausula-cuerpo">
+            <h2>Las tres claves</h2>
+            <p>
+              <strong>El sitio no utiliza cookies HTTP de seguimiento, analítica ni
+              publicidad.</strong> Ni cookies de terceros establecidas por este sitio. El único
+              mecanismo de conservación en su navegador es el almacenamiento local, con
+              exactamente tres claves, todas estrictamente necesarias:
+            </p>
+            <div class="tabla table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Clave</th>
+                    <th scope="col">Contenido</th>
+                    <th scope="col">Para qué</th>
+                    <th scope="col">Duración</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code class="dato">token</code></td>
+                    <td>Token de sesión (JWT) de la cuenta de administración.</td>
+                    <td>Mantener la sesión del panel entre recargas. Solo existe si usted administra el sistema.</td>
+                    <td>Hasta que la sesión caduque o se cierre.</td>
+                  </tr>
+                  <tr>
+                    <td><code class="dato">theme</code></td>
+                    <td>Modo de visualización: <em>dark</em> o <em>light</em>.</td>
+                    <td>Recordar su preferencia de tema entre visitas.</td>
+                    <td>Hasta que la cambie o la borre.</td>
+                  </tr>
+                  <tr>
+                    <td><code class="dato">aviso-cookies</code></td>
+                    <td>Marca del aviso: <em>aceptado</em>.</td>
+                    <td>No volver a mostrar el aviso de cookies que ya respondió.</td>
+                    <td>Hasta que la borre manualmente.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Ninguna clave sale de su navegador, se comparte entre sitios ni rastrea la
+              navegación: se escriben y se leen únicamente en el dominio propio del sitio.
+            </p>
+          </div>
+        </section>
+
+        <section class="clausula" id="c-3">
+          <span class="clausula-no" aria-hidden="true">03</span>
+          <div class="clausula-cuerpo">
+            <h2>Terceros y datos técnicos</h2>
+            <ul>
+              <li>
+                <strong>Google Fonts y Material Icons:</strong> el navegador descarga tipografías
+                e iconos de los servidores de Google. Esa solicitud técnica expone los datos
+                generales de conexión (dirección IP, agente de navegador) que administra el
+                proveedor; el sitio no añade a la petición ningún identificador propio.
+              </li>
+              <li>
+                <strong>Netlify, Northflank y Aiven</strong> entregan el frente, el servidor y el
+                bróker, y registran los datos técnicos de sus servicios bajo sus condiciones; el
+                rol de cada uno está en el <a routerLink="/legal/aviso">aviso legal</a>.
+              </li>
+              <li>
+                <strong>Socket.IO:</strong> la conexión en vivo del mapa público va por
+                WebSocket, sin cookies ni nada guardado en su navegador; transporta solo el
+                número de dispositivos y marcas de tiempo.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="clausula" id="c-4">
+          <span class="clausula-no" aria-hidden="true">04</span>
+          <div class="clausula-cuerpo">
+            <h2>Cómo borrarlas o bloquearlas</h2>
+            <p>
+              Cada navegador permite inspeccionar, bloquear o borrar el almacenamiento de un
+              sitio:
+            </p>
+            <ul>
+              <li>
+                <strong>Chrome:</strong> menú ⋮ → Configuración → Privacidad y seguridad →
+                Cookies y otros datos de sitios → administrar el sitio.
+              </li>
+              <li>
+                <strong>Edge:</strong> menú ⋯ → Configuración → Cookies y permisos de sitios →
+                administrar datos de sitios.
+              </li>
+              <li>
+                <strong>Firefox:</strong> menú ☰ → Privacidad y seguridad → Cookies y datos del
+                sitio → Administrar datos.
+              </li>
+              <li>
+                <strong>Safari:</strong> menú Safari → Configuración → Privacidad → Gestionar
+                datos del sitio web.
+              </li>
+            </ul>
+            <div class="nota">
+              <span class="material-icons" aria-hidden="true">block</span>
+              <p>
+                Si borra o bloquea las claves, el efecto es el esperado: quitar
+                <code class="dato">token</code> cierra su sesión del panel; quitar
+                <code class="dato">theme</code> devuelve el modo oscuro por defecto; quitar
+                <code class="dato">aviso-cookies</code> vuelve a mostrar el aviso del pie. No se
+                pierde nada del sistema: las cuentas y las métricas viven en el servidor.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="clausula" id="c-5">
+          <span class="clausula-no" aria-hidden="true">05</span>
+          <div class="clausula-cuerpo">
+            <h2>Cambios y contacto</h2>
+            <p>
+              Si PlaceAt incorpora en el futuro otras cookies equivalentes a las descritas aquí
+              —por ejemplo, de analítica—, esta política se actualizará primero y el aviso del
+              pie pedirá el consentimiento correspondiente antes de usarlas. Para preguntas
+              sobre datos, los canales están en la
+              <a routerLink="/legal/privacidad">política de privacidad</a>.
+            </p>
+          </div>
+        </section>
+      </article>
+    }
+  }
+
+  <!-- Otros documentos: filas editoriales con título y propósito, distintas al
+       conmutador de arriba. -->
+  <section class="otros" aria-label="Otros documentos del apartado legal">
+    <h2 class="otros-encabezado">Otros documentos</h2>
+    <ul class="otros-lista">
+      @for (pieza of relacionados(); track pieza.id) {
+        <li>
+          <a class="otros-fila" [routerLink]="pieza.ruta">
+            <span class="otros-ficha material-icons" aria-hidden="true">{{ pieza.icono }}</span>
+            <span class="otros-cuerpo">
+              <span class="otros-nombre">{{ pieza.etiqueta }}</span>
+              <span class="otros-detalle">{{ pieza.proposito }}</span>
+            </span>
+            <span class="otros-flecha material-icons" aria-hidden="true">arrow_forward</span>
+          </a>
+        </li>
+      }
+    </ul>
+    <p class="legal-contacto">
+      ¿Preguntas sobre estos documentos?
+      <a href="mailto:jazamudioc@unbosque.edu.co">jazamudioc@unbosque.edu.co</a> ·
+      <a href="mailto:jmezam@unbosque.edu.co">jmezam@unbosque.edu.co</a>
+    </p>
+  </section>
+</div>

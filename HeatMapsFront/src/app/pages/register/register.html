@@ -73,6 +73,24 @@
         }
       </div>
 
+      <!-- Autorización del tratamiento de datos personales (Ley 1581 de 2012).
+           Desmarcada por defecto; sin ella el formulario no se envía. -->
+      <div class="form-group consentimiento">
+        <label class="consentimiento-fila" for="aceptaDatos">
+          <input
+            id="aceptaDatos"
+            type="checkbox"
+            formControlName="aceptaDatos"
+          />
+          <span>
+            He leído y acepto la <a routerLink="/legal/privacidad" target="_blank" rel="noopener">política de privacidad y tratamiento de datos personales</a>, y autorizo el uso de mi correo electrónico para verificar la cuenta.
+          </span>
+        </label>
+        @if (controles['aceptaDatos'].invalid && controles['aceptaDatos'].touched) {
+          <span class="error">Debes aceptar la política de datos para continuar.</span>
+        }
+      </div>
+
       <button type="submit" class="btn-primary">Registrarse</button>
 
     </form>

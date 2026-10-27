@@ -15,9 +15,11 @@
  *    del servicio.
  */
 
-import { Component, computed, DOCUMENT, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, DOCUMENT, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { noop } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, noop } from 'rxjs';
 import { NavbarComponent } from './shared/components/navbar/navbar';
 import { AuthService } from './core/services/auth.service';
 import { SidebarService } from './core/services/sidebar.service';
@@ -26,15 +28,19 @@ import { LoginModalComponent } from './shared/components/login-modal/login-modal
 import { ThemeService } from './core/services/theme.service';
 import { activarFoco } from './shared/animacion/foco';
 import { FondoRadarComponent } from './shared/fondo/fondo-radar';
+import { FondoConstelacion } from './shared/fondo/fondo-constelacion';
+import { PieComponent } from './shared/pie/pie';
+import { AvisoCookiesComponent } from './shared/aviso-cookies/aviso-cookies';
 
 /**
- * Shell de la aplicación. Renderiza el layout global y orquesta la inicialización
- * del tema y la sesión al arrancar.
+ * Shell de la aplicación. Renderiza el layout global y orquesta la
+ * inicialización del tema y la sesión al arrancar. Cierra la página con el
+ * pie legal y avisa de cookies y almacenamiento local en la primera visita.
  */
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, LoginModalComponent, FondoRadarComponent],
+  imports: [RouterOutlet, NavbarComponent, LoginModalComponent, FondoRadarComponent, FondoConstelacion, PieComponent, AvisoCookiesComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -51,6 +57,24 @@ export class AppComponent implements OnInit, OnDestroy {
    * Controla la renderización condicional de `<app-login-modal>` en la plantilla.
    */
   showLogin = computed(() => this.modalService.showLogin());
+
+  /**
+   * Cambio de fondo por ruta: en «¿Qué es PlaceAt?» (`/acerca`) el cielo de
+   * constelaciones REEMPLAZA al radar — no se superponen. En el resto de la
+   * aplicación sigue el radar de siempre.
+   */
+  protected readonly fondoAcerca = computed(() => {
+    this.navegacion(); // dependencia: reevalúa en cada navegación
+    return this.router.url === '/acerca';
+  });
+
+  /** El rotor: cada navegación reevalúa si la ruta pide cielo o radar. */
+  private readonly router = inject(Router);
+
+  private readonly navegacion = toSignal(
+    this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)),
+    { initialValue: null },
+  );
 
   /** Documento de la aplicación, donde se escucha el cursor. */
   private readonly documento = inject(DOCUMENT);

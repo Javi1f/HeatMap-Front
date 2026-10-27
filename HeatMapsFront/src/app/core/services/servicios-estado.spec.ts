@@ -140,7 +140,8 @@ describe('LoginStateService', () => {
     expect(s.controles['identifier'].touched).toBe(true);
   });
 
-  it('con credenciales correctas avisa y va al dashboard', () => {
+  it('con credenciales correctas avisa y va al dashboard tras el instante de acceso', () => {
+    vi.useFakeTimers();
     const login = vi.fn(() => of({ admin: { id: 'a1', username: 'a', email: 'a@b.co' }, token: 't' }));
     const { s, router } = crear(login);
     const alTerminar = vi.fn();
@@ -149,8 +150,28 @@ describe('LoginStateService', () => {
     s.onSubmit(alTerminar);
 
     expect(login).toHaveBeenCalledWith({ username: 'ana', password: 'x' });
+    // Mientras vuela, el envío está bloqueado; la cortina anuncia el acceso
+    // y el cierre y la navegación esperan al final de su instante.
+    expect(s.isSubmitting()).toBe(true);
+    expect(s.isGranted()).toBe(true);
+    expect(s.onSubmit(), 'un segundo envío no repite la petición').toBeUndefined();
+    expect(login).toHaveBeenCalledTimes(1);
+    expect(alTerminar).not.toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1_000);
     expect(alTerminar).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/admin/dashboard']);
+    expect(s.isSubmitting()).toBe(false);
+  });
+
+  it('un fallo del servidor (500) avisa que el problema no son las credenciales', () => {
+    const login = vi.fn(() => throwError(() => new HttpErrorResponse({ status: 500 })));
+    const { s } = crear(login);
+    s.loginForm.setValue({ identifier: 'ana', password: 'x' });
+
+    s.onSubmit();
+
+    expect(s.loginError()).toContain('Error del servidor');
   });
 
   it('bloquea 10 s tras tres intentos fallidos y luego desbloquea', () => {

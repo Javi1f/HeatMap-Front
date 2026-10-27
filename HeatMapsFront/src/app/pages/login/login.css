@@ -10,6 +10,7 @@
 }
 
 .login-card {
+  position: relative; /* ancla la cortina de verificación cuando la cubre */
   width: 100%;
   max-width: 440px;
   display: flex;

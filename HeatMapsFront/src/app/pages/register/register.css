@@ -53,6 +53,47 @@ form { display: flex; flex-direction: column; gap: var(--sp-5); }
 
 .register-card .btn-primary { width: 100%; margin-top: var(--sp-2); }
 
+/* ── Casilla de autorización de datos ──────────────────────────
+   La etiqueta global de formulario (mayúsculas, requintada) no sirve para
+   un texto corrido: la fila de autorización se compone como prose y la
+   casilla conserva su tamaño de control táctil. */
+.consentimiento { gap: var(--sp-2); }
+
+.consentimiento-fila,
+.consentimiento-fila label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.consentimiento-fila input[type='checkbox'] {
+  width: 1.15rem;
+  height: 1.15rem;
+  min-height: 0;
+  padding: 0;
+  margin: 0.15rem 0 0;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.consentimiento-fila a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.consentimiento-fila a:hover { color: var(--color-primary-hover); }
+
 /* ── Modal de verificación ─────────────────────────────────────── */
 
 .attempts {

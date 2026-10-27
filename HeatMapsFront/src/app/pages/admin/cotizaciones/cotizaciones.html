@@ -1,0 +1,258 @@
+<!-- Cotizaciones: el ciclo comercial de las solicitudes que llegan de la web.
+     La tabla alimenta el filtro y el detalle; el detalle arma la conversación
+     con el posible cliente y mueve el estado con notas. -->
+
+<div class="dashboard-container">
+
+  <header class="dashboard-header">
+    <div class="dashboard-title">
+      <span class="material-icons" aria-hidden="true">inbox</span>
+      <h1>Cotizaciones</h1>
+    </div>
+    <p class="dashboard-subtitle">
+      Solicitudes que la web recibe sin sesión. El estimador da el alcance
+      técnico; de aquí sale la conversación comercial.
+    </p>
+  </header>
+
+  <!-- ── Filtro por estado ───────────────────────────────────────── -->
+  <div class="filtros" role="group" aria-label="Filtrar por estado">
+    <button type="button" class="filtro-chip" [class.activa]="filtro() === ''" (click)="cambiarFiltro('')">
+      Todas
+    </button>
+    @for (estado of estados; track estado) {
+      <button
+        type="button"
+        class="filtro-chip"
+        [class.activa]="filtro() === estado"
+        (click)="cambiarFiltro(estado)">
+        {{ etiquetaEstado(estado) }}
+      </button>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error" role="alert">
+      <span class="material-icons" aria-hidden="true">wifi_off</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Listado ────────────────────────────────────────────────── -->
+  @if (isCargando()) {
+    <div class="loading-state">
+      <div class="spinner" aria-hidden="true"></div>
+      Cargando solicitudes...
+    </div>
+  } @else if (solicitudes().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons" aria-hidden="true">inbox</span>
+      @if (filtro() === '') {
+        <p>Aún no hay solicitudes.</p>
+        <p class="empty-hint">
+          Cuando alguien pida una cotización desde la web, aparecerá aquí como «nueva».
+        </p>
+      } @else {
+        <p>No hay solicitudes en este estado.</p>
+        <p class="empty-hint">Prueba otro filtro del ciclo comercial.</p>
+      }
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table cotizaciones-tabla">
+        <thead>
+          <tr>
+            <th scope="col">Recibida</th>
+            <th scope="col">Recinto</th>
+            <th scope="col">Organización</th>
+            <th scope="col">Área</th>
+            <th scope="col">Aforo</th>
+            <th scope="col">Eventos</th>
+            <th scope="col">Nodos</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="solo-lector">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of solicitudes(); track s.idSolicitud) {
+            <tr [class.fila-abierta]="abierta()?.idSolicitud === s.idSolicitud">
+              <td class="cell-muted">{{ fechaCorta(s.fechaCreacion) }}</td>
+              <td>
+                <div class="cell-flex">
+                  <span class="material-icons row-icon" aria-hidden="true">{{ iconoTipo(s.tipoRecinto) }}</span>
+                  <span class="cell-strong">{{ etiquetaTipo(s.tipoRecinto) }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="cell-strong">{{ s.organizacion }}</span><br />
+                <span class="cell-muted">{{ s.nombreContacto }}</span>
+              </td>
+              <td class="cell-num">{{ s.areaM2.toLocaleString('es-CO') }} m²</td>
+              <td class="cell-num">{{ s.aforoMinimo.toLocaleString('es-CO') }}–{{ s.aforoMaximo.toLocaleString('es-CO') }}</td>
+              <td class="cell-num">{{ s.eventosAnuales }}</td>
+              <td class="cell-num cell-strong">{{ s.nodos }}</td>
+              <td><span class="estado-chip" [attr.data-estado]="s.estado">{{ etiquetaEstado(s.estado) }}</span></td>
+              <td>
+                <div class="cell-flex">
+                  <button
+                    type="button"
+                    class="btn-icono"
+                    title="Abrir solicitud"
+                    aria-label="Abrir solicitud de {{ s.organizacion }}"
+                    (click)="abrir(s.idSolicitud)">
+                    <span class="material-icons" aria-hidden="true">unfold_more</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-delete"
+                    title="Eliminar solicitud"
+                    aria-label="Eliminar solicitud de {{ s.organizacion }}"
+                    (click)="pedirEliminar(s.idSolicitud)">
+                    <span class="material-icons" aria-hidden="true">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- ── Detalle ────────────────────────────────────────────────── -->
+  @if (abierta(); as s) {
+    <section class="section-card detalle" aria-label="Detalle de la solicitud">
+      <div class="section-header">
+        <div class="section-title-group">
+          <span class="section-icon material-icons" aria-hidden="true">{{ iconoTipo(s.tipoRecinto) }}</span>
+          <div>
+            <span class="section-title">{{ s.organizacion }}</span>
+            <span class="section-desc">
+              <span class="cifra">{{ s.idSolicitud.slice(0, 8).toUpperCase() }}</span>
+              · {{ etiquetaTipo(s.tipoRecinto) }} · {{ fechaCorta(s.fechaCreacion) }}
+            </span>
+          </div>
+        </div>
+        <div class="cell-flex">
+          <button type="button" class="btn-icono" title="Descargar documento .json" (click)="descargar()">
+            <span class="material-icons" aria-hidden="true">download</span>
+          </button>
+          <button type="button" class="btn-icono" title="Cerrar detalle" (click)="cerrar()">
+            <span class="material-icons" aria-hidden="true">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="detalle-rejilla">
+
+        <!-- Lo que el cliente describió. -->
+        <div class="detalle-bloque">
+          <span class="campo-label">Lo que describió el recinto</span>
+          <dl class="fichas">
+            <div class="ficha">
+              <dt>Área</dt>
+              <dd class="cifra">{{ s.areaM2.toLocaleString('es-CO') }} m²</dd>
+            </div>
+            <div class="ficha">
+              <dt>Aforo esperado</dt>
+              <dd class="cifra">{{ s.aforoMinimo.toLocaleString('es-CO') }}–{{ s.aforoMaximo.toLocaleString('es-CO') }}</dd>
+            </div>
+            <div class="ficha">
+              <dt>Eventos al año</dt>
+              <dd class="cifra">{{ s.eventosAnuales }}</dd>
+            </div>
+            <div class="ficha">
+              <dt>Nodos estimados</dt>
+              <dd class="cifra">{{ s.estimacion.nodos }}</dd>
+            </div>
+          </dl>
+          @if (requisitosDe(s); as r) {
+            <ul class="detalle-requisitos">
+              @if (r.camaras) { <li><span class="material-icons" aria-hidden="true">videocam</span>Cámaras existentes</li> }
+              @if (r.analisisRed) { <li><span class="material-icons" aria-hidden="true">lan</span>Análisis de red</li> }
+              @if (r.seguridadPrivada) { <li><span class="material-icons" aria-hidden="true">security</span>Seguridad privada</li> }
+              @if (r.ventilacionRemota) { <li><span class="material-icons" aria-hidden="true">air</span>Ventilación remota → alertas</li> }
+              @if (r.notas) { <li class="detalle-nota-cliente">«{{ r.notas }}»</li> }
+            </ul>
+          }
+        </div>
+
+        <!-- La estimación que el cliente vio. -->
+        <div class="detalle-bloque">
+          <span class="campo-label">Lo que vio el cliente</span>
+          <ul class="detalle-desglose">
+            @for (linea of s.estimacion.desglose; track linea.titulo) {
+              <li>
+                <span class="desglose-titulo">{{ linea.titulo }}</span>
+                <span class="desglose-valor cifra">{{ linea.valor }}</span>
+                <span class="desglose-detalle">{{ linea.detalle }}</span>
+              </li>
+            }
+          </ul>
+          @if (s.estimacion.integraciones.length > 0) {
+            <ul class="detalle-integraciones lista-anotada">
+              @for (integracion of s.estimacion.integraciones; track integracion) {
+                <li>{{ integracion }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- Contacto, descifrado por el backend solo para esta vista. -->
+        <div class="detalle-bloque">
+          <span class="campo-label">Contacto</span>
+          <dl class="fichas fichas-contacto">
+            <div class="ficha"><dt>Nombre</dt><dd>{{ s.nombreContacto }}</dd></div>
+            <div class="ficha"><dt>Correo</dt><dd class="correo">{{ s.correoContacto }}</dd></div>
+            @if (s.telefonoContacto) {
+              <div class="ficha"><dt>Teléfono</dt><dd class="cifra">{{ s.telefonoContacto }}</dd></div>
+            }
+            <div class="ficha"><dt>Origen</dt><dd class="cifra">{{ s.ipOrigen ?? '—' }}</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- El ciclo comercial: estado y notas viajan juntos. -->
+      <form [formGroup]="formEstado" (ngSubmit)="guardar()" class="detalle-ciclo">
+        <div class="form-group">
+          <label class="campo-label" for="estado">Estado</label>
+          <select id="estado" formControlName="estado" class="selector-estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ etiquetaEstado(estado) }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group ciclo-notas">
+          <label class="campo-label" for="notas">Notas comerciales</label>
+          <textarea
+            id="notas"
+            formControlName="notas"
+            rows="3"
+            placeholder="Criterios del refinamiento, acuerdos, seguimiento..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="isOcupado()">
+          @if (isOcupado()) { <span class="spinner spinner-sm" aria-hidden="true"></span> }
+          Guardar
+        </button>
+      </form>
+    </section>
+  }
+
+  <!-- ── Confirmación de borrado ────────────────────────────────── -->
+  @if (porEliminar(); as id) {
+    <div class="modal-overlay" (click)="cancelarEliminar()">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-eliminar" (click)="$event.stopPropagation()">
+        <h3 id="titulo-eliminar">Eliminar solicitud</h3>
+        <p>
+          Se borrará la solicitud <strong class="cifra">{{ id.slice(0, 8).toUpperCase() }}</strong>
+          junto con sus notas. La acción queda registrada en la auditoría y no se puede deshacer.
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="cancelarEliminar()">Conservar</button>
+          <button type="button" class="btn-danger" [disabled]="isOcupado()" (click)="confirmarEliminar()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

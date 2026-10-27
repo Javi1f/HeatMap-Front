@@ -1,0 +1,20 @@
+<!-- Aviso de cookies: placa fija del pie de la ventana, visible hasta la
+     primera respuesta. Declara el uso real (almacenamiento local de sesión y
+     preferencia), enlaza a la política y no esconde nada bajo el texto. -->
+
+@if (visible()) {
+  <aside class="aviso" role="status" aria-label="Aviso de cookies y almacenamiento local">
+    <span class="aviso-ficha" aria-hidden="true">
+      <span class="material-icons">storage</span>
+    </span>
+
+    <div class="aviso-texto">
+      <strong>Este sitio no usa cookies de seguimiento.</strong>
+      Solo guarda en su navegador la preferencia de tema y —si administra el
+      sistema— la sesión del panel.
+      <a routerLink="/legal/cookies">Política de cookies</a>
+    </div>
+
+    <button class="aviso-tecla" (click)="entender()">Entendido</button>
+  </aside>
+}

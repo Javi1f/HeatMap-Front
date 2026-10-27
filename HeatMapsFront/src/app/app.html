@@ -2,14 +2,20 @@
      contenido; este enlace, invisible hasta recibir el foco, las salta. -->
 <a class="saltar" href="#contenido" (click)="$event.preventDefault(); saltarAlContenido()">Saltar al contenido</a>
 
-<app-fondo-radar />
+@if (fondoAcerca()) {
+  <app-fondo-constelacion />
+} @else {
+  <app-fondo-radar />
+}
 
 <div class="app-layout">
   <app-navbar />
   <main id="contenido" tabindex="-1" [class.collapsed]="isCollapsed()" class="main-content">
     <router-outlet />
+    <app-pie />
   </main>
   @if (showLogin()) {
     <app-login-modal />
   }
+  <app-aviso-cookies />
 </div>

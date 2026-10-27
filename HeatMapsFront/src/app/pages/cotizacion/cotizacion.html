@@ -1,0 +1,415 @@
+<!-- Cotiza tu despliegue — cuatro pasos y una lectura viva.
+     El contenido didáctico vive aquí: cada campo dice para qué se pide y
+     los paneles laterales responden mientras la persona responde. -->
+
+<div class="cotizacion">
+
+  <header class="dashboard-header">
+    <div class="dashboard-title">
+      <span class="material-icons" aria-hidden="true">request_quote</span>
+      <h1>Cotiza tu despliegue</h1>
+    </div>
+    <p class="dashboard-subtitle">
+      Describe tu recinto en cuatro pasos. El sistema estima los nodos con la
+      misma densidad que ya probó el piloto, y el equipo comercial refina la
+      propuesta contigo. No necesitas conocimientos técnicos: cada campo se explica por sí solo.
+    </p>
+  </header>
+
+  @if (resultado(); as respuesta) {
+
+    <!-- ══ Confirmación ═══════════════════════════════════════════ -->
+    <section class="panel vidrio foco exito" role="status">
+      <div class="cortina-emblema" aria-hidden="true"><app-ondas tam="16px" /></div>
+      <h2 class="exito-titulo">Solicitud recibida</h2>
+      <p class="exito-texto">
+        Tu referencia es <strong class="exito-referencia cifra">{{ respuesta.idSolicitud.slice(0, 8).toUpperCase() }}</strong>.
+        El equipo comercial revisa cada solicitud a mano: refinará la estimación
+        con criterio profesional y te escribirá a tu correo.
+      </p>
+
+      <div class="exito-lectura">
+        <div class="lectura-principal">
+          <span class="lectura-cifra cifra">{{ respuesta.estimacion.nodos }}</span>
+          <span class="lectura-unidad">nodos estimados</span>
+        </div>
+        <div class="lectura-principal">
+          <span class="lectura-cifra cifra">{{ respuesta.estimacion.dispositivosEstimados.toLocaleString('es-CO') }}</span>
+          <span class="lectura-unidad">dispositivos en el pico</span>
+        </div>
+      </div>
+
+      <ul class="exito-notas lista-anotada">
+        @for (nota of respuesta.estimacion.notas; track nota) {
+          <li>{{ nota }}</li>
+        }
+      </ul>
+
+      <div class="exito-acciones">
+        <button type="button" class="btn-primary" (click)="descargarCopia()">
+          <span class="material-icons" aria-hidden="true">download</span>
+          Descargar copia (.json)
+        </button>
+        <a class="btn-secondary" routerLink="/">
+          <span class="material-icons" aria-hidden="true">home</span>
+          Volver al inicio
+        </a>
+        <button type="button" class="btn-secondary" (click)="nuevaSolicitud()">
+          <span class="material-icons" aria-hidden="true">replay</span>
+          Otra solicitud
+        </button>
+      </div>
+    </section>
+
+  } @else {
+
+    <div class="cuerpo">
+
+      <!-- ══ Formulario por pasos ═════════════════════════════════ -->
+      <section class="panel vidrio foco formulario">
+
+        <ol class="riel" aria-label="Pasos de la cotización">
+          @for (p of pasos; track p.numero) {
+            <li class="riel-item">
+              <button
+                type="button"
+                class="riel-paso"
+                [class.actual]="paso() === p.numero"
+                [class.hecho]="paso() > p.numero"
+                [disabled]="paso() <= p.numero"
+                (click)="irAPaso(p.numero)">
+                <span class="riel-numero cifra" aria-hidden="true">{{ p.numero }}</span>
+                <span class="riel-titulo">{{ p.titulo }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+
+        @if (error()) {
+          <div class="alert alert-error" role="alert">
+            <span class="material-icons" aria-hidden="true">wifi_off</span>
+            {{ error() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+
+          @switch (paso()) {
+
+            <!-- ── Paso 1: el espacio ──────────────────────────── -->
+            @case (1) {
+              <div class="cabeza-paso">
+                <h2>Tu espacio</h2>
+                <p>{{ pasos[0].intro }}</p>
+              </div>
+
+              <fieldset class="grupo-campos">
+                <div class="form-group">
+                  <span class="campo-label" id="etiqueta-tipo">¿Qué tipo de recinto es?</span>
+                  <div class="tarjetas-tipo" role="radiogroup" aria-labelledby="etiqueta-tipo">
+                    @for (t of tipos; track t.clave) {
+                      <label class="tarjeta-tipo" [class.elegida]="controles['tipoRecinto'].value === t.clave">
+                        <input class="solo-lector" type="radio" formControlName="tipoRecinto" [value]="t.clave" name="tipoRecinto" />
+                        <span class="material-icons" aria-hidden="true">{{ t.icono }}</span>
+                        <span class="tarjeta-titulo">{{ t.nombre }}</span>
+                        <span class="tarjeta-ayuda">{{ t.ayuda }}</span>
+                      </label>
+                    }
+                  </div>
+                  <app-error-campo [control]="controles['tipoRecinto']" [mensajes]="mensajes.tipoRecinto" />
+                </div>
+
+                <div class="form-group">
+                  <label class="campo-label" for="areaM2">Área aproximada <span class="unidad">(m²)</span></label>
+                  <input
+                    id="areaM2"
+                    type="number"
+                    formControlName="areaM2"
+                    min="10"
+                    inputmode="numeric"
+                    placeholder="Ej. 1 200"
+                    [class.input-error]="controles['areaM2'].invalid && controles['areaM2'].touched" />
+                  <div class="chips-referencia">
+                    <span class="chips-referencia-titulo">Para ubicarte:</span>
+                    @for (c of comparacionesArea; track c.etiqueta) {
+                      <button type="button" class="chip-referencia" (click)="ponerArea(c.m2)">
+                        {{ c.etiqueta }} · {{ c.m2.toLocaleString('es-CO') }} m²
+                      </button>
+                    }
+                  </div>
+                  <p class="pista">
+                    ¿Por qué lo pedimos? Cada nodo escucha un área fija: el área decide
+                    cuántos nodos se reparten el recinto. No hace falta exactitud.
+                  </p>
+                  <app-error-campo [control]="controles['areaM2']" [mensajes]="mensajes.areaM2" />
+                </div>
+
+                <div class="form-group">
+                  <span class="campo-label">Aforo esperado</span>
+                  <div class="par-campos">
+                    <div class="campo-mitad">
+                      <label for="aforoMinimo">Mínimo</label>
+                      <input
+                        id="aforoMinimo"
+                        type="number"
+                        formControlName="aforoMinimo"
+                        min="1"
+                        inputmode="numeric"
+                        placeholder="Ej. 200"
+                        [class.input-error]="controles['aforoMinimo'].invalid && controles['aforoMinimo'].touched" />
+                      <p class="pista">Un día tranquilo.</p>
+                      <app-error-campo [control]="controles['aforoMinimo']" [mensajes]="mensajes.aforoMinimo" />
+                    </div>
+                    <div class="campo-mitad">
+                      <label for="aforoMaximo">Máximo</label>
+                      <input
+                        id="aforoMaximo"
+                        type="number"
+                        formControlName="aforoMaximo"
+                        min="1"
+                        inputmode="numeric"
+                        placeholder="Ej. 900"
+                        [class.input-error]="controles['aforoMaximo'].invalid && controles['aforoMaximo'].touched" />
+                      <p class="pista">El día lleno.</p>
+                      @if (form.hasError('aforoIncoherente') && controles['aforoMaximo'].touched) {
+                        <span class="error">{{ mensajes.aforoMaximo.aforoIncoherente }}</span>
+                      }
+                      <app-error-campo [control]="controles['aforoMaximo']" [mensajes]="mensajes.aforoMaximo" />
+                    </div>
+                  </div>
+                  <p class="pista">
+                    ¿Por qué lo pedimos? El sistema cuenta dispositivos, no personas:
+                    del aforo se deduce cuántos teléfonos escucharán los nodos en el pico.
+                  </p>
+                </div>
+              </fieldset>
+            }
+
+            <!-- ── Paso 2: el ritmo ────────────────────────────── -->
+            @case (2) {
+              <div class="cabeza-paso">
+                <h2>El ritmo</h2>
+                <p>{{ pasos[1].intro }}</p>
+              </div>
+
+              <fieldset class="grupo-campos">
+                <div class="form-group">
+                  <label class="campo-label" for="eventosAnuales">Eventos al año</label>
+                  <input
+                    id="eventosAnuales"
+                    type="number"
+                    formControlName="eventosAnuales"
+                    min="1"
+                    inputmode="numeric"
+                    placeholder="Ej. 52"
+                    [class.input-error]="controles['eventosAnuales'].invalid && controles['eventosAnuales'].touched" />
+                  <div class="chips-referencia">
+                    <span class="chips-referencia-titulo">Para ubicarte:</span>
+                    @for (c of comparacionesEventos; track c.valor) {
+                      <button type="button" class="chip-referencia" (click)="ponerEventos(c.valor)">
+                        {{ c.etiqueta }} · {{ c.valor }}
+                      </button>
+                    }
+                  </div>
+                  <p class="pista">
+                    ¿Por qué lo pedimos? Con muchos eventos al año conviene un nodo de
+                    repuesto: reemplazar uno que falla no puede esperar una compra.
+                  </p>
+                  <app-error-campo [control]="controles['eventosAnuales']" [mensajes]="mensajes.eventosAnuales" />
+                </div>
+              </fieldset>
+            }
+
+            <!-- ── Paso 3: las conexiones ──────────────────────── -->
+            @case (3) {
+              <div class="cabeza-paso">
+                <h2>Conexiones</h2>
+                <p>{{ pasos[2].intro }}</p>
+              </div>
+
+              <fieldset class="grupo-campos" formGroupName="requisitos">
+                <div class="form-group">
+                  <span class="campo-label">¿Qué quieres conectar al sistema?</span>
+                  <div class="tarjetas-conexion">
+                    @for (r of requisitosInfo; track r.clave) {
+                      <label class="tarjeta-conexion">
+                        <input class="solo-lector" type="checkbox" [formControlName]="r.clave" />
+                        <span class="material-icons" aria-hidden="true">{{ r.icono }}</span>
+                        <span class="tarjeta-conexion-texto">
+                          <span class="tarjeta-titulo">{{ r.titulo }}</span>
+                          <span class="tarjeta-ayuda">{{ r.detalle }}</span>
+                        </span>
+                        <span class="marca" aria-hidden="true"><span class="material-icons">check</span></span>
+                      </label>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="campo-label" for="notas">Notas para el equipo <span class="unidad">(opcional)</span></label>
+                  <textarea
+                    id="notas"
+                    formControlName="notas"
+                    rows="3"
+                    placeholder="Lo que el equipo deba saber: pisos, distribución, restricciones de instalación..."></textarea>
+                </div>
+              </fieldset>
+            }
+
+            <!-- ── Paso 4: el contacto ─────────────────────────── -->
+            @case (4) {
+              <div class="cabeza-paso">
+                <h2>Contacto</h2>
+                <p>{{ pasos[3].intro }}</p>
+              </div>
+
+              <fieldset class="grupo-campos">
+                <div class="par-campos">
+                  <div class="form-group">
+                    <label class="campo-label" for="organizacion">Organización</label>
+                    <input
+                      id="organizacion"
+                      type="text"
+                      formControlName="organizacion"
+                      placeholder="Ej. Centro de convenciones Ágora"
+                      [class.input-error]="controles['organizacion'].invalid && controles['organizacion'].touched" />
+                    <app-error-campo [control]="controles['organizacion']" [mensajes]="mensajes.organizacion" />
+                  </div>
+                  <div class="form-group">
+                    <label class="campo-label" for="nombreContacto">Nombre de contacto</label>
+                    <input
+                      id="nombreContacto"
+                      type="text"
+                      formControlName="nombreContacto"
+                      placeholder="Quién recibe la propuesta"
+                      [class.input-error]="controles['nombreContacto'].invalid && controles['nombreContacto'].touched" />
+                    <app-error-campo [control]="controles['nombreContacto']" [mensajes]="mensajes.nombreContacto" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="campo-label" for="correoContacto">Correo electrónico</label>
+                  <input
+                    id="correoContacto"
+                    type="email"
+                    formControlName="correoContacto"
+                    placeholder="correo@organizacion.com"
+                    [class.input-error]="controles['correoContacto'].invalid && controles['correoContacto'].touched" />
+                  <p class="pista">
+                    Va cifrado de extremo a extremo y queda cifrado en nuestra base:
+                    solo el equipo comercial que atiende tu solicitud lo lee.
+                  </p>
+                  <app-error-campo [control]="controles['correoContacto']" [mensajes]="mensajes.correoContacto" />
+                </div>
+
+                <div class="form-group">
+                  <label class="campo-label" for="telefonoContacto">Teléfono <span class="unidad">(opcional)</span></label>
+                  <input
+                    id="telefonoContacto"
+                    type="tel"
+                    formControlName="telefonoContacto"
+                    placeholder="+57 300 000 0000" />
+                </div>
+
+                <div class="form-group consentimiento">
+                  <label class="consentimiento-fila" for="aceptaDatos">
+                    <input id="aceptaDatos" type="checkbox" formControlName="aceptaDatos" />
+                    <span>
+                      Autorizo el tratamiento de mis datos de contacto por parte de PlaceAt para responder esta solicitud,
+                      según la <a routerLink="/legal/privacidad" target="_blank" rel="noopener">política de privacidad</a> (Ley 1581 de 2012).
+                    </span>
+                  </label>
+                  @if (controles['aceptaDatos'].invalid && controles['aceptaDatos'].touched) {
+                    <span class="error">{{ mensajes.aceptaDatos.required }}</span>
+                  }
+                </div>
+              </fieldset>
+            }
+          }
+
+          <div class="pie-paso">
+            @if (paso() > 1) {
+              <button type="button" class="btn-secondary" (click)="retroceder()">
+                <span class="material-icons" aria-hidden="true">arrow_back</span>
+                Anterior
+              </button>
+            }
+            @if (paso() < 4) {
+              <button type="button" class="btn-primary" (click)="avanzar()">
+                Continuar
+                <span class="material-icons" aria-hidden="true">arrow_forward</span>
+              </button>
+            } @else {
+              <button type="submit" class="btn-primary" [disabled]="enviando()">
+                @if (enviando()) { <span class="spinner spinner-sm" aria-hidden="true"></span> }
+                Solicitar cotización
+              </button>
+            }
+          </div>
+        </form>
+      </section>
+
+      <!-- ══ Lectura viva ══════════════════════════════════════════ -->
+      <aside class="panel vidrio foco lectura" aria-live="polite">
+        <div class="lectura-cabeza">
+          <span class="material-icons" aria-hidden="true">monitoring</span>
+          <h2>Tu lectura</h2>
+        </div>
+
+        @if (lectura().nodos !== null) {
+          <div class="lectura-principal">
+            <span class="lectura-cifra cifra">{{ lectura().nodos }}</span>
+            <span class="lectura-unidad">nodos estimados</span>
+          </div>
+          @if (lectura().dispositivos !== null) {
+            <p class="lectura-dispositivos">
+              ≈ <span class="cifra">{{ lectura().dispositivos!.toLocaleString('es-CO') }}</span> dispositivos en el pico
+            </p>
+          }
+        } @else {
+          <p class="lectura-vacia">{{ lectura().pendiente }}</p>
+        }
+
+        @if (lectura().desglose.length > 0) {
+          <ul class="lectura-desglose">
+            @for (linea of lectura().desglose; track linea.titulo) {
+              <li class="lectura-linea">
+                <span class="desglose-titulo">{{ linea.titulo }}</span>
+                <span class="desglose-valor cifra">{{ linea.valor }}</span>
+                <span class="desglose-detalle">{{ linea.detalle }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (lectura().integraciones.length > 0) {
+          <div class="lectura-integraciones">
+            <span class="campo-label">Integraciones pedidas</span>
+            <ul class="lista-anotada">
+              @for (integracion of lectura().integraciones; track integracion) {
+                <li>{{ integracion }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <details class="lectura-que-es">
+          <summary>¿Qué es un nodo?</summary>
+          <p>
+            Una Raspberry Pi con software de escucha que se instala en el recinto.
+            Oye las señales Wi-Fi que los teléfonos emiten por sí solos, sin
+            conectarse a nadie, y nunca guarda identificadores: sin cámaras, sin
+            apps. Tres nodos cubrieron la plazoleta del piloto.
+          </p>
+        </details>
+
+        <p class="lectura-nota">
+          <span class="material-icons" aria-hidden="true">info</span>
+          <span>Estimación preliminar: el equipo comercial la refina con un levantamiento en sitio.</span>
+        </p>
+      </aside>
+
+    </div>
+  }
+
+</div>

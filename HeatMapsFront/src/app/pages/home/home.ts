@@ -146,6 +146,14 @@ export class Home implements OnDestroy {
   }
 
   /**
+   * Navega a la página «¿Qué es PlaceAt?» (`/acerca`), el relato completo
+   * del proyecto al que invita el botón «Ver más» de esta tarjeta.
+   */
+  goToAcerca(): void {
+    this.router.navigate(['/acerca']).catch(noop);
+  }
+
+  /**
    * Navega al dashboard de administración (`/admin/dashboard`).
    * Llamado desde el link del mensaje "ya estás autenticado".
    */

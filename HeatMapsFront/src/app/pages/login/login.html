@@ -1,5 +1,5 @@
 <div class="login-container">
-  <div class="login-card anillo">
+  <div class="login-card anillo" [attr.aria-busy]="isSubmitting() ? true : null">
     <div class="acceso-cabeza">
       <span class="acceso-emblema" aria-hidden="true">
         <app-ondas tam="14px" />
@@ -8,11 +8,15 @@
     </div>
 
     @if (loginError()) {
-      <div class="alert alert-error">{{ loginError() }}</div>
+      <div class="alert alert-error">
+        <span class="material-icons">error_outline</span>
+        {{ loginError() }}
+      </div>
     }
 
     @if (isBlocked()) {
       <div class="alert alert-blocked">
+        <span class="material-icons">hourglass_top</span>
         Demasiados intentos fallidos. Espera <strong>{{ countdown() }}</strong> segundos para continuar.
       </div>
     }
@@ -27,7 +31,7 @@
           formControlName="identifier"
           placeholder="correo@ejemplo.com o usuario"
           [class.input-error]="controles['identifier'].invalid && controles['identifier'].touched"
-          [disabled]="isBlocked()"
+          [disabled]="isBlocked() || isSubmitting()"
         />
         @if (controles['identifier'].invalid && controles['identifier'].touched) {
           <span class="error">Este campo es obligatorio.</span>
@@ -43,9 +47,14 @@
             formControlName="password"
             placeholder="Contraseña"
             [class.input-error]="controles['password'].invalid && controles['password'].touched"
-            [disabled]="isBlocked()"
+            [disabled]="isBlocked() || isSubmitting()"
           />
-          <button type="button" class="toggle-password" (click)="togglePassword()">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            [disabled]="isBlocked() || isSubmitting()"
+          >
             {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
           </button>
         </div>
@@ -57,7 +66,7 @@
       <button
         type="submit"
         class="btn-primary"
-        [disabled]="isBlocked()"
+        [disabled]="isBlocked() || isSubmitting()"
       >
         Iniciar sesión
       </button>
@@ -67,6 +76,21 @@
     <div class="register-link">
       ¿No tienes cuenta? <a routerLink="/register">Regístrate</a>
     </div>
+
+    @if (isSubmitting()) {
+      <div class="cortina" role="status" [class.cortina-ok]="isGranted()">
+        @if (isGranted()) {
+          <span class="cortina-emblema" aria-hidden="true">
+            <span class="material-icons">check_circle</span>
+          </span>
+          <p class="cortina-rotulo cortina-rotulo-ok">Acceso concedido</p>
+        } @else {
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="cortina-rotulo">Verificando credenciales</p>
+        }
+        <span class="cortina-barrido" aria-hidden="true"></span>
+      </div>
+    }
 
   </div>
 </div>

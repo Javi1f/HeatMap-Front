@@ -21,7 +21,11 @@
  */
 
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withViewTransitions } from '@angular/router';
+import {
+  provideRouter,
+  withInMemoryScrolling,
+  withViewTransitions
+} from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -35,14 +39,21 @@ import { cryptoInterceptor } from './core/interceptors/crypto.interceptor';
  * - `provideRouter`: configura el sistema de rutas con las rutas definidas en {@link routes}.
  *   Cada navegación usa la API de View Transitions: el contenido sale y entra
  *   animado (ver `styles/movimiento.css`). En navegadores sin la API se navega
- *   igual, sin animación. La primera carga no se anima.
+ *   igual, sin animación. La primera carga no se anima. El desplazamiento se
+ *   restaura al inicio en cada navegación — así un documento legal abierto
+ *   hasta el final no arranca el siguiente a media página — y los anclajes de
+ *   los índices se alcanzan con desplazamiento propio (con `anchorScrolling`).
  * - `provideHttpClient`: habilita `HttpClient` con los interceptores funcionales
  *   `authInterceptor` y `cryptoInterceptor` aplicados globalmente.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withViewTransitions({ skipInitialTransition: true })),
+    provideRouter(
+      routes,
+      withViewTransitions({ skipInitialTransition: true }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })
+    ),
     provideHttpClient(withInterceptors([authInterceptor, cryptoInterceptor]))
   ]
 };

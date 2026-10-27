@@ -54,7 +54,7 @@ describe('NavbarComponent', () => {
 
   it('sin sesión muestra sólo las secciones públicas y el botón de acceso', () => {
     expect(crear().inicial()).toBe('');
-    expect(etiquetas()).toEqual(['Inicio', 'Sección pública']);
+    expect(etiquetas()).toEqual(['Inicio', 'Sección pública', 'Cotización']);
     (html().querySelector('.login-btn') as HTMLButtonElement).click();
     expect(TestBed.inject(ModalService).showLogin()).toBe(true);
   });
@@ -62,7 +62,7 @@ describe('NavbarComponent', () => {
   it('un admin no ve «Usuarios»; un root sí', () => {
     autenticado.set(true);
     crear();
-    expect(etiquetas()).toEqual(['Inicio', 'Sección pública', 'Dashboard', 'Reportes']);
+    expect(etiquetas()).toEqual(['Inicio', 'Sección pública', 'Cotización', 'Dashboard', 'Reportes', 'Cotizaciones']);
     expect(html().textContent).toContain('ana');
     expect(html().querySelector('.avatar')?.textContent?.trim()).toBe('a');
 

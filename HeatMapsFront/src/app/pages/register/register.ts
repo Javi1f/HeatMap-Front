@@ -27,6 +27,9 @@
  * - `email`: formato RFC.
  * - `password`: mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.
  * - `confirmPassword`: debe coincidir con `password` (validador de grupo).
+ * - `aceptaDatos`: casilla desmarcada por defecto que sirve de autorización
+ *   previa, expresa e informada (art. 9 de la Ley 1581 de 2012): sin su
+ *   aceptación el formulario no envía nada.
  */
 
 import { Component, signal } from '@angular/core';
@@ -34,7 +37,7 @@ import {
   AbstractControl, FormBuilder, FormGroup,
   FormsModule, ReactiveFormsModule, Validators
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
@@ -66,7 +69,7 @@ const MENSAJES_ERROR = {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, ErrorCampoComponent, OndasComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, RouterLink, ErrorCampoComponent, OndasComponent],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -74,7 +77,8 @@ export class Register {
   /** Mensajes de validación de cada campo, para la plantilla. */
   readonly mensajes = MENSAJES_ERROR;
 
-  /** Formulario reactivo con los cuatro campos de registro y el validador de grupo. */
+  /** Formulario reactivo: los cuatro campos de registro, el validador de
+   *  grupo y la casilla de autorización de datos personales. */
   registerForm: FormGroup;
 
   /** `true` cuando el modal de verificación por código está visible. */
@@ -134,7 +138,13 @@ export class Register {
           Validators.minLength(8),
           Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$')
         ]],
-        confirmPassword: ['', Validators.required]
+        confirmPassword: ['', Validators.required],
+        /**
+         * Autorización previa, expresa e informada del tratamiento de datos
+         * (art. 9 de la Ley 1581 de 2012). Llega desmarcada; `requiredTrue`
+         * impide enviar el formulario sin la aceptación explicitada.
+         */
+        aceptaDatos: [false, Validators.requiredTrue]
       },
       { validators: Register.passwordMatchValidator }
     );

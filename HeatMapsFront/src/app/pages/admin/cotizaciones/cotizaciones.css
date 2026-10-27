@@ -1,0 +1,292 @@
+/* ══════════════════════════════════════════════════════════════════
+   Panel de cotizaciones: filtro, tabla y detalle del ciclo comercial.
+   La tabla, los avisos y los estados de carga salen de
+   `styles/componentes.css`; aquí solo vive la maquetación propia.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Filtro por estado ───────────────────────────────────────────── */
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.filtro-chip {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color var(--dur-2) ease, border-color var(--dur-2) ease, background-color var(--dur-2) ease;
+}
+
+.filtro-chip:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.filtro-chip.activa {
+  color: var(--color-text-on-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ── Tabla ───────────────────────────────────────────────────────── */
+
+.cotizaciones-tabla td { vertical-align: top; }
+
+.fila-abierta {
+  background: var(--color-primary-soft);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+/* Anchos: la organización domina, las cifras quedan compactas. */
+.cotizaciones-tabla th:nth-child(1) { width: 5rem; }
+.cotizaciones-tabla th:nth-child(4),
+.cotizaciones-tabla th:nth-child(5),
+.cotizaciones-tabla th:nth-child(6),
+.cotizaciones-tabla th:nth-child(7) { width: 6rem; }
+.cotizaciones-tabla th:nth-child(8) { width: 7rem; }
+.cotizaciones-tabla th:nth-child(9) { width: 5.5rem; }
+
+/* ── Estado como sello ───────────────────────────────────────────── */
+
+.estado-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-tecla);
+  border: 1px solid var(--border-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.estado-chip[data-estado='nueva'] {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+}
+
+.estado-chip[data-estado='en-revision'] {
+  color: var(--color-warn);
+  background: var(--color-warn-soft);
+  border-color: color-mix(in srgb, var(--color-warn) 45%, transparent);
+}
+
+.estado-chip[data-estado='contactada'] {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.estado-chip[data-estado='cerrada'] {
+  color: var(--color-ok);
+  background: var(--color-ok-soft);
+  border-color: color-mix(in srgb, var(--color-ok) 45%, transparent);
+}
+
+.estado-chip[data-estado='descartada'] {
+  opacity: 0.7;
+}
+
+/* ── Detalle ─────────────────────────────────────────────────────── */
+
+.detalle {
+  gap: var(--sp-5);
+}
+
+/* El título y su línea de referencia van apilados, no corridos. */
+.section-title-group > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.detalle-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-5);
+}
+
+.detalle-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-deep);
+  min-width: 0;
+}
+
+.campo-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Fichas de dato: la medida en mono, la etiqueta pequeña. */
+.fichas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.ficha dt {
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+.ficha dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.fichas-contacto .ficha dd {
+  font-weight: 500;
+}
+
+.fichas-contacto .correo {
+  overflow-wrap: anywhere;
+}
+
+/* Requisitos declarados por el cliente. */
+.detalle-requisitos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalle-requisitos li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-tecla);
+  font-size: var(--text-2xs);
+  color: var(--color-text-muted);
+}
+
+.detalle-requisitos .material-icons {
+  font-size: 0.95rem;
+  color: var(--color-primary);
+}
+
+.detalle-nota-cliente {
+  width: 100%;
+  font-style: italic;
+  line-height: 1.5;
+  border: none !important;
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--border-2) !important;
+  border-radius: 0 !important;
+}
+
+/* El desglose congelado: lo mismo que vio el cliente, para hablar igual. */
+.detalle-desglose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalle-desglose li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-1) var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.detalle-desglose li:last-child { border-bottom: none; }
+
+.detalle-desglose .desglose-detalle { grid-column: 1 / -1; }
+
+.detalle-integraciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ── Ciclo comercial ─────────────────────────────────────────────── */
+
+.detalle-ciclo {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: var(--sp-4);
+  align-items: end;
+  padding: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.selector-estado {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.7rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-tecla);
+  color: var(--color-text);
+  font-size: var(--text-md);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--dur-1) ease, box-shadow var(--dur-2) ease;
+}
+
+.selector-estado:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.detalle-ciclo textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-tecla);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--dur-1) ease, box-shadow var(--dur-2) ease;
+}
+
+.detalle-ciclo textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.detalle-ciclo .btn-primary {
+  min-width: 120px;
+}
+
+@media (max-width: 760px) {
+  .detalle-ciclo {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  .fichas { grid-template-columns: 1fr; }
+}
