@@ -72,7 +72,7 @@ const FICHAS: FichaLegal[] = [
     ruta: '/legal/aviso',
     etiqueta: 'Aviso legal',
     icono: 'badge',
-    titulo: 'Aviso Legal e Identificación del Titular',
+    titulo: 'Aviso Legal del Sitio',
     resumen:
       'Quién opera el sitio PlaceAt, a qué responde el servicio y con qué proveedores ' +
       'trabajamos para mantenerlo en línea.',
@@ -107,8 +107,8 @@ const FICHAS: FichaLegal[] = [
  * se versiona en conjunto, y el sello queda fijo en su esquina.
  */
 const VERSION = {
-  codigo: 'Versión 1.0',
-  sello: 'Vigente 10 OCT 2026',
+  codigo: 'Versión 1.1',
+  sello: 'Vigente 27 OCT 2026',
 };
 
 /**

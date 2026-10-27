@@ -22,33 +22,40 @@ describe('Legal', () => {
     const html = fixture.nativeElement as HTMLElement;
     expect(html.querySelector('.legal-titulo')?.textContent).toContain('Política de Privacidad');
     expect(fixture.componentInstance.documento()).toBe('privacidad');
-    expect(html.querySelector('.insignia')?.textContent).toContain('Versión 1.0');
+    expect(html.querySelector('.insignia')?.textContent).toContain('Versión 1.1');
   });
 
-  it('la política de privacidad identifica al responsable y sus cláusulas', () => {
+  it('la política identifica al responsable de forma genérica y sin datos personales', () => {
     const fixture = crear('privacidad');
     const html = fixture.nativeElement as HTMLElement;
     expect(html.querySelector('.legal-titulo')?.textContent).toContain(
       'Política de Privacidad y Tratamiento de Datos Personales',
     );
     expect(html.textContent).toContain('artículo 13 de la Ley 1581 de 2012');
-    expect(html.textContent).toContain('jazamudioc@unbosque.edu.co');
+    expect(html.textContent).toContain('El Operador del sistema PlaceAt');
+    expect(html.textContent).not.toContain('Zamudio');
+    expect(html.textContent).not.toContain('@unbosque.edu.co');
+    expect(html.querySelectorAll('mark.pendiente').length).toBe(0);
     expect(html.querySelectorAll('.clausula').length).toBe(12);
   });
 
-  it('el aviso legal identifica a los dos titulares del sitio', () => {
+  it('el aviso legal identifica al operador sin nombres ni correos propios', () => {
     const fixture = crear('aviso');
     const html = fixture.nativeElement as HTMLElement;
-    expect(html.textContent).toContain('Joann Alejandro Zamudio Castro');
-    expect(html.textContent).toContain('Javier Felipe Meza Montero');
-    expect(html.querySelectorAll('mark.pendiente').length).toBeGreaterThanOrEqual(2);
+    expect(html.textContent).toContain('El Operador del sistema PlaceAt');
+    expect(html.textContent).not.toContain('Zamudio');
+    expect(html.textContent).not.toContain('Meza Montero');
+    expect(html.textContent).not.toContain('@unbosque.edu.co');
+    expect(html.querySelectorAll('mark.pendiente').length).toBe(0);
   });
 
-  it('los términos declaran ley de Colombia y jurisdicción de Bogotá', () => {
+  it('los términos declaran ley de Colombia y jurisdicción del domicilio del Operador', () => {
     const fixture = crear('terminos');
     const html = fixture.nativeElement as HTMLElement;
     expect(html.textContent).toContain('República de Colombia');
-    expect(html.textContent).toContain('Bogotá D.C.');
+    expect(html.textContent).toContain('domicilio del');
+    expect(html.textContent).toContain('Operador');
+    expect(html.textContent).not.toContain('Bogotá D.C.');
     expect(html.textContent).toContain('transacción en línea');
     expect(html.textContent).toContain('Ley 527 de 1999');
   });
